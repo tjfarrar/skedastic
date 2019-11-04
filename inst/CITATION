@@ -1,0 +1,12 @@
+citHeader("To cite package in publications, please use:")
+
+citEntry(entry = "manual",
+    title = "skedastic: Heteroskedasticity Diagnostics for Linear Regression Models",
+    author = "Thomas J. Farrar",
+    organization = "University of the Western  Cape",
+    note = paste0("version", as.character(packageVersion("skedastic"))),
+    year = lubridate::year(Sys.Date()),
+    textVersion  = paste0("Farrar, T. J. (2019). ",
+        "skedastic: Heteroskedasticity Diagnostics for Linear Regression Models. ",
+        "R Package version ",as.character(packageVersion("skedastic")),". University of            the Western Cape. Bellville, South Africa. ", "https://CRAN.R-project.org/package=skedastic")
+)

@@ -1,0 +1,241 @@
+#' Graphical Methods for Detecting Heteroskedasticity in a Linear Regression Model
+#'
+#' This function creates various two-dimensional scatter plots that can aid in
+#' detecting heteroskedasticity in a linear regression model.
+#'
+#' The variable plotted on the horizontal axis could be the original
+#' data indices, one of the explanatory variables, the OLS predicted (fitted)
+#' values, or any other numeric vector specified by the user. The variable
+#' plotted on the vertical axis is some function of the OLS residuals or
+#' transformed version thereof such as the BLUS residuals
+#' \insertCite{Theil68;textual}{skedastic} or standardised or studentised
+#' residuals as discussed in \insertCite{Cook83;textual}{skedastic}. A separate
+#' plot is created for each (\code{horzvar}, \code{vertvar}, \code{vertfun})
+#' combination.
+#'
+#' @param horzvar A character vector describing the variable(s) to plot on
+#'    horizontal axes (\code{"index"} for the data index \eqn{i},
+#'    \code{"fitted.values"} for the OLS predicted values \eqn{\hat{y}_i},
+#'    \code{"fitted.values2"} for transformed OLS predicted values
+#'    \eqn{m_{ii}\hat{y}_i}, and/or \code{names} of explanatory variable columns).
+#'    \code{"explanatory"} passes all explanatory variable columns. \code{"log"}
+#'    concatenated with \code{names} of explanatory variable columns passes logs
+#'    of those explanatory variables. \code{"log_explanatory"} passes logs of
+#'    all explanatory variables. If more than one variable is specified,
+#'    a separate plot is created for each.
+#' @param vertvar A character vector describing the variable to plot on the
+#'    vertical axis ("res" for OLS residuals [the default], "res_blus" for
+#'    \code{\link[=blus]{BLUS}} residuals, "res_stand" for standardised OLS
+#'    residuals: \eqn{e_i/\hat{\sigma}}, "res_constvar" for OLS
+#'    residuals transformed to have constant variance: \eqn{e_i/\sqrt{m_{ii}}},
+#'    "res_stud" for studentised OLS residuals: \eqn{e_i/(s\sqrt{m_{ii}})}.
+#'    If more than one value is specified, a separate plot is created for each.
+#' @param vertfun A character vector giving the names of functions to apply to
+#'    the \code{vertvar} variable. Numerals such as "2" are taken to be powers
+#'    to which \code{vertvar} should be set. If multiple values are specified,
+#'    they are all applied to each element of \code{vertvar}.
+#' @param filetype A character giving the type of image file to which the
+#'    plot(s) should be written. Values can be \code{"png"},
+#'    \code{"bmp"}, \code{"jpeg"}, or \code{"tiff"}. Image files are written
+#'    to a subdirectory called "hetplot" within the R session's temporary
+#'    directory, which can be located using \code{tempdir()}. Default filenames
+#'    contain timestamps for uniqueness. If \code{NULL} (the default), no image
+#'    files are written, and in this case, if there are multiple plots, they are
+#'    plotted on a single device using the \code{"mfrow"} graphical parameter.
+#'    If many plots are requested at once, it is advisable to write them to image
+#'    files.
+#' @param ... Arguments to be passed to methods, such as graphical parameters
+#'    (see \code{\link[base]{par}}), parameters for \code{\link[graphics]{plot}},
+#'    for \code{\link[grDevices:png]{graphics devices}},
+#'    and/or the \code{omit} argument for function \code{\link{blusres}},
+#'    if BLUS residuals are being plotted. If it is desired to pass the
+#'    \code{type} argument to a graphics device, use \code{gtype = }, since
+#'    a \code{type} argument will be passed to \code{\link[graphics]{plot}}.
+#' @inheritParams breusch_pagan
+#'
+#' @return A list containing two \code{\link[base:data.frame]{data frames}}, one
+#'    for vectors plotted on horizontal axes and one for vectors plotted
+#'    on vertical axes.
+#' @references{\insertAllCited{}}
+#' @importFrom Rdpack reprompt
+#' @export
+#' @seealso \code{\link[stats]{plot.lm}}
+#'
+#' @examples
+#' n <- 1000
+#' p <- 4
+#' set.seed(9586)
+#' X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
+#' # Response values generated under homoskedasticity
+#' y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
+#' hetplot(mainlm = lm(y_H0 ~ X), horzvar = c("index", "fitted.values"),
+#' vertvar = c("res", "res_blus"), vertfun = "2", filetype = NULL)
+#' hetplot(mainlm = lm(y_H0 ~ X), horzvar = c("index", "fitted.values", "fitted.values2",
+#' "explanatory", "log_explanatory"), vertvar = c("res", "res_blus", "res_stand", "res_stud", "res_constvar"),
+#' vertfun = c("identity", "abs", "2"), filetype = "png")
+#'# Response values generated under heteroskedasticity associated with X
+#' y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = rowSums(X ^ 2))
+#' hetplot(mainlm = lm(y_HA ~ X), horzvar = c("index", "fitted.values"),
+#' vertvar = c("res", "res_blus"), vertfun = "2", filetype = NULL)
+#' hetplot(mainlm = lm(y_HA ~ X), horzvar = c("index", "fitted.values", "fitted.values2",
+#' "explanatory", "log_explanatory"), vertvar = c("res", "res_blus", "res_stand", "res_stud", "res_constvar"),
+#' vertfun = c("identity", "abs", "2"), filetype = "png")
+#'
+
+
+hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity",
+                     filetype = NULL, ...) {
+
+  args <- list(...)
+  grdevargnames <- c("filename", "width", "height", "units", "pointsize", "bg",
+                   "res", "family", "restoreConsole", "compression", "antialias",
+                   "quality", "gtype")
+  plotargnames <- c("type", "main", "sub", "xlab", "ylab", "asp")
+  if ("omit" %in% names(args)) {
+    omitarg <- args[["omit"]]
+    args[["omit"]] <- NULL
+  }
+  parargs <- args[setdiff(names(args), c(grdevargnames, plotargnames))]
+  plotargs <- args[intersect(names(args), plotargnames)]
+  grdevargs <- args[intersect(names(args), grdevargnames)]
+  names(grdevargs)[which(names(grdevargs) == "gtype")] <- "type"
+
+  filename_passed <- ("filename" %in% names(grdevargs))
+  mar_passed <- ("mar" %in% names(parargs))
+  las_passed <- ("las" %in% names(parargs))
+  cex_passed <- ("cex" %in% names(parargs))
+  main_passed <- ("main" %in% names(plotargs))
+  xlab_passed <- ("xlab" %in% names(plotargs))
+  ylab_passed <- ("ylab" %in% names(plotargs))
+
+
+  if (class(mainlm) == "lm") {
+    X <- model.matrix(mainlm)
+  } else if (class(mainlm) == "list") {
+    y <- mainlm[[1]]
+    X <- mainlm[[2]]
+    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
+                                                           is.nan(x), is.infinite(x))))
+    if (length(badrows) > 0) {
+      warning("Rows of data containing NA/NaN/Inf values removed")
+      y <- y[-badrows]
+      X <- X[-badrows, ]
+    }
+    mainlm <- lm.fit(X, y)
+  }
+
+  p <- ncol(X)
+  n <- nrow(X)
+  M <- diag(n) - X %*% solve(t(X) %*% X) %*% t(X)
+  sigma_hat_sq <- sum(mainlm$residuals ^ 2) / n
+  s_sq <- sum(mainlm$residuals ^ 2) / (n - p)
+
+  hasintercept <- columnof1s(X)
+  if (hasintercept[[1]]) {
+    if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
+    colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
+  } else {
+    colnames(X) <- paste0("X", 1:p)
+  }
+
+  if ("explanatory" %in% horzvar) {
+    horzvar <- c(horzvar[-which(horzvar == "explanatory")], colnames(X))
+    if ("(Intercept)" %in% horzvar) horzvar <- horzvar[-which(horzvar == "(Intercept)")]
+  }
+  if ("log_explanatory" %in% horzvar) {
+    horzvar <- c(horzvar[-which(horzvar == "log_explanatory")], paste0("log", colnames(X)))
+    if ("log(Intercept)" %in% horzvar) horzvar <- horzvar[-which(horzvar == "log(Intercept)")]
+  }
+
+  x_hor <- as.data.frame(lapply(horzvar, function(x) if (x %in% colnames(X)) {X[, x]}
+                                    else if (regexpr("log", substr(x, 1, 3)) != -1) {
+                                      log(X[, substr(x, 4, nchar(x))])
+                                    }
+                                    else if (x == "fitted.values") {mainlm$fitted.values}
+                                    else if (x == "fitted.values2") {diag(M) * mainlm$fitted.values}
+                                    else if (x == "index") {1:n}))
+  names(x_hor) <- horzvar
+
+  vertfun_function <- lapply(vertfun, function(x) {
+      if (suppressWarnings(is.na(as.integer(x)))) {get(x)}
+      else {function(y) `^`(y, as.integer(x)) }
+    })
+
+  y_ver_nofunc <- lapply(vertvar, function(x) if (x == "res") {mainlm$residuals}
+                                else if (x == "res_blus") {
+                                  if (exists("omitarg")) {
+                                    blus(mainlm, omit = omitarg, keepNA = T)
+                                  } else { blus(mainlm, keepNA = T)}
+                                }
+                                else if (x == "res_stand") {mainlm$residuals / sqrt(sigma_hat_sq)}
+                                else if (x == "res_constvar") {mainlm$residuals / sqrt(diag(M))}
+                                else if (x == "res_stud") {mainlm$residuals / sqrt(diag(M) * s_sq)})
+
+  y_ver <- as.data.frame(unlist(lapply(vertfun_function,
+                                function(x) lapply(y_ver_nofunc, x)), recursive = F))
+  names(y_ver) <- unlist(lapply(vertfun, function(x) paste(vertvar, x, sep = "_")))
+
+  yline_mtext <- unlist(lapply(names(y_ver), function(l) {
+    ylinebase <- ifelse(is.null(filetype), 3, 4.25)
+    if (regexpr("stud", l) != -1) {
+      ylinebase <- ylinebase - 0.5
+    } else if (regexpr("const", l) != -1) {
+      ylinebase <- ylinebase - 0.25
+    }
+    if (regexpr("identity", l) == -1) {
+      ylinebase <- ylinebase - 0.5
+    }
+    ylinebase
+  }))
+
+  print(cbind(names(y_ver), unlist(yline_mtext)))
+
+  if (is.null(filetype)) {
+    numplots <- length(horzvar) * length(vertvar) * length(vertfun)
+    mfrow_dim <- plotdim(numplots)
+    if (max(mfrow_dim) > 5) warning("Large number of plots in one dimension")
+    par(mfrow = mfrow_dim)
+    if (!las_passed) parargs$las <- 1
+    if (!mar_passed) parargs$mar <- c(4, 5.5, 0.5, 1.5)
+    do.call(par, parargs)
+    mapply(function(y, ynames, yline) mapply(function(x, xnames, y, ynames, yline) {
+      if (!main_passed) plotargs$main <- ""
+      if (!xlab_passed) plotargs$xlab <- ""
+      if (!ylab_passed) plotargs$ylab <- ""
+      plotargs$x <- x
+      plotargs$y <- y
+      do.call(plot, plotargs)
+      if (!xlab_passed) mtext(parselabels(xnames, theaxis = "x"), side = 1, line = 2.5, las = 1,
+                              cex = ifelse(cex_passed, parargs$cex, 0.8))
+      if (!ylab_passed) mtext(parselabels(ynames, theaxis = "y"), side = 2, line = yline, las = 1,
+                              cex = ifelse(cex_passed, parargs$cex, 0.8))
+    }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = F),
+    y_ver, names(y_ver), yline_mtext, SIMPLIFY = F)
+  } else {
+    if (!dir.exists(paste0(tempdir(),"\\hetplot"))) dir.create(paste0(tempdir(),"\\hetplot"))
+    mapply(function(y, ynames, yline) mapply(function(x, xnames, y, ynames, yline) {
+      if (!filename_passed) {
+        grdevargs$filename <- paste0(tempdir(),"\\hetplot\\",xnames, "_", ynames, "_",
+                                     gsub("[[:space:]]|[[:punct:]]", "_", Sys.time()), ".", filetype)
+      }
+      do.call(get(filetype), grdevargs)
+      if (!las_passed) parargs$las <- 1
+      if (!mar_passed) parargs$mar <- c(4, 7.25, 0.1, 0.1)
+      do.call(par, parargs)
+      if (!main_passed) plotargs$main <- ""
+      if (!xlab_passed) plotargs$xlab <- ""
+      if (!ylab_passed) plotargs$ylab <- ""
+      plotargs$x <- x
+      plotargs$y <- y
+      do.call(plot, plotargs)
+      if (!xlab_passed) mtext(parselabels(xnames, theaxis = "x"), side = 1, line = 2.5, las = 1,
+                              cex = ifelse(cex_passed, parargs$cex, 1.2))
+      if (!ylab_passed) mtext(parselabels(ynames, theaxis = "y"), side = 2, line = yline, las = 1,
+                              cex = ifelse(cex_passed, parargs$cex, 1.2))
+      dev.off()
+    }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = F),
+           y_ver, names(y_ver), yline_mtext, SIMPLIFY = F)
+    graphics.off()
+  }
+  list("horizontal" = x_hor, "vertical" = y_ver)
+}
