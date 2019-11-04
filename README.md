@@ -16,11 +16,13 @@ devtools::install_github("tjfarrar/skedastic")
 
 ## Usage
 
-The purpose of the `skedastic` package is to make accessible diagnostic methods 
-for detecting heteroskedasticity in linear regression models. Heteroskedasticity 
-(sometimes spelt 'heteroscedasticity') is a violation of one of the assumptions 
-of the classical linear regression model (the Gauss-Markov Assumptions). This assumption, known as homoskedasticity, holds that the variance of the random 
-error term remains constant across all observations.
+The purpose of the `skedastic` package is to make diagnostic methods 
+for detecting heteroskedasticity in linear regression models accessible to R 
+users. Heteroskedasticity (sometimes spelt 'heteroscedasticity') is a violation 
+of one of the assumptions of the classical linear regression model (the 
+Gauss-Markov Assumptions). This assumption, known as homoskedasticity, holds 
+that the variance of the random error term remains constant across all 
+observations.
 
 Most of the functions in the package implement particular hypothesis testing 
 methods for detecting heteroskedasticity that have been published in a journal 
