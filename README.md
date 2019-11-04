@@ -1,7 +1,8 @@
 # skedastic
 
-The purpose of the `skedastic` package is to make accessible diagnostic methods 
-for detecting heteroskedasticity in linear regression models.
+The purpose of the `skedastic` package is to make diagnostic methods 
+for detecting heteroskedasticity in linear regression models accessible to R 
+users.
 
 ## Installation
 
