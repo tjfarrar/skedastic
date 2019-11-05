@@ -104,7 +104,7 @@ dpeakdist <- function(n, k) {
 #' \insertCite{Goldfeld65;textual}{skedastic}. The function may be used to
 #' compute \eqn{p}-values for the Goldfeld-Quandt nonparametric test for
 #' heteroskedasticity in a linear model. Computation time is very slow for
-#' \eqn{n > 170}.
+#' \eqn{n > 170} if \code{usedata} is set to \code{FALSE}.
 #'
 #' @param n A positive integer representing the number of observations in the
 #'    series.
@@ -116,6 +116,11 @@ dpeakdist <- function(n, k) {
 #'    primarily for calculating \eqn{p}-values for the peaks test. Note that
 #'    both upper and lower tailed cumulative probabilities are computed
 #'    inclusive of \code{k}.
+#' @param usedata A logical. Should probability mass function values be
+#'    read from \code{\link{dpeakdat}} rather than computing them from
+#'    \code{\link{dpeakdist}}? This option will save significantly on
+#'    computation time if \eqn{n < 170} but is currently only available
+#'    for \eqn{n \leq 300}.
 #'
 #' @return A double between 0 and 1 representing the probability of at least
 #'    (at most) k peaks occurring in a series of \eqn{n} independent and
@@ -130,15 +135,20 @@ dpeakdist <- function(n, k) {
 #' sum(dpeakdist(5, 0:4))
 #'
 
-ppeakdist <- function(n, k, upper = T) {
+ppeakdist <- function(n, k, upper = TRUE, usedata = TRUE) {
 
+  maxn_indata <- length(dpeakdat)
   ppeak_up <- function(n, j) {
     if (j >= n) {
       stop("`k` must be less than `n`")
     } else if (j == 0) {
       return(1)
     } else {
-      return(sum(dpeakdist(n, j:(n - 1))))
+      if (usedata && n <= maxn_indata) {
+        return(sum(dpeakdat[[n]][j:(n - 1)]))
+      } else {
+        return(sum(dpeakdist(n, j:(n - 1))))
+      }
     }
   }
 
@@ -146,7 +156,11 @@ ppeakdist <- function(n, k, upper = T) {
     if (j >= n) {
       stop("`k` must be less than `n`")
     } else {
-      return(sum(dpeakdist(n, 0:j)))
+      if (usedata && n <= maxn_indata) {
+        return(sum(dpeakdat[[n]][0:j]))
+      } else {
+        return(sum(dpeakdist(n, 0:j)))
+      }
     }
   }
 

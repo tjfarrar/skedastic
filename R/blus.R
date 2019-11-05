@@ -78,8 +78,10 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
   Xmats <- do_Xmats(X, n, p, omitfunc$omit_ind)
   singular_matrix <- FALSE
 
-  if (is.singular.matrix(Xmats$X_ord_sq, tol = .Machine$double.eps) ||
-      is.singular.matrix(Xmats$X0, tol = .Machine$double.eps)) {
+  if (matrixcalc::is.singular.matrix(Xmats$X_ord_sq,
+                  tol = .Machine$double.eps) ||
+      matrixcalc::is.singular.matrix(Xmats$X0,
+                  tol = .Machine$double.eps)) {
 
     singular_matrix <- TRUE
     message("Passed `omit` argument resulted in singular matrix; BLUS residuals
@@ -103,8 +105,10 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
     for (r in 1:maxrow) {
       omitfunc <- do_omit(all_possible_omit[rowstodo[r], ], n, p)
       Xmats <- do_Xmats(X, n, p, omitfunc$omit_ind)
-      if (!is.singular.matrix(Xmats$X_ord_sq, tol = .Machine$double.eps) &&
-          !is.singular.matrix(Xmats$X0, tol = .Machine$double.eps)) {
+      if (!matrixcalc::is.singular.matrix(Xmats$X_ord_sq,
+                        tol = .Machine$double.eps) &&
+          !matrixcalc::is.singular.matrix(Xmats$X0,
+                        tol = .Machine$double.eps)) {
         singular_matrix <- FALSE
         message(paste0("Success! Subset of indices found that does not yield singular
                        matrix: ", paste(omitfunc$omit_ind, collapse = ",")))

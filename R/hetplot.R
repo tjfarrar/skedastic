@@ -47,7 +47,7 @@
 #' @param ... Arguments to be passed to methods, such as graphical parameters
 #'    (see \code{\link[base]{par}}), parameters for \code{\link[graphics]{plot}},
 #'    for \code{\link[grDevices:png]{graphics devices}},
-#'    and/or the \code{omit} argument for function \code{\link{blusres}},
+#'    and/or the \code{omit} argument for function \code{\link{blus}},
 #'    if BLUS residuals are being plotted. If it is desired to pass the
 #'    \code{type} argument to a graphics device, use \code{gtype = }, since
 #'    a \code{type} argument will be passed to \code{\link[graphics]{plot}}.
