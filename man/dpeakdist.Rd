@@ -4,7 +4,7 @@
 \alias{dpeakdist}
 \title{Probability mass function of number of peaks in a random series}
 \usage{
-dpeakdist(n, k)
+dpeakdist(n, k, usedata = FALSE)
 }
 \arguments{
 \item{n}{A positive integer representing the number of observations in the
@@ -13,12 +13,18 @@ series.}
 \item{k}{An integer or a sequence of integers strictly incrementing by 1,
 with all values between 0 and \code{n - 1} inclusive. Represents the number
 of peaks in the series.}
+
+\item{usedata}{A logical. Should probability mass function values be
+read from \code{\link{dpeakdat}} rather than computing them? This option
+will save significantly on computation time if \eqn{n < 170} but is
+currently only available for \eqn{n \leq 300}.}
 }
 \value{
 A double between 0 and 1 representing the probability of exactly
 k peaks occurring in a series of \eqn{n} independent and identically
 distributed continuous random variables. Computation time is very slow for
-\eqn{n > 170}.
+\eqn{n > 170} (if \code{usedata} is \code{FALSE}) and for \eqn{n > 300}
+regardless of \code{usedata} value.
 }
 \description{
 This function computes \eqn{P(n,k)} as defined by
@@ -30,9 +36,15 @@ contains exactly \eqn{k} peaks, with peaks also as defined by
 nonparametric test for heteroskedasticity in a linear model.
 }
 \examples{
-dpeakdist(5, 0:4)
-sum(dpeakdist(5, 0:4))
+dpeakdist(10, 0:9)
+plot(0:9, dpeakdist(10, 0:9), type = "p", pch = 20, xlab = "Number of Peaks",
+         ylab = "Probability")
 
+# `dpeakdat` is a data set containing probabilities generated from `dpeakdist`
+expval <- unlist(lapply(dpeakdat,
+                 function(p) sum(p * 0:(length(p) - 1))))
+plot(1:300, expval[1:300], type = "l", xlab = parse(text = "n"),
+     ylab = "Expected Number of Peaks")
 }
 \references{
 {\insertAllCited{}}

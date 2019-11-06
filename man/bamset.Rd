@@ -68,17 +68,12 @@ BAMSET is an analogue of Bartlett's \eqn{M} Test for heterogeneity of
    distributed with \eqn{k-1} degrees of freedom. The test is right-tailed.
 }
 \examples{
-n <- 20
-p <- 4
-set.seed(9586)
-X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-# Response values generated under homoskedasticity
-y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-bamset(lm(y_H0 ~ X))
-# Response values generated under heteroskedasticity associated with X
-y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = X[, 1] ^ 2)
-bamset(lm(y_HA ~ X))
-bamset(lm(y_HA ~ X), deflator = "X1")
+mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+bamset(mtcars_lm, deflator = "wt", k = 3)
+
+# BLUS residuals cannot be computed with given `omit` argument and so
+# omitted indices are randomised:
+bamset(mtcars_lm, deflator = "wt", k = 4, omitatmargins = FALSE, omit = "last")
 
 }
 \references{

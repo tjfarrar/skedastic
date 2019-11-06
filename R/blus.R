@@ -45,19 +45,20 @@
 #'    residuals.
 #'
 #' @examples
-#' n <- 20
-#' p <- 4
-#' set.seed(9586)
-#' X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-#' # Response values generated under homoskedasticity
-#' y <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-#' e_tilde <- blus(lm(y ~ X))
+#' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+#' blus(mtcars_lm)
+#' plot(mtcars_lm$residuals, blus(mtcars_lm))
+#'
+#' # BLUS residuals cannot be computed with `omit = "last"` in this case so
+#' # omitted indices are randomised:
+#' blus(mtcars_lm, omit = "last")
+#'
 
 blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
                   exhaust = NULL) {
 
   if (class(mainlm) == "lm") {
-    X <- model.matrix(mainlm)
+    X <- stats::model.matrix(mainlm)
   } else if (class(mainlm) == "list") {
     y <- mainlm[[1]]
     X <- mainlm[[2]]
@@ -67,7 +68,7 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
       y <- y[-badrows]
       X <- X[-badrows, ]
     }
-    mainlm <- lm.fit(X, y)
+    mainlm <- stats::lm.fit(X, y)
   }
 
   e <- mainlm$residuals
@@ -87,7 +88,7 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
     message("Passed `omit` argument resulted in singular matrix; BLUS residuals
           could not be computed. Randomly chosen combinations of indices to
           omit will be attempted according to `exhaust` argument passed.")
-    all_possible_omit <- t(combn(n, p))
+    all_possible_omit <- t(utils::combn(n, p))
     if (omitfunc$omit_passed == "first") {
       all_possible_omit <- all_possible_omit[-1, ]
     } else if (omitfunc$omit_passed == "last") {
@@ -100,7 +101,7 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
     }
 
     maxrow <- ifelse(is.null(exhaust), nrow(all_possible_omit), exhaust)
-    rowstodo <- sample(1:nrow(all_possible_omit), maxrow, replace = F)
+    rowstodo <- sample(1:nrow(all_possible_omit), maxrow, replace = FALSE)
 
     for (r in 1:maxrow) {
       omitfunc <- do_omit(all_possible_omit[rowstodo[r], ], n, p)
@@ -122,11 +123,11 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
 
   keep_ind <- setdiff(1:n, omitfunc$omit_ind)
   G <- Xmats$X0 %*% solve(Xmats$X_ord_sq) %*% t(Xmats$X0)
-  Geig <- eigen(G, symmetric = T)
+  Geig <- eigen(G, symmetric = TRUE)
   d <- sqrt(Geig$values)
   q <- as.data.frame(Geig$vectors)
   Z <- Reduce(`+`, mapply(`*`, d / (1 + d),
-                          lapply(q, function(x) x %*% t(x)), SIMPLIFY = F))
+                          lapply(q, function(x) x %*% t(x)), SIMPLIFY = FALSE))
   e0 <- e[omitfunc$omit_ind]
   e1 <- e[keep_ind]
   e_tilde <- c(e1 - Xmats$X1 %*% solve(Xmats$X0) %*% Z %*% e0)

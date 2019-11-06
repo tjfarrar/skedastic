@@ -45,7 +45,7 @@
 #'    If many plots are requested at once, it is advisable to write them to image
 #'    files.
 #' @param ... Arguments to be passed to methods, such as graphical parameters
-#'    (see \code{\link[base]{par}}), parameters for \code{\link[graphics]{plot}},
+#'    (see \code{\link{par}}), parameters for \code{\link[graphics]{plot}},
 #'    for \code{\link[grDevices:png]{graphics devices}},
 #'    and/or the \code{omit} argument for function \code{\link{blus}},
 #'    if BLUS residuals are being plotted. If it is desired to pass the
@@ -62,26 +62,16 @@
 #' @seealso \code{\link[stats]{plot.lm}}
 #'
 #' @examples
-#' n <- 1000
-#' p <- 4
-#' set.seed(9586)
-#' X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-#' # Response values generated under homoskedasticity
-#' y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-#' hetplot(mainlm = lm(y_H0 ~ X), horzvar = c("index", "fitted.values"),
-#' vertvar = c("res", "res_blus"), vertfun = "2", filetype = NULL)
-#' hetplot(mainlm = lm(y_H0 ~ X), horzvar = c("index", "fitted.values", "fitted.values2",
-#' "explanatory", "log_explanatory"), vertvar = c("res", "res_blus", "res_stand", "res_stud", "res_constvar"),
-#' vertfun = c("identity", "abs", "2"), filetype = "png")
-#'# Response values generated under heteroskedasticity associated with X
-#' y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = rowSums(X ^ 2))
-#' hetplot(mainlm = lm(y_HA ~ X), horzvar = c("index", "fitted.values"),
-#' vertvar = c("res", "res_blus"), vertfun = "2", filetype = NULL)
-#' hetplot(mainlm = lm(y_HA ~ X), horzvar = c("index", "fitted.values", "fitted.values2",
-#' "explanatory", "log_explanatory"), vertvar = c("res", "res_blus", "res_stand", "res_stud", "res_constvar"),
-#' vertfun = c("identity", "abs", "2"), filetype = "png")
+#' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+#' # Generates 2 x 2 matrix of plots in console
+#' hetplot(mtcars_lm, horzvar = c("index", "fitted.values"),
+#' vertvar = c("res_blus"), vertfun = c("2", "abs"), filetype = NULL)
 #'
-
+#' # Generates 84 png files in tempdir() folder
+#' hetplot(mainlm = mtcars_lm, horzvar = c("explanatory", "log_explanatory",
+#' "fitted.values2"), vertvar = c("res", "res_stand", "res_stud",
+#' "res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")
+#'
 
 hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity",
                      filetype = NULL, ...) {
@@ -110,7 +100,7 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
 
 
   if (class(mainlm) == "lm") {
-    X <- model.matrix(mainlm)
+    X <- stats::model.matrix(mainlm)
   } else if (class(mainlm) == "list") {
     y <- mainlm[[1]]
     X <- mainlm[[2]]
@@ -121,7 +111,7 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
       y <- y[-badrows]
       X <- X[-badrows, ]
     }
-    mainlm <- lm.fit(X, y)
+    mainlm <- stats::lm.fit(X, y)
   }
 
   p <- ncol(X)
@@ -164,16 +154,18 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
   y_ver_nofunc <- lapply(vertvar, function(x) if (x == "res") {mainlm$residuals}
                                 else if (x == "res_blus") {
                                   if (exists("omitarg")) {
-                                    blus(mainlm, omit = omitarg, keepNA = T)
-                                  } else { blus(mainlm, keepNA = T)}
+                                    blus(mainlm, omit = omitarg, keepNA = TRUE)
+                                  } else { blus(mainlm, keepNA = TRUE)}
                                 }
-                                else if (x == "res_stand") {mainlm$residuals / sqrt(sigma_hat_sq)}
-                                else if (x == "res_constvar") {mainlm$residuals / sqrt(diag(M))}
-                                else if (x == "res_stud") {mainlm$residuals / sqrt(diag(M) * s_sq)})
+              else if (x == "res_stand") {mainlm$residuals / sqrt(sigma_hat_sq)}
+              else if (x == "res_constvar") {mainlm$residuals / sqrt(diag(M))}
+              else if (x == "res_stud") {mainlm$residuals / sqrt(diag(M) * s_sq)})
 
   y_ver <- as.data.frame(unlist(lapply(vertfun_function,
-                                function(x) lapply(y_ver_nofunc, x)), recursive = F))
-  names(y_ver) <- unlist(lapply(vertfun, function(x) paste(vertvar, x, sep = "_")))
+                                function(x) lapply(y_ver_nofunc, x)),
+                                recursive = FALSE))
+  names(y_ver) <- unlist(lapply(vertfun, function(x) paste(vertvar, x,
+                                                           sep = "_")))
 
   yline_mtext <- unlist(lapply(names(y_ver), function(l) {
     ylinebase <- ifelse(is.null(filetype), 3, 4.25)
@@ -194,48 +186,52 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
     numplots <- length(horzvar) * length(vertvar) * length(vertfun)
     mfrow_dim <- plotdim(numplots)
     if (max(mfrow_dim) > 5) warning("Large number of plots in one dimension")
-    par(mfrow = mfrow_dim)
+    graphics::par(mfrow = mfrow_dim)
     if (!las_passed) parargs$las <- 1
     if (!mar_passed) parargs$mar <- c(4, 5.5, 0.5, 1.5)
-    do.call(par, parargs)
+    do.call(graphics::par, parargs)
     mapply(function(y, ynames, yline) mapply(function(x, xnames, y, ynames, yline) {
       if (!main_passed) plotargs$main <- ""
       if (!xlab_passed) plotargs$xlab <- ""
       if (!ylab_passed) plotargs$ylab <- ""
       plotargs$x <- x
       plotargs$y <- y
-      do.call(plot, plotargs)
-      if (!xlab_passed) mtext(parselabels(xnames, theaxis = "x"), side = 1, line = 2.5, las = 1,
+      do.call(graphics::plot, plotargs)
+      if (!xlab_passed) graphics::mtext(parselabels(xnames, theaxis = "x"),
+                              side = 1, line = 2.5, las = 1,
                               cex = ifelse(cex_passed, parargs$cex, 0.8))
-      if (!ylab_passed) mtext(parselabels(ynames, theaxis = "y"), side = 2, line = yline, las = 1,
+      if (!ylab_passed) graphics::mtext(parselabels(ynames, theaxis = "y"),
+                              side = 2, line = yline, las = 1,
                               cex = ifelse(cex_passed, parargs$cex, 0.8))
-    }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = F),
-    y_ver, names(y_ver), yline_mtext, SIMPLIFY = F)
+    }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = FALSE),
+    y_ver, names(y_ver), yline_mtext, SIMPLIFY = FALSE)
   } else {
-    if (!dir.exists(paste0(tempdir(),"\\hetplot"))) dir.create(paste0(tempdir(),"\\hetplot"))
+    if (!dir.exists(paste0(tempdir(),"\\hetplot"))) {
+      dir.create(paste0(tempdir(),"\\hetplot"))
+    }
     mapply(function(y, ynames, yline) mapply(function(x, xnames, y, ynames, yline) {
       if (!filename_passed) {
-        grdevargs$filename <- paste0(tempdir(),"\\hetplot\\",xnames, "_", ynames, "_",
-                                     gsub("[[:space:]]|[[:punct:]]", "_", Sys.time()), ".", filetype)
+        grdevargs$filename <- paste0(tempdir(),"\\hetplot\\",xnames, "_",
+                          ynames, "_", gsub("[[:space:]]|[[:punct:]]",
+                                  "_", Sys.time()), ".", filetype)
       }
       do.call(get(filetype), grdevargs)
       if (!las_passed) parargs$las <- 1
       if (!mar_passed) parargs$mar <- c(4, 7.25, 0.1, 0.1)
-      do.call(par, parargs)
+      do.call(graphics::par, parargs)
       if (!main_passed) plotargs$main <- ""
       if (!xlab_passed) plotargs$xlab <- ""
       if (!ylab_passed) plotargs$ylab <- ""
       plotargs$x <- x
       plotargs$y <- y
-      do.call(plot, plotargs)
-      if (!xlab_passed) mtext(parselabels(xnames, theaxis = "x"), side = 1, line = 2.5, las = 1,
-                              cex = ifelse(cex_passed, parargs$cex, 1.2))
-      if (!ylab_passed) mtext(parselabels(ynames, theaxis = "y"), side = 2, line = yline, las = 1,
-                              cex = ifelse(cex_passed, parargs$cex, 1.2))
-      dev.off()
-    }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = F),
-           y_ver, names(y_ver), yline_mtext, SIMPLIFY = F)
-    graphics.off()
+      do.call(graphics::plot, plotargs)
+      if (!xlab_passed) graphics::mtext(parselabels(xnames, theaxis = "x"),
+          side = 1, line = 2.5, las = 1, cex = ifelse(cex_passed, parargs$cex, 1.2))
+      if (!ylab_passed) graphics::mtext(parselabels(ynames, theaxis = "y"),
+          side = 2, line = yline, las = 1, cex = ifelse(cex_passed, parargs$cex, 1.2))
+      if (length(grDevices::dev.list()) > 60) grDevices::graphics.off()
+    }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = FALSE),
+           y_ver, names(y_ver), yline_mtext, SIMPLIFY = FALSE)
   }
   list("horizontal" = x_hor, "vertical" = y_ver)
 }

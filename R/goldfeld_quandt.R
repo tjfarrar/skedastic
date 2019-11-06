@@ -78,19 +78,9 @@
 #'    different sizes.
 #'
 #' @examples
-#' n <- 20
-#' p <- 4
-#' set.seed(9586)
-#' X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-#' # Response values generated under homoskedasticity
-#' y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-#' goldfeld_quandt(lm(y_H0 ~ X), deflator = "X1", prop_central = 0.3)
-#' pvals <- ppeakdist(n, 0:(n-1), upper = T)
-#' goldfeld_quandt(lm(y_H0 ~ X), deflator = "X1", method = "nonparametric", pvals = pvals)
-#'# Response values generated under heteroskedasticity associated with X
-#' y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = X[, 1])
-#' goldfeld_quandt(lm(y_HA ~ X), deflator = "X1", prop_central = 0.3)
-#' goldfeld_quandt(lm(y_HA ~ X), deflator = "X1", method = "nonparametric", pvals = pvals)
+#' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+#' goldfeld_quandt(mtcars_lm, deflator = "qsec", prop_central = 0.25)
+#' goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric")
 #'
 
 goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
@@ -101,14 +91,15 @@ goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
   method <- match.arg(method, c("parametric", "nonparametric"))
 
   if (class(mainlm) == "lm") {
-    X <- model.matrix(mainlm)
+    X <- stats::model.matrix(mainlm)
     p <- ncol(X)
     hasintercept <- columnof1s(X)
-    y <- model.response(model.frame(mainlm))
+    y <- stats::model.response(stats::model.frame(mainlm))
   } else if (class(mainlm) == "list") {
     y <- mainlm[[1]]
     X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x), is.nan(x), is.infinite(x))))
+    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
+                                        is.nan(x), is.infinite(x))))
     if (length(badrows) > 0) {
       warning("Rows of data containing NA/NaN/Inf values removed")
       y <- y[-badrows]
@@ -122,7 +113,7 @@ goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
     } else {
       colnames(X) <- paste0("X", 1:p)
     }
-    if (method == "nonparametric") mainlm <- lm.fit(X, y)
+    if (method == "nonparametric") mainlm <- stats::lm.fit(X, y)
   }
 
   n <- nrow(X)
@@ -159,18 +150,18 @@ goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
     }
     ind_lo <- 1:((n - k) / 2)
     ind_hi <- ((n + k) / 2 + 1):n
-    S_hi <- sum(lm.fit(X[ind_hi, ], y[ind_hi])$residuals ^ 2)
-    S_lo <- sum(lm.fit(X[ind_lo, ], y[ind_lo])$residuals ^ 2)
+    S_hi <- sum(stats::lm.fit(X[ind_hi, ], y[ind_hi])$residuals ^ 2)
+    S_lo <- sum(stats::lm.fit(X[ind_lo, ], y[ind_lo])$residuals ^ 2)
     teststat <- S_hi / S_lo
     param <- (n - k) / 2 - p
     names(param) <- "df"
-    pval <- switch(alternative, "greater" = 1 - pf(teststat, df1 = param, df2 = param),
-                                "less" = pf(teststat, df1 = param, df2 = param),
-                                "two.sided" = 2 * min(1 - pf(teststat, df1 = param,
-                                df2 = param), pf(teststat, df1 = param, df2 = param)))
+    pval <- switch(alternative, "greater" = 1 - stats::pf(teststat, df1 = param,
+                  df2 = param), "less" = stats::pf(teststat, df1 = param,
+                  df2 = param), "two.sided" = 2 * min(1 - stats::pf(teststat,
+                  df1 = param, df2 = param), stats::pf(teststat, df1 = param,
+                  df2 = param)))
     fullmethod <- "Goldfeld-Quandt F Test"
   } else if (method == "nonparametric") {
-
     alternative <- "greater"
     if (is.null(deflator)) {
       absres <- abs(mainlm$residuals)
@@ -181,7 +172,8 @@ goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
     param <- n
     names(param) <- "No. of obs"
     if (is.null(pvals)) {
-      pvals <- ppeakdist(n, 0:(n-1), upper = T)
+      pvals <- ppeakdist(n, 0:(n-1), upper = TRUE,
+                usedata = (n > 170 & n <= 300))
     }
     pval <- pvals[teststat + 1]
     fullmethod <- "Goldfeld-Quandt Peaks Test"

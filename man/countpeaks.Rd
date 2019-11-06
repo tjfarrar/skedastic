@@ -22,6 +22,8 @@ a linear model.
 \examples{
 set.seed(9586)
 countpeaks(rnorm(20))
+mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+countpeaks(mtcars_lm$residuals)
 
 }
 \references{

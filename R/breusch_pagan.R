@@ -48,24 +48,15 @@
 #'    case of the Breusch-Pagan Test.
 #'
 #' @examples
-#' n <- 20
-#' p <- 4
-#' set.seed(9586)
-#' X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-#' # Response values generated under homoskedasticity
-#' y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-#' breusch_pagan(lm(y_H0 ~ X))
-#' breusch_pagan(lm(y_H0 ~ X), koenker = F)
-#'# Response values generated under heteroskedasticity associated with X
-#' y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = rowSums(X ^ 2))
-#' breusch_pagan(lm(y_HA ~ X))
-#' breusch_pagan(lm(y_HA ~ X), koenker = F)
+#' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+#' breusch_pagan(mtcars_lm)
+#' breusch_pagan(mtcars_lm, koenker = FALSE)
 #'
 
 breusch_pagan <- function (mainlm, auxdesign = NULL, koenker = TRUE) {
 
   if (class(mainlm) == "lm") {
-    X <- model.matrix(mainlm)
+    X <- stats::model.matrix(mainlm)
   } else if (class(mainlm) == "list") {
     y <- mainlm[[1]]
     X <- mainlm[[2]]
@@ -75,7 +66,7 @@ breusch_pagan <- function (mainlm, auxdesign = NULL, koenker = TRUE) {
       y <- y[-badrows]
       X <- X[-badrows, ]
     }
-    mainlm <- lm.fit(X, y)
+    mainlm <- stats::lm.fit(X, y)
   }
 
   if (is.null(auxdesign)) {
@@ -104,12 +95,12 @@ breusch_pagan <- function (mainlm, auxdesign = NULL, koenker = TRUE) {
 
   if (koenker) {
     method <- "Koenker (studentised)"
-    teststat <- n * sum(lm.fit(Z, w_hat)$fitted.values ^ 2) / sum(w_hat ^ 2)
+    teststat <- n * sum(stats::lm.fit(Z, w_hat)$fitted.values ^ 2) / sum(w_hat ^ 2)
   } else {
     method <- "Breusch-Pagan (non-studentised)"
-    teststat <- sum(lm.fit(Z, w_hat)$fitted.values ^ 2) / (2 * sigma_hatsq ^ 2)
+    teststat <- sum(stats::lm.fit(Z, w_hat)$fitted.values ^ 2) / (2 * sigma_hatsq ^ 2)
   }
-  pval <- 1 - pchisq(teststat, df = p)
+  pval <- 1 - stats::pchisq(teststat, df = p)
 
   rval <- structure(list(statistic = teststat, parameter = p, p.value = pval,
                null.value = "Homoskedasticity",

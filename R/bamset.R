@@ -38,17 +38,12 @@
 #' @export
 #'
 #' @examples
-#' n <- 20
-#' p <- 4
-#' set.seed(9586)
-#' X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-#' # Response values generated under homoskedasticity
-#' y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-#' bamset(lm(y_H0 ~ X))
-#'# Response values generated under heteroskedasticity associated with X
-#' y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = X[, 1] ^ 2)
-#' bamset(lm(y_HA ~ X))
-#' bamset(lm(y_HA ~ X), deflator = "X1")
+#' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+#' bamset(mtcars_lm, deflator = "wt", k = 3)
+#'
+#' # BLUS residuals cannot be computed with given `omit` argument and so
+#' # omitted indices are randomised:
+#' bamset(mtcars_lm, deflator = "wt", k = 4, omitatmargins = FALSE, omit = "last")
 #'
 
 bamset <- function(mainlm, k = 3, deflator = NULL, correct = TRUE,
@@ -56,8 +51,8 @@ bamset <- function(mainlm, k = 3, deflator = NULL, correct = TRUE,
 
   if (!is.null(deflator)) {
     if (class(mainlm) == "lm") {
-      y <- model.response(model.frame(mainlm))
-      X <- model.matrix(mainlm)
+      y <- stats::model.response(stats::model.frame(mainlm))
+      X <- stats::model.matrix(mainlm)
       p <- ncol(X)
       n <- length(y)
       hasintercept <- columnof1s(X)
@@ -121,13 +116,18 @@ bamset <- function(mainlm, k = 3, deflator = NULL, correct = TRUE,
   # slightly different definition of v_i compared with Ramsey (1969)
   # this one makes the subsets more equitable in size (not differing by more than 1)
   v <- rep(min_subset_size, k) + c(rep(1, nprime_modk), rep(0, k - nprime_modk))
-
-  if (omitatmargins) omit <- margin_indices(v, p)
+  sub_ind <- vector("list", k)
+  sub_ind[[1]] <- seq.int(from = 1, by = 1, length.out = v[1])
+  for (j in 2:k) {
+    sub_ind[[j]] <- seq.int(from = max(sub_ind[[j - 1]]) + 1, by = 1,
+                            length.out = v[j])
+  }
+  if (omitatmargins) omit <- margin_indices(v, p, sub_ind)
   res <- blus(mainlm, omit)
 
   s_sq <- unlist(lapply(sub_ind, function(i, e)
-    sum(e[i] ^ 2, na.rm = T), e = res)) / v
-  s_sq_tot <- sum(res ^ 2, na.rm = T) / nprime
+    sum(e[i] ^ 2, na.rm = TRUE), e = res)) / v
+  s_sq_tot <- sum(res ^ 2, na.rm = TRUE) / nprime
 
   teststat <- nprime * log(s_sq_tot) - sum(v * log(s_sq))
   if (correct) {
@@ -136,7 +136,7 @@ bamset <- function(mainlm, k = 3, deflator = NULL, correct = TRUE,
   }
 
   df <- k - 1
-  pval <- 1 - pchisq(teststat, df = df)
+  pval <- 1 - stats::pchisq(teststat, df = df)
 
   rval <- structure(list(statistic = teststat, parameter = df, p.value = pval,
                          null.value = "Homoskedasticity",

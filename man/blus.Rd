@@ -57,13 +57,14 @@ Under the ideal linear model conditions, the BLUS residuals have a scalar
    within the algorithm.
 }
 \examples{
-n <- 20
-p <- 4
-set.seed(9586)
-X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-# Response values generated under homoskedasticity
-y <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-e_tilde <- blus(lm(y ~ X))
+mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+blus(mtcars_lm)
+plot(mtcars_lm$residuals, blus(mtcars_lm))
+
+# BLUS residuals cannot be computed with `omit = "last"` in this case so
+# omitted indices are randomised:
+blus(mtcars_lm, omit = "last")
+
 }
 \references{
 {\insertAllCited{}}

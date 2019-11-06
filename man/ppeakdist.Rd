@@ -41,8 +41,12 @@ heteroskedasticity in a linear model. Computation time is very slow for
 \eqn{n > 170} if \code{usedata} is set to \code{FALSE}.
 }
 \examples{
-dpeakdist(5, 0:4)
-sum(dpeakdist(5, 0:4))
+# For an independent sample of size 250, the probability of at least 10
+# peaks is 0.06186582
+ppeakdist(250, 10, upper = TRUE, usedata = TRUE)
+# For an independent sample of size 10, the probability of at most 2 peaks
+# is 0.7060615
+ppeakdist(10, 2, upper = FALSE, usedata = FALSE)
 
 }
 \references{

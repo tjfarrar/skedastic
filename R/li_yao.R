@@ -26,18 +26,9 @@
 #' @export
 #'
 #' @examples
-#' n <- 20
-#' p <- 4
-#' set.seed(9586)
-#' X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-#' # Response values generated under homoskedasticity
-#' y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-#' li_yao(lm(y_H0 ~ X))
-#' li_yao(lm(y_H0 ~ X), method = "c")
-#'# Response values generated under heteroskedasticity associated with X
-#' y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = rowSums(X ^ 2))
-#' li_yao(lm(y_HA ~ X))
-#' li_yao(lm(y_HA ~ X), method = "c")
+#' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+#' li_yao(mtcars_lm, method = "alrt")
+#' li_yao(mtcars_lm, method = "cvt")
 #'
 
 li_yao <- function (mainlm, method = "alrt") {
@@ -51,7 +42,7 @@ li_yao <- function (mainlm, method = "alrt") {
       y <- y[-badrows]
       X <- X[-badrows, ]
     }
-    mainlm <- lm.fit(X, y)
+    mainlm <- stats::lm.fit(X, y)
   }
 
   method <- match.arg(method, c("alrt", "cvt"))
@@ -69,7 +60,7 @@ li_yao <- function (mainlm, method = "alrt") {
     fullmethod <- "Coefficient-of-Variation Test"
   } else stop("Invalid `method` argument")
 
-  pval <- 1 - pnorm(teststat)
+  pval <- 1 - stats::pnorm(teststat)
   rval <- structure(list(statistic = teststat, p.value = pval,
                null.value = "Homoskedasticity", alternative = "Heteroskedasticity",
                method = fullmethod), class = "htest")

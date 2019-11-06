@@ -52,7 +52,7 @@ If many plots are requested at once, it is advisable to write them to image
 files.}
 
 \item{...}{Arguments to be passed to methods, such as graphical parameters
-(see \code{\link[base]{par}}), parameters for \code{\link[graphics]{plot}},
+(see \code{\link{par}}), parameters for \code{\link[graphics]{plot}},
 for \code{\link[grDevices:png]{graphics devices}},
 and/or the \code{omit} argument for function \code{\link{blus}},
 if BLUS residuals are being plotted. If it is desired to pass the
@@ -80,24 +80,15 @@ plot is created for each (\code{horzvar}, \code{vertvar}, \code{vertfun})
 combination.
 }
 \examples{
-n <- 1000
-p <- 4
-set.seed(9586)
-X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-# Response values generated under homoskedasticity
-y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-hetplot(mainlm = lm(y_H0 ~ X), horzvar = c("index", "fitted.values"),
-vertvar = c("res", "res_blus"), vertfun = "2", filetype = NULL)
-hetplot(mainlm = lm(y_H0 ~ X), horzvar = c("index", "fitted.values", "fitted.values2",
-"explanatory", "log_explanatory"), vertvar = c("res", "res_blus", "res_stand", "res_stud", "res_constvar"),
-vertfun = c("identity", "abs", "2"), filetype = "png")
-# Response values generated under heteroskedasticity associated with X
-y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = rowSums(X ^ 2))
-hetplot(mainlm = lm(y_HA ~ X), horzvar = c("index", "fitted.values"),
-vertvar = c("res", "res_blus"), vertfun = "2", filetype = NULL)
-hetplot(mainlm = lm(y_HA ~ X), horzvar = c("index", "fitted.values", "fitted.values2",
-"explanatory", "log_explanatory"), vertvar = c("res", "res_blus", "res_stand", "res_stud", "res_constvar"),
-vertfun = c("identity", "abs", "2"), filetype = "png")
+mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+# Generates 2 x 2 matrix of plots in console
+hetplot(mtcars_lm, horzvar = c("index", "fitted.values"),
+vertvar = c("res_blus"), vertfun = c("2", "abs"), filetype = NULL)
+
+# Generates 84 png files in tempdir() folder
+hetplot(mainlm = mtcars_lm, horzvar = c("explanatory", "log_explanatory",
+"fitted.values2"), vertvar = c("res", "res_stand", "res_stud",
+"res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")
 
 }
 \references{

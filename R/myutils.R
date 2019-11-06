@@ -13,7 +13,7 @@ plotdim <- function(x) { # find all positive factors of a positive integer
   div <- seq_len(x)
   factors <- div[x %% div == 0L]
   twofactors <- cbind(factors, x / factors, deparse.level = 0)
-  twofactors <- twofactors[twofactors[, 1] <= twofactors[, 2], , drop = F]
+  twofactors <- twofactors[twofactors[, 1] <= twofactors[, 2], , drop = FALSE]
   twofactors[rowSums(twofactors) == min(rowSums(twofactors)), ]
 }
 
@@ -57,11 +57,11 @@ parselabels <- function(labname, theaxis) {
     if (substr(texttoparse, 1, 1) == "X" &&
         suppressWarnings(!is.na(as.integer(substr(texttoparse, 2, nchar(texttoparse)))))) {
          j <- as.integer(substr(texttoparse, 2, nchar(texttoparse)))
-         texttoparse <- paste0("X[i * phantom(i) *", j, "]")
+         texttoparse <- paste0("X[i * ", j, "]")
     } else if (substr(texttoparse, 1, 4) == "logX" &&
       suppressWarnings(!is.na(as.integer(substr(texttoparse, 5, nchar(texttoparse)))))) {
         j <- as.integer(substr(texttoparse, 5, nchar(texttoparse)))
-        texttoparse <- paste0("log(X[i * phantom(i) *", j, "])")
+        texttoparse <- paste0("log(X[i * ", j, "])")
     }
     parse(text = texttoparse)
   }
@@ -69,7 +69,7 @@ parselabels <- function(labname, theaxis) {
 
 generate_interactions <- function (X) { # generate all two-way interactions
   k <- ncol(X)
-  mycombn <- t(combn(k, 2))
+  mycombn <- t(utils::combn(k, 2))
   apply(mycombn, 1, function(i, X) X[, i[1]] * X[, i[2]], X)
 }
 
@@ -79,18 +79,14 @@ checklm <- function(mylm) { # Check validity of lm object
              "fitted.values", "terms") %in% names(mylm))) {
     stop("`mylm` must contain the components expected in class `lm`")
   }
-  if (any(is.na(model.frame(mylm)))) stop("Missing values in `model.frame` not allowed.")
+  if (any(is.na(stats::model.frame(mylm)))) {
+    stop("Missing values in `model.frame` not allowed.")
+  }
 }
 
-margin_indices <- function(v, p) {
+margin_indices <- function(v, p, sub_ind) {
 
   k <- length(v)
-  sub_ind <- vector("list", k)
-  sub_ind[[1]] <- seq.int(from = 1, by = 1, length.out = v[1])
-  for (j in 2:k) {
-    sub_ind[[j]] <- seq.int(from = max(sub_ind[[j - 1]]) + 1, by = 1,
-                            length.out = v[j])
-  }
   reptimes <- floor(p / (k - 1))
   pmodk1 <- p %% (k - 1)
   omit_ind <- vector("list", reptimes + 1)

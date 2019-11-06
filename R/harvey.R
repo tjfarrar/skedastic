@@ -29,22 +29,15 @@
 #'   (which produces identical results).
 #'
 #' @examples
-#' n <- 20
-#' p <- 4
-#' set.seed(9586)
-#' X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-#' # Response values generated under homoskedasticity
-#' y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-#' harvey(lm(y_H0 ~ X))
-#'# Response values generated under heteroskedasticity associated with X
-#' y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = rowSums(X ^ 2))
-#' harvey(lm(y_HA ~ X))
+#' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+#' harvey(mtcars_lm)
+#' harvey(mtcars_lm, auxdesign = "fitted.values")
 #'
 
 harvey <- function (mainlm, auxdesign = NULL) {
 
   if (class(mainlm) == "lm") {
-    X <- model.matrix(mainlm)
+    X <- stats::model.matrix(mainlm)
   } else if (class(mainlm) == "list") {
     y <- mainlm[[1]]
     X <- mainlm[[2]]
@@ -54,7 +47,7 @@ harvey <- function (mainlm, auxdesign = NULL) {
       y <- y[-badrows]
       X <- X[-badrows, ]
     }
-    mainlm <- lm.fit(X, y)
+    mainlm <- stats::lm.fit(X, y)
   }
 
   if (is.null(auxdesign)) {
@@ -79,11 +72,11 @@ harvey <- function (mainlm, auxdesign = NULL) {
   p <- ncol(Z) - 1
   n <- nrow(Z)
   auxresponse <- log(mainlm$residuals ^ 2)
-  auxres <- lm.fit(Z, auxresponse)$residuals
+  auxres <- stats::lm.fit(Z, auxresponse)$residuals
 
   teststat <- (sum(auxresponse ^ 2) - n * mean(auxresponse) ^ 2
                - sum(auxres ^ 2)) / pracma::psi(1, 1 / 2)
-  pval <- 1 - pchisq(teststat, df = p)
+  pval <- 1 - stats::pchisq(teststat, df = p)
 
   rval <- structure(list(statistic = teststat, parameter = p, p.value = pval,
                null.value = "Homoskedasticity",

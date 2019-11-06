@@ -44,26 +44,15 @@
 #' \code{car::ncvTest}.
 #'
 #' @examples
-#' n <- 20
-#' p <- 4
-#' set.seed(9586)
-#' X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-#' # Response values generated under homoskedasticity
-#' y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-#' cook_weisberg(lm(y_H0 ~ X))
-#' cook_weisberg(lm(y_H0 ~ X), auxdesign = "fitted.values")
-#' cook_weisberg(lm(y_H0 ~ X), errorfun = "multiplicative")
-#'# Response values generated under heteroskedasticity associated with X
-#' y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = rowSums(X ^ 2))
-#' cook_weisberg(lm(y_HA ~ X))
-#' cook_weisberg(lm(y_HA ~ X), auxdesign = "fitted.values")
-#' cook_weisberg(lm(y_HA ~ X), errorfun = "multiplicative")
+#' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+#' cook_weisberg(mtcars_lm)
+#' cook_weisberg(mtcars_lm, auxdesign = "fitted.values", errorfun = "multiplicative")
 #'
 
 cook_weisberg <- function (mainlm, auxdesign = NULL, errorfun = "additive") {
 
   if (class(mainlm) == "lm") {
-    X <- model.matrix(mainlm)
+    X <- stats::model.matrix(mainlm)
   } else if (class(mainlm) == "list") {
     y <- mainlm[[1]]
     X <- mainlm[[2]]
@@ -74,7 +63,7 @@ cook_weisberg <- function (mainlm, auxdesign = NULL, errorfun = "additive") {
       y <- y[-badrows]
       X <- X[-badrows, ]
     }
-    mainlm <- lm.fit(X, y)
+    mainlm <- stats::lm.fit(X, y)
   }
 
   if (is.null(auxdesign)) {
@@ -108,10 +97,10 @@ cook_weisberg <- function (mainlm, auxdesign = NULL, errorfun = "additive") {
 
   sigma_hatsq <- sum(mainlm$residuals ^ 2) / n
   std_res_sq <- mainlm$residuals ^ 2 / sigma_hatsq
-  auxres <- lm.fit(Z, std_res_sq)$residuals
+  auxres <- stats::lm.fit(Z, std_res_sq)$residuals
   teststat <- (sum(std_res_sq ^ 2) - n * mean(std_res_sq) ^ 2 - sum(auxres ^ 2)) / 2
   method <- errorfun
-  pval <- 1 - pchisq(teststat, df = q)
+  pval <- 1 - stats::pchisq(teststat, df = q)
   rval <- structure(list(statistic = teststat, parameter = q, p.value = pval,
                          null.value = "Homoskedasticity",
                          alternative = "Heteroskedasticity", method = method),

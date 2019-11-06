@@ -17,6 +17,8 @@
 #' @examples
 #' set.seed(9586)
 #' countpeaks(rnorm(20))
+#' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+#' countpeaks(mtcars_lm$residuals)
 #'
 
 countpeaks <- function(x) {
@@ -47,22 +49,33 @@ countpeaks <- function(x) {
 #' @param k An integer or a sequence of integers strictly incrementing by 1,
 #' with all values between 0 and \code{n - 1} inclusive. Represents the number
 #' of peaks in the series.
+#' @param usedata A logical. Should probability mass function values be
+#' read from \code{\link{dpeakdat}} rather than computing them? This option
+#' will save significantly on computation time if \eqn{n < 170} but is
+#' currently only available for \eqn{n \leq 300}.
 #'
 #' @return A double between 0 and 1 representing the probability of exactly
 #' k peaks occurring in a series of \eqn{n} independent and identically
 #' distributed continuous random variables. Computation time is very slow for
-#' \eqn{n > 170}.
+#' \eqn{n > 170} (if \code{usedata} is \code{FALSE}) and for \eqn{n > 300}
+#' regardless of \code{usedata} value.
 #'
 #' @references{\insertAllCited{}}
 #' @export
 #' @seealso \code{\link{ppeakdist}}, \code{\link{goldfeld_quandt}}
 #'
 #' @examples
-#' dpeakdist(5, 0:4)
-#' sum(dpeakdist(5, 0:4))
+#' dpeakdist(10, 0:9)
+#' plot(0:9, dpeakdist(10, 0:9), type = "p", pch = 20, xlab = "Number of Peaks",
+#'          ylab = "Probability")
 #'
+#' # `dpeakdat` is a data set containing probabilities generated from `dpeakdist`
+#' expval <- unlist(lapply(dpeakdat,
+#'                  function(p) sum(p * 0:(length(p) - 1))))
+#' plot(1:300, expval[1:300], type = "l", xlab = parse(text = "n"),
+#'      ylab = "Expected Number of Peaks")
 
-dpeakdist <- function(n, k) {
+dpeakdist <- function(n, k, usedata = FALSE) {
   if (length(k) == 1) {
     maxk <- k
   } else if (length(k) > 1) {
@@ -75,25 +88,30 @@ dpeakdist <- function(n, k) {
     k <- ifelse(length(k) == 1, n - 1, min(k):(n - 1))
     maxk <- n - 1
   }
-  if (n > 170) {
-    N <- Rmpfr::mpfrArray(0, precBits = 53, dim = c(n, maxk + 1))
-    factorial_denom <- gmp::factorialZ(n)
+  if (usedata) {
+    utils::data(dpeakdat)
+    dpeakdat[[n]][k]
   } else {
-    N <- matrix(data = 0, nrow = n, ncol = maxk + 1) # k can be 0
-    factorial_denom <- factorial(n)
-  }
-  N[1, 1] <- 1
-  if (n > 1) {
-    for (i in 2:n) {
-      N[i, 1] <- (i - 1) * N[i - 1, 1]
-      if (maxk >= 1) {
-        for (j in 2:(maxk + 1)) {
-          N[i, j] <- (i - 1) * N[i - 1, j] + N[i - 1, j - 1]
+    if (n > 170) {
+      N <- Rmpfr::mpfrArray(0, precBits = 53, dim = c(n, maxk + 1))
+      factorial_denom <- gmp::factorialZ(n)
+    } else {
+      N <- matrix(data = 0, nrow = n, ncol = maxk + 1) # k can be 0
+      factorial_denom <- factorial(n)
+    }
+    N[1, 1] <- 1
+    if (n > 1) {
+      for (i in 2:n) {
+        N[i, 1] <- (i - 1) * N[i - 1, 1]
+        if (maxk >= 1) {
+          for (j in 2:(maxk + 1)) {
+            N[i, j] <- (i - 1) * N[i - 1, j] + N[i - 1, j - 1]
+          }
         }
       }
     }
+    as.double(N[n, k + 1] / factorial_denom)
   }
-  as.double(N[n, k + 1] / factorial_denom)
 }
 
 #' Cumulative distribution function of number of peaks in a random series
@@ -131,13 +149,20 @@ dpeakdist <- function(n, k) {
 #' @seealso \code{\link{dpeakdist}}, \code{\link{goldfeld_quandt}}
 #'
 #' @examples
-#' dpeakdist(5, 0:4)
-#' sum(dpeakdist(5, 0:4))
+#' # For an independent sample of size 250, the probability of at least 10
+#' # peaks is 0.06186582
+#' ppeakdist(250, 10, upper = TRUE, usedata = TRUE)
+#' # For an independent sample of size 10, the probability of at most 2 peaks
+#' # is 0.7060615
+#' ppeakdist(10, 2, upper = FALSE, usedata = FALSE)
 #'
 
 ppeakdist <- function(n, k, upper = TRUE, usedata = TRUE) {
 
-  maxn_indata <- length(dpeakdat)
+  if (usedata) {
+    utils::data(dpeakdat)
+    maxn_indata <- length(dpeakdat)
+  }
   ppeak_up <- function(n, j) {
     if (j >= n) {
       stop("`k` must be less than `n`")

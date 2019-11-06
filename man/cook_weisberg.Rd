@@ -59,20 +59,9 @@ of the test statistic is asymptotically chi-squared with \eqn{q} degrees of
 freedom. The test is right-tailed.
 }
 \examples{
-n <- 20
-p <- 4
-set.seed(9586)
-X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-# Response values generated under homoskedasticity
-y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-cook_weisberg(lm(y_H0 ~ X))
-cook_weisberg(lm(y_H0 ~ X), auxdesign = "fitted.values")
-cook_weisberg(lm(y_H0 ~ X), errorfun = "multiplicative")
-# Response values generated under heteroskedasticity associated with X
-y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = rowSums(X ^ 2))
-cook_weisberg(lm(y_HA ~ X))
-cook_weisberg(lm(y_HA ~ X), auxdesign = "fitted.values")
-cook_weisberg(lm(y_HA ~ X), errorfun = "multiplicative")
+mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+cook_weisberg(mtcars_lm)
+cook_weisberg(mtcars_lm, auxdesign = "fitted.values", errorfun = "multiplicative")
 
 }
 \references{

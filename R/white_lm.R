@@ -35,24 +35,15 @@
 #'   testing for heteroskedasticity in a linear model.
 #'
 #' @examples
-#' n <- 20
-#' p <- 4
-#' set.seed(9586)
-#' X <- matrix(data = runif(n * (p - 1)), nrow = n, ncol = p - 1)
-#' # Response values generated under homoskedasticity
-#' y_H0 <- rnorm(n, mean = 1 + rowSums(X), sd = 1)
-#' white_lm(lm(y_H0 ~ X))
-#' white_lm(lm(y_H0 ~ X), interactions = T)
-#'# Response values generated under heteroskedasticity associated with X
-#' y_HA <- rnorm(n, mean = 1 + rowSums(X), sd = rowSums(X ^ 2))
-#' white_lm(lm(y_HA ~ X))
-#' white_lm(lm(y_HA ~ X), interactions = T)
+#' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
+#' white_lm(mtcars_lm)
+#' white_lm(mtcars_lm, interactions = TRUE)
 #'
 
 white_lm <- function (mainlm, interactions = FALSE) {
 
   if (class(mainlm) == "lm") {
-    X <- model.matrix(mainlm)
+    X <- stats::model.matrix(mainlm)
   } else if (class(mainlm) == "list") {
     y <- mainlm[[1]]
     X <- mainlm[[2]]
@@ -62,7 +53,7 @@ white_lm <- function (mainlm, interactions = FALSE) {
       y <- y[-badrows]
       X <- X[-badrows, ]
     }
-    mainlm <- lm.fit(X, y)
+    mainlm <- stats::lm.fit(X, y)
   }
 
   hasintercept <- columnof1s(X)
@@ -81,18 +72,18 @@ white_lm <- function (mainlm, interactions = FALSE) {
   }
 
   esq <- mainlm$residuals ^ 2
-  auxlm <- lm.fit(Z, esq)
+  auxlm <- stats::lm.fit(Z, esq)
   iota <- rep(1, n)
   N <- diag(n) - 1 / n * (iota %*% t(iota))
   e_aux <- auxlm$residuals
   teststat <- n * (1 - (t(e_aux) %*% e_aux) / (t(esq) %*% N %*% esq))
 
   df <- ncol(Z) - 1
-  pval <- 1 - pchisq(teststat, df = df)
+  pval <- 1 - stats::pchisq(teststat, df = df)
 
   rval <- structure(list(statistic = teststat, parameter = df, p.value = pval,
                          null.value = "Homoskedasticity",
-                         alternative = "Heteroskedasticity", method = "White's Test",
-                         data.name = dname), class = "htest")
+                         alternative = "Heteroskedasticity",
+                         method = "White's Test"), class = "htest")
   broom::tidy(rval)
 }
