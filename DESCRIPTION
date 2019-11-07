@@ -4,7 +4,7 @@ Title: Heteroskedasticity Diagnostics for Linear Regression Models
 Version: 0.1.0
 Authors@R: person("Thomas", "Farrar", email = "tjfarrar@alumni.uwaterloo.ca", 
   role = c("aut", "cre"))
-Description: This package contains functions implementing numerous methods for 
+Description: Provides functions implementing numerous methods for 
     detecting heteroskedasticity (sometimes called 
     heteroscedasticity) in the classical linear regression model. 
     Homoskedasticity refers to the assumption of constant variance that is 
