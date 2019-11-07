@@ -2,6 +2,7 @@ language: r
 r:
   - release
   - devel
+r_binary_packages: Rmpfr
 warnings_are_errors: true
 os:
   - linux

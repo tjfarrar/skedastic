@@ -70,6 +70,7 @@ countpeaks <- function(x) {
 #'          ylab = "Probability")
 #'
 #' # `dpeakdat` is a data set containing probabilities generated from `dpeakdist`
+#' utils::data(dpeakdat)
 #' expval <- unlist(lapply(dpeakdat,
 #'                  function(p) sum(p * 0:(length(p) - 1))))
 #' plot(1:300, expval[1:300], type = "l", xlab = parse(text = "n"),
