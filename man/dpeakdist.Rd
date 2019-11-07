@@ -40,7 +40,8 @@ dpeakdist(10, 0:9)
 plot(0:9, dpeakdist(10, 0:9), type = "p", pch = 20, xlab = "Number of Peaks",
          ylab = "Probability")
 
-# `dpeakdat` is a data set containing probabilities generated from `dpeakdist`
+# `dpeakdat` is a dataset containing probabilities generated from `dpeakdist`
+utils::data(dpeakdat)
 expval <- unlist(lapply(dpeakdat,
                  function(p) sum(p * 0:(length(p) - 1))))
 plot(1:300, expval[1:300], type = "l", xlab = parse(text = "n"),
