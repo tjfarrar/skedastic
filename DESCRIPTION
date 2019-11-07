@@ -23,7 +23,8 @@ Imports:
     pracma (>= 2.2.5),
     gmp (>= 0.5.13),
     Rmpfr (>= 0.7.2),
-    matrixcalc (>= 1.0.3)
+    matrixcalc (>= 1.0.3),
+    lubridate (>= 1.7.4)
 Suggests:
 License: MIT + file LICENSE
 Encoding: UTF-8
