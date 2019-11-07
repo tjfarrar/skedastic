@@ -24,7 +24,11 @@ Imports:
     gmp (>= 0.5.13),
     Rmpfr (>= 0.7.2),
     matrixcalc (>= 1.0.3),
-    lubridate (>= 1.7.4)
+    lubridate (>= 1.7.4),
+    lmtest (>= 0.9.37),
+    car (>= 3.0.3),
+    het.test (>= 0.1),
+    tseries (>= 0.10.47)
 Suggests:
 License: MIT + file LICENSE
 Encoding: UTF-8
