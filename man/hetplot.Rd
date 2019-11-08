@@ -86,9 +86,10 @@ hetplot(mtcars_lm, horzvar = c("index", "fitted.values"),
 vertvar = c("res_blus"), vertfun = c("2", "abs"), filetype = NULL)
 
 # Generates 84 png files in tempdir() folder
-hetplot(mainlm = mtcars_lm, horzvar = c("explanatory", "log_explanatory",
-"fitted.values2"), vertvar = c("res", "res_stand", "res_stud",
-"res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")
+## Not run
+# hetplot(mainlm = mtcars_lm, horzvar = c("explanatory", "log_explanatory",
+#  "fitted.values2"), vertvar = c("res", "res_stand", "res_stud",
+#  "res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")
 
 }
 \references{
