@@ -44,12 +44,13 @@ they are all applied to each element of \code{vertvar}.}
 plot(s) should be written. Values can be \code{"png"},
 \code{"bmp"}, \code{"jpeg"}, or \code{"tiff"}. Image files are written
 to a subdirectory called "hetplot" within the R session's temporary
-directory, which can be located using \code{tempdir()}. Default filenames
-contain timestamps for uniqueness. If \code{NULL} (the default), no image
-files are written, and in this case, if there are multiple plots, they are
-plotted on a single device using the \code{"mfrow"} graphical parameter.
-If many plots are requested at once, it is advisable to write them to image
-files.}
+directory, which can be located using \code{tempdir()}. The files should
+be moved or copied to another location if they are needed after the R
+session is ended. Default filenames contain timestamps for uniqueness.
+If \code{NULL} (the default), no image files are written, and in this
+case, if there are multiple plots, they are plotted on a single device
+using the \code{"mfrow"} graphical parameter. If many plots are requested
+at once, it is advisable to write them to image files.}
 
 \item{...}{Arguments to be passed to methods, such as graphical parameters
 (see \code{\link{par}}), parameters for \code{\link[graphics]{plot}},
@@ -86,9 +87,10 @@ hetplot(mtcars_lm, horzvar = c("index", "fitted.values"),
 vertvar = c("res_blus"), vertfun = c("2", "abs"), filetype = NULL)
 
 # Generates 84 png files in tempdir() folder
-hetplot(mainlm = mtcars_lm, horzvar = c("explanatory", "log_explanatory",
-"fitted.values2"), vertvar = c("res", "res_stand", "res_stud",
-"res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")
+## Not run
+# hetplot(mainlm = mtcars_lm, horzvar = c("explanatory", "log_explanatory",
+#  "fitted.values2"), vertvar = c("res", "res_stand", "res_stud",
+#  "res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")
 
 }
 \references{
