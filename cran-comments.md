@@ -29,7 +29,7 @@ is the correct spelling while 'heteroscedasticity' is incorrectly transliterated
 This is not a serious problem; in fact `citation("package")` appears to throw an 
 error for most CRAN packages if the package is not installed.
 
-* The Debian check returned one additional NOTE:
+* The Debian check on the previous submission attempt returned one additional NOTE:
 
 > checking for detritus in the temp directory ... NOTE  
 > Found the following files/directories:  
@@ -37,8 +37,7 @@ error for most CRAN packages if the package is not installed.
 >  ‘RtmpLz8nMX\hetplot\X1_res_2_2019_11_07_11_52_44.png’  
 > ...
 
-These files are written to a subdirectory of `tempdir()` by a function `hetplot` that creates heteroskedasticity plots. This is in line with the CRAN Repository Policy which 
-states that 
+These image files are written to a subdirectory of `tempdir()` by a function `hetplot` that creates heteroskedasticity plots. This is in line with the CRAN Repository Policy which states that   
 
 > Packages should not write in the user’s home filespace (including clipboards), nor   
 > anywhere else on the file system apart from the R session’s temporary directory

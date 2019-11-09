@@ -4,11 +4,14 @@ Title: Heteroskedasticity Diagnostics for Linear Regression Models
 Version: 0.1.0
 Authors@R: person("Thomas", "Farrar", email = "tjfarrar@alumni.uwaterloo.ca", 
   role = c("aut", "cre"))
-Description: Provides functions implementing numerous methods for 
-    detecting heteroskedasticity (sometimes called 
-    heteroscedasticity) in the classical linear regression model. 
-    Homoskedasticity refers to the assumption of constant variance that is 
-    imposed on the model errors (disturbances); heteroskedasticity is the 
+Description: Implements numerous methods for detecting heteroskedasticity 
+    (sometimes called heteroscedasticity) in the classical linear regression 
+    model. Methods include Goldfeld-Quandt Test (parametric and nonparametric), 
+    Glejser's Test, Ramsey's BAMSET Test, Harvey Test, Breusch-Pagan-Koenker Test, 
+    White's Test, Cook-Weisberg Test, and Li-Yao Test, as well as graphical 
+    methods (see references in individual function documentation). 
+    Homoskedasticity refers to the assumption of constant variance that 
+    is imposed on the model errors (disturbances); heteroskedasticity is the 
     violation of this assumption.
 RdMacros: Rdpack
 Depends: 
