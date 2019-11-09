@@ -10,9 +10,8 @@ This is the first time the package is submitted to CRAN (second attempt).
 ## R CMD check results
 No ERRORs or WARNINGs from any checks.
 
-* The Windows check returned one NOTE containing two possible issues:
+* The Windows check returned one NOTE:
 
-1. 
 > Possibly mis-spelled words in DESCRIPTION:  
 > Heteroskedasticity (3:8)  
 > Homoskedasticity (10:5)  
@@ -21,15 +20,7 @@ No ERRORs or WARNINGs from any checks.
 This is not a misspelling. Alfredo R. Paloyo has [published an article](https://www.rwi-essen.de/media/content/pages/publikationen/ruhr-economic-papers/REP_11_300.pdf) on the etymology of the word, concluding that 'heteroskedasticity' 
 is the correct spelling while 'heteroscedasticity' is incorrectly transliterated.
 
-2. 
-> Reading CITATION file fails with  
-> there is no package called ‘skedastic’  
-> when package is not installed.  
-
-This is not a serious problem; in fact `citation("package")` appears to throw an 
-error for most CRAN packages if the package is not installed.
-
-* The Debian check on the previous submission attempt returned one additional NOTE:
+* The Debian check on a previous submission attempt returned one additional NOTE:
 
 > checking for detritus in the temp directory ... NOTE  
 > Found the following files/directories:  
