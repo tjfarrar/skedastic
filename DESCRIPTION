@@ -3,7 +3,8 @@ Type: Package
 Title: Heteroskedasticity Diagnostics for Linear Regression Models
 Version: 0.1.0
 Authors@R: c(person(given = "Thomas", family = "Farrar", 
-            email = "tjfarrar@alumni.uwaterloo.ca", role = c("aut", "cre")), 
+            email = "tjfarrar@alumni.uwaterloo.ca", role = c("aut", "cre"), 
+            comment = c(ORCID = "0000-0003-0744-6972")),
             person(given = "University of the Western Cape", role = "cph"))
 Description: Implements numerous methods for detecting heteroskedasticity 
     (sometimes called heteroscedasticity) in the classical linear regression 
@@ -15,7 +16,7 @@ Description: Implements numerous methods for detecting heteroskedasticity
     the BLUS residuals derived by Theil (1965) 
     <doi:10.1080/01621459.1965.10480851>, the test of Harvey (1976) 
     <doi:10.2307/1913974>, the test of Breusch and Pagan (1979) 
-    <doi:10.2307/1911963> with and without the studentising modification 
+    <doi:10.2307/1911963> with and without the studentizing modification 
     proposed by Koenker (1981) <doi:10.1016/0304-4076(81)90062-2>, the test of 
     White (1980) <doi:10.2307/1912934>, the test and graphical Cook and Weisberg 
     (1983) <doi:10.1093/biomet/70.1.1>, and the test of Li and Yao (2019) 
