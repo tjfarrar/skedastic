@@ -3,7 +3,8 @@ Type: Package
 Title: Heteroskedasticity Diagnostics for Linear Regression Models
 Version: 0.1.0
 Authors@R: c(person(given = "Thomas", family = "Farrar", 
-            email = "tjfarrar@alumni.uwaterloo.ca", role = c("aut", "cre")), 
+            email = "tjfarrar@alumni.uwaterloo.ca", role = c("aut", "cre"), 
+            comment = c(ORCID = "0000-0003-0744-6972")),
             person(given = "University of the Western Cape", role = "cph"))
 Description: Implements numerous methods for detecting heteroskedasticity 
     (sometimes called heteroscedasticity) in the classical linear regression 
