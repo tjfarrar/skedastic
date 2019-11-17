@@ -41,7 +41,7 @@ countpeaks <- function(x) {
 #' series of \eqn{n} independent and identically distributed random variables
 #' contains exactly \eqn{k} peaks, with peaks also as defined by
 #' \insertCite{Goldfeld65;textual}{skedastic}. The function is used in
-#' \code{\link{ppeakdist}} to compute \eqn{p}-values for the Goldfeld-Quandt
+#' \code{\link{ppeak}} to compute \eqn{p}-values for the Goldfeld-Quandt
 #' nonparametric test for heteroskedasticity in a linear model.
 #'
 #' @param n A positive integer representing the number of observations in the
@@ -52,31 +52,31 @@ countpeaks <- function(x) {
 #' @param usedata A logical. Should probability mass function values be
 #' read from \code{\link{dpeakdat}} rather than computing them? This option
 #' will save significantly on computation time if \eqn{n < 170} but is
-#' currently only available for \eqn{n \leq 300}.
+#' currently only available for \eqn{n \leq 500}.
 #'
 #' @return A double between 0 and 1 representing the probability of exactly
 #' k peaks occurring in a series of \eqn{n} independent and identically
 #' distributed continuous random variables. Computation time is very slow for
-#' \eqn{n > 170} (if \code{usedata} is \code{FALSE}) and for \eqn{n > 300}
+#' \eqn{n > 170} (if \code{usedata} is \code{FALSE}) and for \eqn{n > 500}
 #' regardless of \code{usedata} value.
 #'
 #' @references{\insertAllCited{}}
 #' @export
-#' @seealso \code{\link{ppeakdist}}, \code{\link{goldfeld_quandt}}
+#' @seealso \code{\link{ppeak}}, \code{\link{goldfeld_quandt}}
 #'
 #' @examples
-#' dpeakdist(10, 0:9)
-#' plot(0:9, dpeakdist(10, 0:9), type = "p", pch = 20, xlab = "Number of Peaks",
+#' dpeak(10, 0:9)
+#' plot(0:9, dpeak(10, 0:9), type = "p", pch = 20, xlab = "Number of Peaks",
 #'          ylab = "Probability")
 #'
-#' # `dpeakdat` is a dataset containing probabilities generated from `dpeakdist`
+#' # `dpeakdat` is a dataset containing probabilities generated from `dpeak`
 #' utils::data(dpeakdat)
 #' expval <- unlist(lapply(dpeakdat,
 #'                  function(p) sum(p * 0:(length(p) - 1))))
-#' plot(1:300, expval[1:300], type = "l", xlab = parse(text = "n"),
+#' plot(1:500, expval[1:500], type = "l", xlab = parse(text = "n"),
 #'      ylab = "Expected Number of Peaks")
 
-dpeakdist <- function(n, k, usedata = FALSE) {
+dpeak <- function(n, k, usedata = FALSE) {
   if (length(k) == 1) {
     maxk <- k
   } else if (length(k) > 1) {
@@ -137,9 +137,9 @@ dpeakdist <- function(n, k, usedata = FALSE) {
 #'    inclusive of \code{k}.
 #' @param usedata A logical. Should probability mass function values be
 #'    read from \code{\link{dpeakdat}} rather than computing them from
-#'    \code{\link{dpeakdist}}? This option will save significantly on
+#'    \code{\link{dpeak}}? This option will save significantly on
 #'    computation time if \eqn{n < 170} but is currently only available
-#'    for \eqn{n \leq 300}.
+#'    for \eqn{n \leq 500}.
 #'
 #' @return A double between 0 and 1 representing the probability of at least
 #'    (at most) k peaks occurring in a series of \eqn{n} independent and
@@ -147,18 +147,18 @@ dpeakdist <- function(n, k, usedata = FALSE) {
 #'
 #' @references{\insertAllCited{}}
 #' @export
-#' @seealso \code{\link{dpeakdist}}, \code{\link{goldfeld_quandt}}
+#' @seealso \code{\link{dpeak}}, \code{\link{goldfeld_quandt}}
 #'
 #' @examples
 #' # For an independent sample of size 250, the probability of at least 10
 #' # peaks is 0.06186582
-#' ppeakdist(250, 10, upper = TRUE, usedata = TRUE)
+#' ppeak(250, 10, upper = TRUE, usedata = TRUE)
 #' # For an independent sample of size 10, the probability of at most 2 peaks
 #' # is 0.7060615
-#' ppeakdist(10, 2, upper = FALSE, usedata = FALSE)
+#' ppeak(10, 2, upper = FALSE, usedata = FALSE)
 #'
 
-ppeakdist <- function(n, k, upper = TRUE, usedata = TRUE) {
+ppeak <- function(n, k, upper = TRUE, usedata = TRUE) {
 
   if (usedata) {
     utils::data(dpeakdat)
@@ -173,7 +173,7 @@ ppeakdist <- function(n, k, upper = TRUE, usedata = TRUE) {
       if (usedata && n <= maxn_indata) {
         return(sum(dpeakdat[[n]][j:(n - 1)]))
       } else {
-        return(sum(dpeakdist(n, j:(n - 1))))
+        return(sum(dpeak(n, j:(n - 1))))
       }
     }
   }
@@ -185,7 +185,7 @@ ppeakdist <- function(n, k, upper = TRUE, usedata = TRUE) {
       if (usedata && n <= maxn_indata) {
         return(sum(dpeakdat[[n]][0:j]))
       } else {
-        return(sum(dpeakdist(n, 0:j)))
+        return(sum(dpeak(n, 0:j)))
       }
     }
   }

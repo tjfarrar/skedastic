@@ -1,6 +1,12 @@
 ## First submission
 
-This is the first time the package is submitted to CRAN (second attempt).
+This is the first time the package is submitted to CRAN (third attempt).
+
+## Revisions after previous submission
+* The copyright holder was added to the `Authors@R` field in DESCRIPTION
+* References (with DOI or ISBN) were added to DESCRIPTION
+* A data file `dpeakdat.Rda` was updated to a list of 500 objects instead of 300, 
+  as a slow computation of 200 more objects had completed in the meantime.
 
 ## Test environments
 * ubuntu xenial 16.04 (on travis-ci), r-release (3.6.1) and r-devel (4.0.0)
@@ -19,19 +25,3 @@ No ERRORs or WARNINGs from any checks.
 
 This is not a misspelling. Alfredo R. Paloyo has [published an article](https://www.rwi-essen.de/media/content/pages/publikationen/ruhr-economic-papers/REP_11_300.pdf) on the etymology of the word, concluding that 'heteroskedasticity' 
 is the correct spelling while 'heteroscedasticity' is incorrectly transliterated.
-
-* The Debian check on a previous submission attempt returned one additional NOTE:
-
-> checking for detritus in the temp directory ... NOTE  
-> Found the following files/directories:  
-> ‘RtmpLz8nMX\hetplot’  
->  ‘RtmpLz8nMX\hetplot\X1_res_2_2019_11_07_11_52_44.png’  
-> ...
-
-These image files are written to a subdirectory of `tempdir()` by a function `hetplot` that creates heteroskedasticity plots. This is in line with the CRAN Repository Policy which states that   
-
-> Packages should not write in the user’s home filespace (including clipboards), nor   
-> anywhere else on the file system apart from the R session’s temporary directory
-
-However, to avoid this issue recurring the relevant example has been changed to 
-`## NOT RUN`

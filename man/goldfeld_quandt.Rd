@@ -52,9 +52,9 @@ only when \code{method} is \code{"nonparametric"}). If
 \code{NULL} (the default), p-values are calculated within the function.
 To improve performance where the test is being used many times (e.g. in
 a Monte Carlo simulation), a vector of \eqn{p}-values for a particular
-\eqn{n} can be computed beforehand using \code{\link{ppeakdist}} and passed
+\eqn{n} can be computed beforehand using \code{\link{ppeak}} and passed
 to the function, so that the \eqn{p}-values are not computed each time the
-function executes (see Examples). Computation of \code{\link{ppeakdist}} is
+function executes (see Examples). Computation of \code{\link{ppeak}} is
 extremely slow for \eqn{n > 170}.}
 }
 \value{
