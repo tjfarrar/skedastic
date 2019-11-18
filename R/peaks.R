@@ -91,7 +91,7 @@ dpeak <- function(n, k, usedata = FALSE) {
   }
   if (usedata) {
     utils::data(dpeakdat)
-    dpeakdat[[n]][k]
+    dpeakdat[[n]][k+1]
   } else {
     if (n > 170) {
       N <- Rmpfr::mpfrArray(0, precBits = 53, dim = c(n, maxk + 1))
@@ -171,7 +171,7 @@ ppeak <- function(n, k, upper = TRUE, usedata = TRUE) {
       return(1)
     } else {
       if (usedata && n <= maxn_indata) {
-        return(sum(dpeakdat[[n]][j:(n - 1)]))
+        return(sum(dpeakdat[[n]][(j + 1):(n)]))
       } else {
         return(sum(dpeak(n, j:(n - 1))))
       }
@@ -183,7 +183,7 @@ ppeak <- function(n, k, upper = TRUE, usedata = TRUE) {
       stop("`k` must be less than `n`")
     } else {
       if (usedata && n <= maxn_indata) {
-        return(sum(dpeakdat[[n]][0:j]))
+        return(sum(dpeakdat[[n]][1:(j + 1)]))
       } else {
         return(sum(dpeak(n, 0:j)))
       }
