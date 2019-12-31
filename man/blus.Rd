@@ -4,8 +4,12 @@
 \alias{blus}
 \title{Compute Best Linear Unbiased Scalar-Covariance (BLUS) residuals from a linear model}
 \usage{
-blus(mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
-  exhaust = NULL)
+blus(
+  mainlm,
+  omit = c("first", "last", "random"),
+  keepNA = TRUE,
+  exhaust = NULL
+)
 }
 \arguments{
 \item{mainlm}{Either an object of \code{\link[base]{class}} "lm", or a list

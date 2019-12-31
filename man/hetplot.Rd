@@ -4,8 +4,14 @@
 \alias{hetplot}
 \title{Graphical Methods for Detecting Heteroskedasticity in a Linear Regression Model}
 \usage{
-hetplot(mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity",
-  filetype = NULL, ...)
+hetplot(
+  mainlm,
+  horzvar = 1:n,
+  vertvar = "res",
+  vertfun = "identity",
+  filetype = NULL,
+  ...
+)
 }
 \arguments{
 \item{mainlm}{Either an object of \code{\link[base]{class}} "lm", or a list

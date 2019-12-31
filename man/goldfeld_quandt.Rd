@@ -4,9 +4,14 @@
 \alias{goldfeld_quandt}
 \title{Goldfeld-Quandt Tests for Heteroskedasticity in a Linear Regression Model}
 \usage{
-goldfeld_quandt(mainlm, method = "parametric", deflator = NULL,
-  prop_central = 1/3, alternative = c("greater", "less", "two.sided"),
-  pvals = NULL)
+goldfeld_quandt(
+  mainlm,
+  method = "parametric",
+  deflator = NULL,
+  prop_central = 1/3,
+  alternative = c("greater", "less", "two.sided"),
+  pvals = NULL
+)
 }
 \arguments{
 \item{mainlm}{Either an object of \code{\link[base]{class}} "lm", or a list

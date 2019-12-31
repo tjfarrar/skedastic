@@ -4,8 +4,14 @@
 \alias{bamset}
 \title{Ramsey's BAMSET Test for Heteroskedasticity in a Linear Regression Model}
 \usage{
-bamset(mainlm, k = 3, deflator = NULL, correct = TRUE,
-  omitatmargins = TRUE, omit = NULL)
+bamset(
+  mainlm,
+  k = 3,
+  deflator = NULL,
+  correct = TRUE,
+  omitatmargins = TRUE,
+  omit = NULL
+)
 }
 \arguments{
 \item{mainlm}{Either an object of \code{\link[base]{class}} "lm", or a list
