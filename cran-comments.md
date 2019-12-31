@@ -11,7 +11,7 @@ This is the first time the package is submitted to CRAN (third attempt).
 
 ## Test environments
 * ubuntu xenial 16.04 (on travis-ci), r-release (3.6.2) and r-devel (4.0.0)
-* win-builder (in RStudio), r-release (3.6.2) and r-devel (4.0.0)
+* win-builder (in RStudio), r-release (3.6.2) and r-devel (4.0.0) 
 
 ## R CMD check results
 No ERRORs or WARNINGs from any checks.
