@@ -184,6 +184,8 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
 
   print(cbind(names(y_ver), unlist(yline_mtext)))
 
+  opar <- par(no.readonly = TRUE)
+  on.exit(par(opar))
   if (is.null(filetype)) {
     numplots <- length(horzvar) * length(vertvar) * length(vertfun)
     mfrow_dim <- plotdim(numplots)
