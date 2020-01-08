@@ -8,7 +8,7 @@ This is the first time the package is submitted to CRAN (fourth attempt).
 ## Test environments
 * ubuntu xenial 16.04 (on travis-ci), r-release (3.6.2) and r-devel (4.0.0)
 * win-builder (in RStudio), r-release (3.6.2) and r-devel (4.0.0) 
-* could not test for mac osx xcode 9.4 because package installation failed on travis-ci for both r-release and r-devel (had previously worked for r-release under 3.6.1)
+* mac osx xcode 9.4 (on travis-ci), r-release (3.6.2); could not build for r-devel due to https://cloud.r-project.org/bin/macosx/el-capitan/contrib/r-devel/ package repository being empty
 
 ## R CMD check results
 No ERRORs or WARNINGs from any checks.
