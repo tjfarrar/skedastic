@@ -103,7 +103,7 @@ goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
     if (length(badrows) > 0) {
       warning("Rows of data containing NA/NaN/Inf values removed")
       y <- y[-badrows]
-      X <- X[-badrows, ]
+      X <- X[-badrows, drop = FALSE]
     }
     p <- ncol(X)
     hasintercept <- columnof1s(X)

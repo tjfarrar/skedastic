@@ -40,7 +40,7 @@ li_yao <- function (mainlm, method = "alrt") {
     if (length(badrows) > 0) {
       warning("Rows of data containing NA/NaN/Inf values removed")
       y <- y[-badrows]
-      X <- X[-badrows, ]
+      X <- X[-badrows, drop = FALSE]
     }
     mainlm <- stats::lm.fit(X, y)
   }

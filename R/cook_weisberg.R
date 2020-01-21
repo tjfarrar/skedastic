@@ -61,7 +61,7 @@ cook_weisberg <- function (mainlm, auxdesign = NULL, errorfun = "additive") {
     if (length(badrows) > 0) {
       warning("Rows of data containing NA/NaN/Inf values removed")
       y <- y[-badrows]
-      X <- X[-badrows, ]
+      X <- X[-badrows, drop = FALSE]
     }
     mainlm <- stats::lm.fit(X, y)
   }
@@ -81,7 +81,7 @@ cook_weisberg <- function (mainlm, auxdesign = NULL, errorfun = "additive") {
 
   hasintercept <- columnof1s(Z)
   if (hasintercept[[1]]) {
-    Z <- Z[, -hasintercept[[2]]]
+    Z <- Z[, -hasintercept[[2]], drop = FALSE]
   }
 
   q <- ncol(Z)

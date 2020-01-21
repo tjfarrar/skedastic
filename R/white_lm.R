@@ -51,7 +51,7 @@ white_lm <- function (mainlm, interactions = FALSE) {
     if (length(badrows) > 0) {
       warning("Rows of data containing NA/NaN/Inf values removed")
       y <- y[-badrows]
-      X <- X[-badrows, ]
+      X <- X[-badrows, drop = FALSE]
     }
     mainlm <- stats::lm.fit(X, y)
   }
@@ -60,7 +60,7 @@ white_lm <- function (mainlm, interactions = FALSE) {
   if (!hasintercept[[1]]) {
     message("Intercept included in auxiliary design matrix")
   } else {
-    X <- X[, -hasintercept[[2]]]
+    X <- X[, -hasintercept[[2]], drop = FALSE]
   }
 
   n <- nrow(X)
