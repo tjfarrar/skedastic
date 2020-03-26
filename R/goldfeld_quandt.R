@@ -172,8 +172,7 @@ goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
     param <- n
     names(param) <- "No. of obs"
     if (is.null(pvals)) {
-      pvals <- ppeak(n, 0:(n-1), upper = TRUE,
-                usedata = (n > 170 & n <= 500))
+      pvals <- ppeak(n, 0:(n-1), upper = TRUE, usedata = (n <= 1000))
     }
     pval <- pvals[teststat + 1]
     fullmethod <- "Goldfeld-Quandt Peaks Test"

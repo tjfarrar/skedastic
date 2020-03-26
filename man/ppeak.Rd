@@ -24,7 +24,7 @@ inclusive of \code{k}.}
 read from \code{\link{dpeakdat}} rather than computing them from
 \code{\link{dpeak}}? This option will save significantly on
 computation time if \eqn{n < 170} but is currently only available
-for \eqn{n \leq 500}.}
+for \eqn{n \le 1000}.}
 }
 \value{
 A double between 0 and 1 representing the probability of at least

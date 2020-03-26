@@ -17,13 +17,13 @@ of peaks in the series.}
 \item{usedata}{A logical. Should probability mass function values be
 read from \code{\link{dpeakdat}} rather than computing them? This option
 will save significantly on computation time if \eqn{n < 170} but is
-currently only available for \eqn{n \leq 500}.}
+currently only available for \eqn{n \leq 1000}.}
 }
 \value{
 A double between 0 and 1 representing the probability of exactly
 k peaks occurring in a series of \eqn{n} independent and identically
 distributed continuous random variables. Computation time is very slow for
-\eqn{n > 170} (if \code{usedata} is \code{FALSE}) and for \eqn{n > 500}
+\eqn{n > 170} (if \code{usedata} is \code{FALSE}) and for \eqn{n > 1000}
 regardless of \code{usedata} value.
 }
 \description{
@@ -44,7 +44,7 @@ plot(0:9, dpeak(10, 0:9), type = "p", pch = 20, xlab = "Number of Peaks",
 utils::data(dpeakdat)
 expval <- unlist(lapply(dpeakdat,
                  function(p) sum(p * 0:(length(p) - 1))))
-plot(1:500, expval[1:500], type = "l", xlab = parse(text = "n"),
+plot(1:1000, expval[1:1000], type = "l", xlab = parse(text = "n"),
      ylab = "Expected Number of Peaks")
 }
 \references{

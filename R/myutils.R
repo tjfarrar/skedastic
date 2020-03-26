@@ -146,3 +146,53 @@ do_Xmats <- function(X, n, p, omit_ind) {
   X_ord_sq <- t(X_ord) %*% X_ord
   return(list("X0" = X0, "X1" = X1, "X_ord_sq" = X_ord_sq))
 }
+
+bvtnormcub <- function(x, sigma_e_i, sigma_e_j, rho) {
+  function(x)
+    force(1 / (2 * pi * sigma_e_i * sigma_e_j * sqrt(1 - rho ^ 2)) *
+    exp(- 1 / (2 * (1 - rho ^ 2)) * ((x[1] / sigma_e_i) ^ 2 +
+    (x[2] / sigma_e_j) ^ 2 - 2 * rho * x[1] * x[2]) / (sigma_e_i * sigma_e_j)))
+}
+
+# qreg arguments:
+# x and y are independent and dependent variables (matrix and vector)
+# qval is the quantile to be used, which defaults to median
+# the argument q can be used instead of qval to alter the quantile used
+# the argument pr ???
+# the argument xout indicates whether data are to be removed if
+#   the value of x is flagged as an outlier
+# the argument outfun indicates the method to detect outliers, which defaults
+#   to the MAD-median rule when there is only one independent variable
+# plotit determines whether to draw a scatter plot
+# xlab and ylab would be axis labels of plot
+# op = 1, v2 = TRUE, method = "br", WARN = FALSE ???
+
+
+do_brownbridge_me <- function(z, sq = FALSE) { # Function to transform independent std normal variates into Brownian Bridge
+  m <- length(z)
+  if (sq) {
+    wiener <- stats::ts(cumsum(z ^ 2 / sqrt(2 * m)), start = 1 / m, frequency = m)
+    stats::ts(c(0, wiener - stats::time(wiener) * as.vector(wiener)[m]),
+        start = 0, frequency = m)
+  } else {
+    wiener <- stats::ts(cumsum(z / sqrt(m)), start = 1 / m, frequency = m)
+    stats::ts(c(0, wiener - stats::time(wiener) * as.vector(wiener)[m]),
+       start = 0, frequency = m)
+  }
+}
+
+supfunc <- function(B, m) {  # Function to find supremum of absolute differences in Brownian Bridge
+  # as per Rackauskas and Zuokas (2007) equation (11)
+  kseq <- 1:(m - 1)
+  unlist(lapply(kseq, function(k)
+    max(abs(B[(m - k + 1):(m + 1)] -
+              B[1:(k + 1)]))))
+}
+
+rksim <- function(R, m, sqZ, seed, alpha = alpha) { # generates pseudorandom variates from T_alpha distribution
+                                                    # of Rackauskas-Zuokas Test
+  hseq <- (1:(m - 1)) / m
+  set.seed(seed)
+  T_alpha <- replicate(R, max(supfunc(B = do_brownbridge_me(stats::rnorm(m), sq = sqZ), m = m) *
+                                hseq ^ (-alpha)))
+}
