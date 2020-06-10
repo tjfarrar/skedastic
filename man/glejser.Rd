@@ -4,7 +4,7 @@
 \alias{glejser}
 \title{Glejser Test for Heteroskedasticity in a Linear Regression Model}
 \usage{
-glejser(mainlm, auxdesign = NULL)
+glejser(mainlm, auxdesign = NULL, sigmaest = c("main", "auxiliary"))
 }
 \arguments{
 \item{mainlm}{Either an object of \code{\link[base]{class}} "lm", or a list
@@ -24,6 +24,14 @@ If set to \code{NULL} (the default), the
 design matrix of the original regression model is used. An intercept
 is included in the auxiliary regression even if the first column of
 \code{auxdesign} is not a vector of ones.}
+
+\item{sigmaest}{A character indicating which model residuals to use in the
+\eqn{\hat{\sigma}^2} estimator in the denominator of the test statistic.
+If \code{"main"} (the default), the OLS residuals from the original model
+are used; this produces results identical to the Glejser Test in SHAZAM
+software. If \code{"auxiliary"}, the OLS residuals from the auxiliary
+model are used, as in \insertCite{Mittelhammer00;textual}{skedastic}.
+Partial matching is used.}
 }
 \value{
 An object of \code{\link[base]{class}} "htest". If object is not

@@ -14,8 +14,8 @@
 #'    'upper' model to the sum of squared residuals from the 'lower' model.
 #'    Under the null hypothesis, the test statistic is exactly F-distributed
 #'    with numerator and denominator degrees of freedom equal to
-#'    \eqn{(n-k)/2 - p} where \eqn{n} is the number of observations in the
-#'    original regression model, \eqn{k} is the number of central observations
+#'    \eqn{(n-c)/2 - p} where \eqn{n} is the number of observations in the
+#'    original regression model, \eqn{c} is the number of central observations
 #'    removed, and \eqn{p} is the number of columns in the design matrix (number of
 #'    parameters to be estimated, including intercept).
 #'
@@ -44,24 +44,35 @@
 #'    \code{"parametric"} only). \code{\link[base]{round}} is
 #'    used to ensure the number of central observations is an integer. The
 #'    value must be small enough to allow the two auxiliary regressions to
-#'    be fit; otherwise an error is thrown. Defaults to \eqn{1/3}.
+#'    be fit; otherwise an error is thrown. Defaults to \eqn{\frac{1}{3}}.
 #' @param alternative A character specifying the form of alternative
-#'    hypothesis ((when \code{method} is \code{"parametric"} only;
-#'    nonparametric test is strictly upper-tailed). If it is suspected that
-#'    the error variance is positively associated with the deflator variable,
-#'    "greater". If it is suspected that error variance is negatively
-#'    associated with deflator variable, "less". If no prior information is
-#'    available, "two.sided". Defaults to "greater".
-#' @param pvals A vector of \eqn{p}-values, i.e. upper cumulative probabilities
-#'    corresponding to to values of the test statistic from 0 to \eqn{n-1} (used
+#'    hypothesis. If it is suspected that the
+#'    error variance is positively associated with the deflator variable,
+#'    \code{"greater"}. If it is suspected that the error variance is
+#'    negatively associated with deflator variable, \code{"less"}. If no
+#'    information is available on the suspected direction of the association,
+#'    \code{"two.sided"}. Defaults to \code{"greater"}.
+#' @param prob A vector of probabilities corresponding to values of the test
+#'    statistic (number of peaks) from 0 to \eqn{n-1} inclusive (used
 #'    only when \code{method} is \code{"nonparametric"}). If
-#'    \code{NULL} (the default), p-values are calculated within the function.
-#'    To improve performance where the test is being used many times (e.g. in
-#'    a Monte Carlo simulation), a vector of \eqn{p}-values for a particular
-#'    \eqn{n} can be computed beforehand using \code{\link{ppeak}} and passed
-#'    to the function, so that the \eqn{p}-values are not computed each time the
-#'    function executes (see Examples). Computation of \code{\link{ppeak}} is
-#'    extremely slow for \eqn{n > 170}.
+#'    \code{NULL} (the default), probabilities are calculated within the
+#'    function by calling \code{ppeak}. The user can improve computational
+#'    performance of the test (for instance, when the test is being used
+#'    repeatedly in a simulation) by pre-specifying the exact probability
+#'    distribution of the number of peaks using this argument.
+#' @param twosidedmethod A character indicating the method to be used to compute
+#'    two-sided \eqn{p}-values for the parametric test when \code{alternative}
+#'    is \code{"two.sided"}. The argument is passed to
+#'    \code{\link{twosidedpval}} as its \code{method} argument.
+#' @param restype A character specifying which residuals to use: \code{"ols"}
+#'    for OLS residuals (the default) or the \code{"blus"} for
+#'    \link[=blus]{BLUS} residuals. The advantage of using BLUS residuals is
+#'    that, under the null hypothesis, the assumption that the random series
+#'    is independent and identically distributed is met (whereas with OLS
+#'    residuals it is not). The disadvantage of using BLUS residuals is that
+#'    only \eqn{n-p} residuals are used rather than the full \eqn{n}. This
+#'    argument is ignored if \code{method} is \code{"parametric"}.
+#' @param ... Optional further arguments to pass to \code{\link{blus}}.
 #'
 #' @inheritParams breusch_pagan
 #'
@@ -80,15 +91,21 @@
 #' @examples
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' goldfeld_quandt(mtcars_lm, deflator = "qsec", prop_central = 0.25)
-#' goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric")
-#'
+#' goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric",
+#'  restype = "blus")
+#' goldfeld_quandt(mtcars_lm, deflator = "qsec", prop_central = 0.25, alternative = "two.sided")
+#' goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric",
+#'  restype = "blus", alternative = "two.sided")
 
 goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
-                             prop_central = 1 / 3, alternative = c("greater",
-                              "less", "two.sided"), pvals = NULL) {
+                    prop_central = 1 / 3, alternative = c("greater", "less",
+                    "two.sided"), prob = NULL, twosidedmethod = c("doubled",
+                    "kulinskaya"), restype = c("ols", "blus"), ...) {
 
+  twosidedmethod <- match.arg(twosidedmethod, c("doubled", "kulinskaya"))
   alternative <- match.arg(alternative, c("greater", "less", "two.sided"))
   method <- match.arg(method, c("parametric", "nonparametric"))
+  restype <- match.arg(restype, c("ols", "blus"))
 
   if (class(mainlm) == "lm") {
     X <- stats::model.matrix(mainlm)
@@ -134,19 +151,11 @@ goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
 
   if (method == "parametric") {
 
-    k <- as.integer(round(n * prop_central))
-    if ((n - k) / 2 <= p) {
-      stop("`prop_central` must be small enough that
-             (n - k) / 2 > p where n is total no. of observations,
-             k is number of central observations removed, and p is no. of
-             columns in design matrix (no. of parameters to be estimated)")
-    } else if (k < 0) {
-      stop("`prop_central` cannot be negative")
-    }
+    k <- num_to_remove(n, prop_central)
 
     if (!is.null(deflator)) {
       y <- y[order(X[, deflator])]
-      X <- X[order(X[, deflator]), ]
+      X <- X[order(X[, deflator]), , drop = FALSE]
     }
     ind_lo <- 1:((n - k) / 2)
     ind_hi <- ((n + k) / 2 + 1):n
@@ -155,26 +164,55 @@ goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
     teststat <- S_hi / S_lo
     param <- (n - k) / 2 - p
     names(param) <- "df"
-    pval <- switch(alternative, "greater" = 1 - stats::pf(teststat, df1 = param,
-                  df2 = param), "less" = stats::pf(teststat, df1 = param,
-                  df2 = param), "two.sided" = 2 * min(1 - stats::pf(teststat,
-                  df1 = param, df2 = param), stats::pf(teststat, df1 = param,
-                  df2 = param)))
+    if (alternative == "greater") {
+      pval <- stats::pf(teststat, df1 = param, df2 = param, lower.tail = FALSE)
+    } else if (alternative == "less") {
+      pval <- stats::pf(teststat, df1 = param, df2 = param, lower.tail = TRUE)
+    } else if (alternative == "two.sided") {
+      pval <- twosidedpval(q = teststat, Aloc = 1, CDF = pf,
+                       method = twosidedmethod, df1 = param, df2 = param)
+    }
     fullmethod <- "Goldfeld-Quandt F Test"
   } else if (method == "nonparametric") {
-    alternative <- "greater"
-    if (is.null(deflator)) {
+    if (restype == "ols") {
       absres <- abs(mainlm$residuals)
+      newn <- n
+    } else if (restype == "blus") {
+      absres <- abs(blus(mainlm, ...))
+      newn <- n - p
+    }
+
+    if (!is.null(deflator)) absres <- absres[order(X[, deflator])]
+
+    teststat <- countpeaks(absres[!is.na(absres)])
+    param <- NULL
+    if (is.null(prob)) {
+      if (alternative == "greater") {
+        pval <- ppeak(k = teststat, n = newn, lower.tail = FALSE, usedata = (newn <= 1000))
+      } else if (alternative == "less") {
+        pval <- ppeak(k = teststat, n = newn, lower.tail = TRUE, usedata = (newn <= 1000))
+      } else if (alternative == "two.sided") {
+          peakmean <- sum(0:(newn - 1) * dpeak(k = 0:(newn - 1), n = newn,
+                                               usedata = (newn <= 1000)))
+          pval <- twosidedpval(q = teststat, Aloc = peakmean, CDF = ppeak,
+                           method = twosidedmethod, continuous = FALSE,
+                           n = newn, lower.tail = TRUE, usedata = (newn <= 1000))
+      }
     } else {
-      absres <- abs(mainlm$residuals)[order(X[, deflator])]
+      if (length(prob) != newn) stop("prob must be a vector of length equal to number of observations in series")
+      if (alternative == "greater") {
+        pval <- sum(prob[(teststat + 1):length(prob)])
+      } else if (alternative == "less") {
+        pval <- sum(prob[1:(teststat + 1)])
+      } else if (alternative == "two.sided") {
+          pfunc <- function(k) {
+            sum(prob[1:(k + 1)])
+          }
+          peakmean <- sum(0:(newn - 1) * prob)
+          pval <- twosidedpval(q = teststat, Aloc = peakmean, CDF = pfunc,
+                           method = twosidedmethod, continuous = FALSE)
+      }
     }
-    teststat <- countpeaks(absres)
-    param <- n
-    names(param) <- "No. of obs"
-    if (is.null(pvals)) {
-      pvals <- ppeak(n, 0:(n-1), upper = TRUE, usedata = (n <= 1000))
-    }
-    pval <- pvals[teststat + 1]
     fullmethod <- "Goldfeld-Quandt Peaks Test"
   } else stop("Invalid `method` argument")
 

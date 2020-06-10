@@ -2,23 +2,23 @@
 % Please edit documentation in R/peaks.R
 \name{ppeak}
 \alias{ppeak}
-\title{Cumulative distribution function of number of peaks in a random series}
+\title{Cumulative distribution function of number of peaks in an i.i.d. random sequence}
 \usage{
-ppeak(n, k, upper = TRUE, usedata = TRUE)
+ppeak(k, n, lower.tail = FALSE, usedata = TRUE)
 }
 \arguments{
-\item{n}{A positive integer representing the number of observations in the
-series.}
-
 \item{k}{An integer or a sequence of integers strictly incrementing by 1,
 with all values between 0 and \code{n - 1} inclusive. Represents the
-number of peaks in the series.}
+number of peaks in the sequence.}
 
-\item{upper}{A logical. Should upper tailed cumulative probability be
-calculated? Defaults to \code{TRUE} due to function being designed
-primarily for calculating \eqn{p}-values for the peaks test. Note that
-both upper and lower tailed cumulative probabilities are computed
-inclusive of \code{k}.}
+\item{n}{A positive integer representing the number of observations in the
+sequence.}
+
+\item{lower.tail}{A logical. Should lower tailed cumulative probability be
+calculated? Defaults to \code{FALSE} due to function being designed
+primarily for calculating \eqn{p}-values for the peaks test, which is
+by default an upper-tailed test. Note that both upper and lower tailed
+cumulative probabilities are computed inclusive of \code{k}.}
 
 \item{usedata}{A logical. Should probability mass function values be
 read from \code{\link{dpeakdat}} rather than computing them from
@@ -28,12 +28,14 @@ for \eqn{n \le 1000}.}
 }
 \value{
 A double between 0 and 1 representing the probability of at least
-   (at most) k peaks occurring in a series of \eqn{n} independent and
-   identically distributed continuous random variables.
+   (at most) k peaks occurring in a sequence of \eqn{n} independent and
+   identically distributed continuous random variables. The double has a
+   \code{names} attribute with the values corresponding to the
+   probabilities.
 }
 \description{
 This function computes \eqn{\sum_{k} P(n,k)}, i.e. the probability that a
-series of \eqn{n} independent and identically distributed random variables
+sequence of \eqn{n} independent and identically distributed random variables
 contains \eqn{\ge k} \eqn{(\le k)} peaks, with peaks as defined in
 \insertCite{Goldfeld65;textual}{skedastic}. The function may be used to
 compute \eqn{p}-values for the Goldfeld-Quandt nonparametric test for
@@ -42,11 +44,11 @@ heteroskedasticity in a linear model. Computation time is very slow for
 }
 \examples{
 # For an independent sample of size 250, the probability of at least 10
-# peaks is 0.06186582
-ppeak(250, 10, upper = TRUE, usedata = TRUE)
+# peaks is 0.02650008
+ppeak(k = 10, n = 250, lower.tail = FALSE, usedata = TRUE)
 # For an independent sample of size 10, the probability of at most 2 peaks
 # is 0.7060615
-ppeak(10, 2, upper = FALSE, usedata = FALSE)
+ppeak(k = 2, n = 10, lower.tail = TRUE, usedata = FALSE)
 
 }
 \references{

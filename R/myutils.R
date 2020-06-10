@@ -109,7 +109,7 @@ margin_indices <- function(v, p, sub_ind) {
   unlist(omit_ind)
 }
 
-do_omit <- function(omit, n, p) {
+do_omit <- function(omit, n, p, seed.) {
   if (is.character(omit)) {
     omit <- match.arg(omit, c("first", "last", "random"))
     omit_passed <- omit
@@ -118,6 +118,7 @@ do_omit <- function(omit, n, p) {
     } else if (omit == "last") {
       omit_ind <- (n - p + 1):n
     } else if (omit == "random") {
+      if (!is.null(seed.)) set.seed(seed.)
       omit_ind <- sort(sample(1:n, p))
     } else stop("Invalid character for `omit` argument")
   } else if (is.numeric(omit)) {
@@ -147,12 +148,65 @@ do_Xmats <- function(X, n, p, omit_ind) {
   return(list("X0" = X0, "X1" = X1, "X_ord_sq" = X_ord_sq))
 }
 
-bvtnormcub <- function(x, sigma_e_i, sigma_e_j, rho) {
+normexpect_integrand <- function(x, sigma1, sigma2, rho) {
   function(x)
-    force(1 / (2 * pi * sigma_e_i * sigma_e_j * sqrt(1 - rho ^ 2)) *
-    exp(- 1 / (2 * (1 - rho ^ 2)) * ((x[1] / sigma_e_i) ^ 2 +
-    (x[2] / sigma_e_j) ^ 2 - 2 * rho * x[1] * x[2]) / (sigma_e_i * sigma_e_j)))
+    force(sqrt(abs(x[1] * x[2])) / (2 * pi * sigma1 * sigma2 * sqrt(1 - rho ^ 2)) *
+    exp(- 1 / (2 * (1 - rho ^ 2)) * ((x[1] / sigma1) ^ 2 +
+    (x[2] / sigma2) ^ 2 - 2 * rho * x[1] * x[2] / (sigma1 * sigma2))))
 }
+
+value_possible <- function(x, myCDF, ...) {
+  if (x %% 1 == 0) {
+    if (myCDF(x, ...) - myCDF(x - 1, ...) == 0) {
+      FALSE
+    } else if (myCDF(x, ...) - myCDF(x - 1, ...) > 0) {
+      TRUE
+    }
+  } else if (x %% 1 > 0) {
+    FALSE
+  }
+}
+
+meanfromCDF <- function(theCDF, cont, suplim, ...) {
+  CDF2 <- function(x) theCDF(x, ...)
+  surv <- function(x) 1 - theCDF(x, ...)
+  if (cont) {
+    stats::integrate(surv, lower = 0, upper = Inf)$value -
+      stats::integrate(CDF2, lower = -Inf, upper = 0)$value
+  } else {
+    if (missing(suplim)) {
+      meanval <- sum(surv(0:1e6)) - sum(CDF2(-1e6:-1))
+    } else {
+      if (is.infinite(suplim[2])) {
+        suplim[2] <- 1e6
+        warning("Infinite upper limit of support truncated at 1e6")
+      }
+      if (is.infinite(suplim[1])) {
+        suplim[1] <- -1e6
+        warning("Infinite lower limit of support truncated at -1e6")
+      }
+      negsupport <- suplim[1] < 0
+      possupport <- suplim[2] > 0
+      if (negsupport && possupport) {
+        meanval <- sum(surv(0:suplim[2])) - sum(CDF2(suplim[1]:-1))
+      } else if (negsupport && !possupport) {
+        meanval <- 0 - sum(CDF2(suplim[1]:suplim[2]))
+      } else if (!negsupport && possupport) {
+        meanval <- sum(surv(suplim[1]:suplim[2]))
+      }
+    }
+    if (meanval %% 1 < 1e-4 || meanval %% 1 > (1 - 1e-4)) {
+      as.integer(round(meanval))
+    } else {
+      meanval
+    }
+  }
+}
+
+# normexp_integrand2 <- function(x, Sigmat) {
+#   function(x)
+#     force(mvtnorm::dmvnorm(x, sigma = Sigmat))
+# }
 
 # qreg arguments:
 # x and y are independent and dependent variables (matrix and vector)
@@ -181,18 +235,72 @@ do_brownbridge_me <- function(z, sq = FALSE) { # Function to transform independe
   }
 }
 
-supfunc <- function(B, m) {  # Function to find supremum of absolute differences in Brownian Bridge
+supfunc <- function(B, m..) {  # Function to find supremum of absolute differences in Brownian Bridge
   # as per Rackauskas and Zuokas (2007) equation (11)
-  kseq <- 1:(m - 1)
+  kseq <- 1:(m.. - 1)
   unlist(lapply(kseq, function(k)
-    max(abs(B[(m - k + 1):(m + 1)] -
+    max(abs(B[(m.. - k + 1):(m.. + 1)] -
               B[1:(k + 1)]))))
 }
 
-rksim <- function(R, m, sqZ, seed, alpha = alpha) { # generates pseudorandom variates from T_alpha distribution
+rksim <- function(R., m., sqZ., seed., alpha. = alpha) { # generates pseudorandom variates from T_alpha distribution
                                                     # of Rackauskas-Zuokas Test
-  hseq <- (1:(m - 1)) / m
-  set.seed(seed)
-  T_alpha <- replicate(R, max(supfunc(B = do_brownbridge_me(stats::rnorm(m), sq = sqZ), m = m) *
-                                hseq ^ (-alpha)))
+  hseq <- (1:(m. - 1)) / m.
+  if (!is.null(seed.)) set.seed(seed.)
+  Z <- replicate(R., stats::rnorm(m.), simplify = FALSE)
+  B <- lapply(X = Z, FUN = do_brownbridge_me, sq = sqZ.)
+  vapply(X = B, FUN = function(b) max(supfunc(B = b, m.. = m.) *
+                      hseq ^ (-alpha.)), NA_real_)
+}
+
+num_to_remove <- function(n, p) {
+ k <- as.integer(round(n * p))
+ if ((((n - k) / 2) %% 1) != 0) k <- k - 1
+ if ((n - k) / 2 <= p) {
+   stop("`prop_central` must be small enough that
+             (n - k) / 2 > p where n is total no. of observations,
+             k is number of central observations removed, and p is no. of
+             columns in design matrix (no. of parameters to be estimated)")
+ } else if (k < 0) {
+   stop("`prop_central` cannot be negative")
+ }
+ return(k)
+}
+
+fastM <- function(X, n) {
+  diag(n) - X %*% solve(crossprod(X)) %*% t(X)
+}
+
+IRfunc <- function(X, e, B, method) {
+  p <- ncol(X)
+  n <- length(e)
+  sigma_hat_sq <- sum(e ^ 2) / n
+  H <- X %*% solve(crossprod(X)) %*% t(X)
+  xi <- replicate(B, stats::rnorm(n))
+  if (method == "Xj") {
+    Hminus <- lapply(1:p, function(j) X[, -j, drop = FALSE] %*%
+                       solve(t(X[, -j, drop = FALSE]) %*% X[, -j, drop = FALSE]) %*%
+                       t(X[, -j, drop = FALSE]))
+    w <- sapply(1:p, function(j) diag(H) - diag(Hminus[[j]]))
+    IR <- vapply(1:p, function(j) sum(w[, j] * e ^ 2) / sigma_hat_sq, NA_real_)
+    W <- sqrt(n) * (IR - 1)
+    Wstar <- sapply(1:B, function(b) vapply(1:p, function(j) sqrt(n) *
+            sum(xi[, b] * ((w[, j] - 1 / n * IR[j]) * (e ^ 2 / sigma_hat_sq - 1) -
+            1 / n * (IR[j] - 1))), NA_real_))
+    Px <- vapply(1:3, function(j) sum(Wstar[j, ] >= W[j]) / B, NA_real_)
+    return(list(W, Px))
+  } else if (method == "pool") {
+    wpool <- diag(H) / p
+    IRpool <- sum(e ^ 2 * wpool) / sigma_hat_sq
+    Wstarpool <- vapply(1:B, function(b) sqrt(n) *
+                          sum(xi[, b] * ((wpool - 1 / n * IRpool) *
+                                           (e ^ 2 / sigma_hat_sq - 1) - 1 / n * (IRpool - 1))), NA_real_)
+    Wpool <- sqrt(n) * (IRpool - 1)
+    P <- sum(Wstarpool >= Wpool) / B
+    return(list(Wpool, P))
+  }
+}
+
+SKH <- function(i) {
+  2 * (1 - cos((pi * i) / (length(i) + 1)))
 }

@@ -10,6 +10,7 @@ hetplot(
   vertvar = "res",
   vertfun = "identity",
   filetype = NULL,
+  values = FALSE,
   ...
 )
 }
@@ -57,6 +58,9 @@ If \code{NULL} (the default), no image files are written, and in this
 case, if there are multiple plots, they are plotted on a single device
 using the \code{"mfrow"} graphical parameter. If many plots are requested
 at once, it is advisable to write them to image files.}
+
+\item{values}{A logical. Should the sequences corresponding to the
+horizontal and vertical variable(s) be returned in a \code{list} object?}
 
 \item{...}{Arguments to be passed to methods, such as graphical parameters
 (see \code{\link{par}}), parameters for \code{\link[graphics]{plot}},

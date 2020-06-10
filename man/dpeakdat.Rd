@@ -5,9 +5,11 @@
 \alias{dpeakdat}
 \title{Probability distribution for number of peaks in a continuous,
 uncorrelated stochastic series}
-\format{A list of 1000 objects. The \eqn{n}th object is a double vector
+\format{
+A list of 1000 objects. The \eqn{n}th object is a double vector
 of length \eqn{n}, with elements representing the probability of \eqn{k}
-peaks for \eqn{k=0,1,\ldots,n-1}.}
+peaks for \eqn{k=0,1,\ldots,n-1}.
+}
 \usage{
 dpeakdat
 }

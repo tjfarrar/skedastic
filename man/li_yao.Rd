@@ -4,7 +4,7 @@
 \alias{li_yao}
 \title{Li-Yao ALRT and CVT Tests for Heteroskedasticity in a Linear Regression Model}
 \usage{
-li_yao(mainlm, method = "alrt")
+li_yao(mainlm, method = c("cvt", "alrt"), baipanyin = TRUE)
 }
 \arguments{
 \item{mainlm}{Either an object of \code{\link[base]{class}} "lm", or a list
@@ -17,9 +17,17 @@ important.}
 
 \item{method}{A character indicating which of the two tests derived in
 \insertCite{Li19;textual}{skedastic} should be implemented. Possible
-values are "alrt" (approximate likelihood-ratio test) and "cvt"
-(coefficient-of-variation test). Default is "alrt". It is acceptable to
-specify only the first letter.}
+values are \code{"alrt"} (approximate likelihood-ratio test) and
+\code{"cvt"} (coefficient-of-variation test). Default is \code{"cvt"}.
+Partial matching is used.}
+
+\item{baipanyin}{A logical. Should the central limit theorem of
+\insertCite{Bai16;textual}{skedastic} be used to determine the
+\eqn{p}-value for the coefficient-of-variation test (assuming normally
+distributed errors)? If \code{FALSE}, the asymptotic null distribution
+in \insertCite{Li19;textual}{skedastic} is used, which requires the
+assumption that the design variables are random and normally distributed.
+This argument is ignored if \code{method} is \code{"alrt"}.}
 }
 \value{
 An object of \code{\link[base]{class}} "htest". If object is not
@@ -44,6 +52,7 @@ These two tests are straightforward to implement; in both cases the test
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 li_yao(mtcars_lm, method = "alrt")
 li_yao(mtcars_lm, method = "cvt")
+li_yao(mtcars_lm, method = "cvt", baipanyin = FALSE)
 
 }
 \references{

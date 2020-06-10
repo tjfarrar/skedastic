@@ -4,7 +4,7 @@
 \alias{cook_weisberg}
 \title{Cook-Weisberg Score Test for Heteroskedasticity in a Linear Regression Model}
 \usage{
-cook_weisberg(mainlm, auxdesign = NULL, errorfun = "additive")
+cook_weisberg(mainlm, auxdesign = NULL, hetfun = "additive")
 }
 \arguments{
 \item{mainlm}{Either an object of \code{\link[base]{class}} "lm", or a list
@@ -25,7 +25,7 @@ design matrix of the original regression model is used. An intercept
 is included in the auxiliary regression even if the first column of
 \code{auxdesign} is not a vector of ones.}
 
-\item{errorfun}{A character describing the functional form of
+\item{hetfun}{A character describing the functional form of
 the error variance under the heteroskedastic alternative. Possible values
 are \code{"additive"} (the default) and
 \code{"multiplicative"}, corresponding to the two cases considered in
@@ -52,7 +52,8 @@ The Cook-Weisberg Score Test entails fitting an auxiliary regression model
 in which the response variable is the vector of standardised squared
 residuals \eqn{e_i^2/\hat{\sigma}^2} from the original OLS
 model and the design matrix is some function of \eqn{Z}, an
-\eqn{n \times q} matrix consisting of \eqn{q} exogenous variables.
+\eqn{n \times q} matrix consisting of \eqn{q} exogenous variables, appended
+to a column of ones.
 The test statistic is half the residual sum of squares from this auxiliary
 regression. Under the null hypothesis of homoskedasticity, the distribution
 of the test statistic is asymptotically chi-squared with \eqn{q} degrees of
@@ -61,7 +62,7 @@ freedom. The test is right-tailed.
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 cook_weisberg(mtcars_lm)
-cook_weisberg(mtcars_lm, auxdesign = "fitted.values", errorfun = "multiplicative")
+cook_weisberg(mtcars_lm, auxdesign = "fitted.values", hetfun = "multiplicative")
 
 }
 \references{
@@ -71,11 +72,11 @@ cook_weisberg(mtcars_lm, auxdesign = "fitted.values", errorfun = "multiplicative
 \code{\link[car:ncvTest]{car::ncvTest}}, which implements the same
 test. Calling \code{car::ncvTest} with \code{var.formula} argument omitted
 is equivalent to calling \code{skedastic::cook_weisberg} with
-\code{auxdesign = "fitted.values", errorfun = "additive"}. Calling
+\code{auxdesign = "fitted.values", hetfun = "additive"}. Calling
 \code{car::ncvTest} with \code{var.formula = ~ X} (where \code{X} is the
 design matrix of the linear model with the intercept column omitted) is
 equivalent to calling \code{skedastic::cook_weisberg} with default
-\code{auxdesign} and \code{errorfun} values. The
-\code{errorfun = "multiplicative"} option has no equivalent in
+\code{auxdesign} and \code{hetfun} values. The
+\code{hetfun = "multiplicative"} option has no equivalent in
 \code{car::ncvTest}.
 }

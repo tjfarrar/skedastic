@@ -2,17 +2,17 @@
 % Please edit documentation in R/peaks.R
 \name{dpeak}
 \alias{dpeak}
-\title{Probability mass function of number of peaks in a random series}
+\title{Probability mass function of number of peaks in an i.i.d. random sequence}
 \usage{
-dpeak(n, k, usedata = FALSE)
+dpeak(k, n, usedata = FALSE)
 }
 \arguments{
-\item{n}{A positive integer representing the number of observations in the
-series.}
-
 \item{k}{An integer or a sequence of integers strictly incrementing by 1,
 with all values between 0 and \code{n - 1} inclusive. Represents the number
-of peaks in the series.}
+of peaks in the sequence.}
+
+\item{n}{A positive integer representing the number of observations in the
+sequence.}
 
 \item{usedata}{A logical. Should probability mass function values be
 read from \code{\link{dpeakdat}} rather than computing them? This option
@@ -21,23 +21,25 @@ currently only available for \eqn{n \leq 1000}.}
 }
 \value{
 A double between 0 and 1 representing the probability of exactly
-k peaks occurring in a series of \eqn{n} independent and identically
-distributed continuous random variables. Computation time is very slow for
+k peaks occurring in a sequence of \eqn{n} independent and identically
+distributed continuous random variables. The double has a \code{names}
+attribute with the values corresponding to the probabilities.
+Computation time is very slow for
 \eqn{n > 170} (if \code{usedata} is \code{FALSE}) and for \eqn{n > 1000}
 regardless of \code{usedata} value.
 }
 \description{
 This function computes \eqn{P(n,k)} as defined by
 \insertCite{Goldfeld65;textual}{skedastic}, i.e. the probability that a
-series of \eqn{n} independent and identically distributed random variables
+sequence of \eqn{n} independent and identically distributed random variables
 contains exactly \eqn{k} peaks, with peaks also as defined by
 \insertCite{Goldfeld65;textual}{skedastic}. The function is used in
 \code{\link{ppeak}} to compute \eqn{p}-values for the Goldfeld-Quandt
 nonparametric test for heteroskedasticity in a linear model.
 }
 \examples{
-dpeak(10, 0:9)
-plot(0:9, dpeak(10, 0:9), type = "p", pch = 20, xlab = "Number of Peaks",
+dpeak(0:9, 10)
+plot(0:9, dpeak(0:9, 10), type = "p", pch = 20, xlab = "Number of Peaks",
          ylab = "Probability")
 
 # `dpeakdat` is a dataset containing probabilities generated from `dpeak`

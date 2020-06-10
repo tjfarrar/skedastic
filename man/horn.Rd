@@ -9,8 +9,8 @@ horn(
   deflator = NULL,
   restype = c("ols", "blus"),
   alternative = c("two.sided", "greater", "less"),
-  exact = (n <= 10),
-  correct = !exact,
+  exact = (m <= 10),
+  correct = TRUE,
   ...
 )
 }
@@ -32,9 +32,13 @@ Default \code{NULL} means the data will be left in its current order
 (e.g. in case the existing index is believed to be associated with
 error variance).}
 
-\item{restype}{A character specifying which residuals to use: OLS residuals
-(the default) or the \link[=blus]{BLUS residuals} of
-\insertCite{Theil65;textual}{skedastic}.}
+\item{restype}{A character specifying which residuals to use: \code{"ols"}
+for OLS residuals (the default) or the \code{"blus"} for
+\link[=blus]{BLUS} residuals. The advantage of using BLUS residuals is
+that, under the null hypothesis, the assumption that the random series
+is independent and identically distributed is met (whereas with OLS
+residuals it is not). The disadvantage of using BLUS residuals is that
+only \eqn{n-p} residuals are used rather than the full \eqn{n}.}
 
 \item{alternative}{A character specifying the form of alternative
 hypothesis; one of "two.sided" (default), "greater", or "less".
@@ -46,7 +50,8 @@ corresponds to a positive trend in the absolute residuals when ordered by
 positive trend.)}
 
 \item{exact}{A logical. Should exact \eqn{p}-values be computed? If
-\code{FALSE} (the default), the normalised statistic \eqn{Z}}
+\code{FALSE}, a normal approximation is used. Defaults to \code{TRUE}
+only if the number of absolute residuals being ranked is \eqn{\le 10}.}
 
 \item{correct}{A logical. Should a continuity correction be used when
 computing the \eqn{p}-value? This parameter is ignored if

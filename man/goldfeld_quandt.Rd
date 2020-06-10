@@ -10,7 +10,10 @@ goldfeld_quandt(
   deflator = NULL,
   prop_central = 1/3,
   alternative = c("greater", "less", "two.sided"),
-  pvals = NULL
+  prob = NULL,
+  twosidedmethod = c("doubled", "kulinskaya"),
+  restype = c("ols", "blus"),
+  ...
 )
 }
 \arguments{
@@ -41,26 +44,40 @@ observations to exclude from the F test (when \code{method} is
 \code{"parametric"} only). \code{\link[base]{round}} is
 used to ensure the number of central observations is an integer. The
 value must be small enough to allow the two auxiliary regressions to
-be fit; otherwise an error is thrown. Defaults to \eqn{1/3}.}
+be fit; otherwise an error is thrown. Defaults to \eqn{\frac{1}{3}}.}
 
 \item{alternative}{A character specifying the form of alternative
-hypothesis ((when \code{method} is \code{"parametric"} only;
-nonparametric test is strictly upper-tailed). If it is suspected that
-the error variance is positively associated with the deflator variable,
-"greater". If it is suspected that error variance is negatively
-associated with deflator variable, "less". If no prior information is
-available, "two.sided". Defaults to "greater".}
+hypothesis. If it is suspected that the
+error variance is positively associated with the deflator variable,
+\code{"greater"}. If it is suspected that the error variance is
+negatively associated with deflator variable, \code{"less"}. If no
+information is available on the suspected direction of the association,
+\code{"two.sided"}. Defaults to \code{"greater"}.}
 
-\item{pvals}{A vector of \eqn{p}-values, i.e. upper cumulative probabilities
-corresponding to to values of the test statistic from 0 to \eqn{n-1} (used
+\item{prob}{A vector of probabilities corresponding to values of the test
+statistic (number of peaks) from 0 to \eqn{n-1} inclusive (used
 only when \code{method} is \code{"nonparametric"}). If
-\code{NULL} (the default), p-values are calculated within the function.
-To improve performance where the test is being used many times (e.g. in
-a Monte Carlo simulation), a vector of \eqn{p}-values for a particular
-\eqn{n} can be computed beforehand using \code{\link{ppeak}} and passed
-to the function, so that the \eqn{p}-values are not computed each time the
-function executes (see Examples). Computation of \code{\link{ppeak}} is
-extremely slow for \eqn{n > 170}.}
+\code{NULL} (the default), probabilities are calculated within the
+function by calling \code{ppeak}. The user can improve computational
+performance of the test (for instance, when the test is being used
+repeatedly in a simulation) by pre-specifying the exact probability
+distribution of the number of peaks using this argument.}
+
+\item{twosidedmethod}{A character indicating the method to be used to compute
+two-sided \eqn{p}-values for the parametric test when \code{alternative}
+is \code{"two.sided"}. The argument is passed to
+\code{\link{twosidedpval}} as its \code{method} argument.}
+
+\item{restype}{A character specifying which residuals to use: \code{"ols"}
+for OLS residuals (the default) or the \code{"blus"} for
+\link[=blus]{BLUS} residuals. The advantage of using BLUS residuals is
+that, under the null hypothesis, the assumption that the random series
+is independent and identically distributed is met (whereas with OLS
+residuals it is not). The disadvantage of using BLUS residuals is that
+only \eqn{n-p} residuals are used rather than the full \eqn{n}. This
+argument is ignored if \code{method} is \code{"parametric"}.}
+
+\item{...}{Optional further arguments to pass to \code{\link{blus}}.}
 }
 \value{
 An object of \code{\link[base]{class}} "htest". If object is not
@@ -83,8 +100,8 @@ The parametric test entails putting the data rows in increasing order of
    'upper' model to the sum of squared residuals from the 'lower' model.
    Under the null hypothesis, the test statistic is exactly F-distributed
    with numerator and denominator degrees of freedom equal to
-   \eqn{(n-k)/2 - p} where \eqn{n} is the number of observations in the
-   original regression model, \eqn{k} is the number of central observations
+   \eqn{(n-c)/2 - p} where \eqn{n} is the number of observations in the
+   original regression model, \eqn{c} is the number of central observations
    removed, and \eqn{p} is the number of columns in the design matrix (number of
    parameters to be estimated, including intercept).
 
@@ -99,8 +116,11 @@ The nonparametric test entails putting the residuals of the linear model in
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 goldfeld_quandt(mtcars_lm, deflator = "qsec", prop_central = 0.25)
-goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric")
-
+goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric",
+ restype = "blus")
+goldfeld_quandt(mtcars_lm, deflator = "qsec", prop_central = 0.25, alternative = "two.sided")
+goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric",
+ restype = "blus", alternative = "two.sided")
 }
 \references{
 {\insertAllCited{}}

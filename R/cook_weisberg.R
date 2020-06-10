@@ -8,12 +8,13 @@
 #' in which the response variable is the vector of standardised squared
 #' residuals \eqn{e_i^2/\hat{\sigma}^2} from the original OLS
 #' model and the design matrix is some function of \eqn{Z}, an
-#' \eqn{n \times q} matrix consisting of \eqn{q} exogenous variables.
+#' \eqn{n \times q} matrix consisting of \eqn{q} exogenous variables, appended
+#' to a column of ones.
 #' The test statistic is half the residual sum of squares from this auxiliary
 #' regression. Under the null hypothesis of homoskedasticity, the distribution
 #' of the test statistic is asymptotically chi-squared with \eqn{q} degrees of
 #' freedom. The test is right-tailed.
-#' @param errorfun A character describing the functional form of
+#' @param hetfun A character describing the functional form of
 #'    the error variance under the heteroskedastic alternative. Possible values
 #'    are \code{"additive"} (the default) and
 #'    \code{"multiplicative"}, corresponding to the two cases considered in
@@ -35,21 +36,21 @@
 #' @seealso \code{\link[car:ncvTest]{car::ncvTest}}, which implements the same
 #' test. Calling \code{car::ncvTest} with \code{var.formula} argument omitted
 #' is equivalent to calling \code{skedastic::cook_weisberg} with
-#' \code{auxdesign = "fitted.values", errorfun = "additive"}. Calling
+#' \code{auxdesign = "fitted.values", hetfun = "additive"}. Calling
 #' \code{car::ncvTest} with \code{var.formula = ~ X} (where \code{X} is the
 #' design matrix of the linear model with the intercept column omitted) is
 #' equivalent to calling \code{skedastic::cook_weisberg} with default
-#' \code{auxdesign} and \code{errorfun} values. The
-#' \code{errorfun = "multiplicative"} option has no equivalent in
+#' \code{auxdesign} and \code{hetfun} values. The
+#' \code{hetfun = "multiplicative"} option has no equivalent in
 #' \code{car::ncvTest}.
 #'
 #' @examples
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' cook_weisberg(mtcars_lm)
-#' cook_weisberg(mtcars_lm, auxdesign = "fitted.values", errorfun = "multiplicative")
+#' cook_weisberg(mtcars_lm, auxdesign = "fitted.values", hetfun = "multiplicative")
 #'
 
-cook_weisberg <- function (mainlm, auxdesign = NULL, errorfun = "additive") {
+cook_weisberg <- function (mainlm, auxdesign = NULL, hetfun = "additive") {
 
   if (class(mainlm) == "lm") {
     X <- stats::model.matrix(mainlm)
@@ -87,23 +88,23 @@ cook_weisberg <- function (mainlm, auxdesign = NULL, errorfun = "additive") {
   q <- ncol(Z)
   n <- nrow(Z)
 
-  if (errorfun == "additive") {
+  if (hetfun == "additive") {
     Z <- cbind(1, Z)
-  } else if (errorfun == "multiplicative") {
+  } else if (hetfun == "multiplicative") {
     Z <- cbind(1, log(Z))
   } else {
-    Z <- cbind(1, get(errorfun)(Z))
+    Z <- cbind(1, get(hetfun)(Z))
   }
 
   sigma_hatsq <- sum(mainlm$residuals ^ 2) / n
   std_res_sq <- mainlm$residuals ^ 2 / sigma_hatsq
   auxres <- stats::lm.fit(Z, std_res_sq)$residuals
   teststat <- (sum(std_res_sq ^ 2) - n * mean(std_res_sq) ^ 2 - sum(auxres ^ 2)) / 2
-  method <- errorfun
-  pval <- 1 - stats::pchisq(teststat, df = q)
+  method <- hetfun
+  pval <- stats::pchisq(teststat, df = q, lower.tail = FALSE)
   rval <- structure(list(statistic = teststat, parameter = q, p.value = pval,
                          null.value = "Homoskedasticity",
-                         alternative = "Heteroskedasticity", method = method),
+                         alternative = "greater", method = method),
                          class = "htest")
   broom::tidy(rval)
 }

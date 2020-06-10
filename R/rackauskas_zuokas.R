@@ -39,13 +39,15 @@
 #' @param seed An integer representing the seed to be used for pseudorandom
 #'    number generation when simulating values from the asymptotic null
 #'    distribution. This is to provide reproducibility of test results.
-#'    Ignored if \code{pvalmethod == "data"}.
+#'    Ignored if \code{pvalmethod == "data"}. If user does not wish to set
+#'    the seed, pass \code{NULL}.
 #'
 #' @inheritParams breusch_pagan
 #'
 #' @return An object of \code{\link[base]{class}} "htest". If object is not
 #'    assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
+#'    \code{parameter} in the output object is the \eqn{\alpha} value.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
 #' @export
@@ -54,10 +56,12 @@
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' rackauskas_zuokas(mtcars_lm)
 #' rackauskas_zuokas(mtcars_lm, alpha = 7 / 16)
+#' n <- length(mtcars_lm$residuals)
+#' rackauskas_zuokas(mtcars_lm, pvalmethod = "sim", m = n, sqZ = TRUE)
 #'
 
 rackauskas_zuokas <- function (mainlm, alpha = 0, pvalmethod = c("data", "sim"),
-                               R = 1e3, m = n, sqZ = TRUE, seed = 1234) {
+                               R = 2 ^ 14, m = 2 ^ 17, sqZ = FALSE, seed = 1234) {
 
   if (alpha < 0 || alpha >= 1 / 2) stop("Invalid `alpha` argument. `alpha` must be >= 0
               and < 1/2")
@@ -90,11 +94,12 @@ rackauskas_zuokas <- function (mainlm, alpha = 0, pvalmethod = c("data", "sim"),
     whichcol <- alpha * 32 + 1
     pval <- sum(teststat < T_alpha[, whichcol]) / nrow(T_alpha)
   } else if (pvalmethod == "sim") {
-    Talphavals <- rksim(R, m, sqZ, seed)
+    Talphavals <- rksim(R. = R, m. = m, sqZ. = sqZ, seed. = seed,
+                        alpha. = alpha)
     pval <- sum(teststat < Talphavals) / R
   }
   rval <- structure(list(statistic = teststat, p.value = pval,
-               null.value = "Homoskedasticity", alternative = "Heteroskedasticity",
+               null.value = "Homoskedasticity", alternative = "greater",
                method = pvalmethod, parameter = alpha), class = "htest")
   broom::tidy(rval)
 }

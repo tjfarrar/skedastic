@@ -8,7 +8,8 @@ blus(
   mainlm,
   omit = c("first", "last", "random"),
   keepNA = TRUE,
-  exhaust = NULL
+  exhaust = NULL,
+  seed = 1234
 )
 }
 \arguments{
@@ -35,6 +36,11 @@ using the passed value of \code{omit}, how many random combinations
 of \eqn{p} indices should be attempted before an error is thrown? If
 \code{NULL} (the default), all possible combinations are attempted
 (which could result in very slow execution if \eqn{n} is large).}
+
+\item{seed}{An integer specifying a seed to pass to
+\code{\link[base]{set.seed}} for random number generation. This allows
+reproducibility of bootstrap results. The default value, \code{NULL},
+results in not setting a seed.}
 }
 \value{
 A double vector of length \eqn{n} containing the BLUS residuals
@@ -77,6 +83,6 @@ blus(mtcars_lm, omit = "last")
 H. D. Vinod's online article,
    \href{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2412740}{Theil's
    BLUS Residuals and R Tools for Testing and Removing Autocorrelation and
-   Heteroscedasticity}, for an alternative function for extracting BLUS
+   Heteroscedasticity}, for an alternative function for computing BLUS
    residuals.
 }

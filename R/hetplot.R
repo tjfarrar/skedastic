@@ -45,6 +45,8 @@
 #'    case, if there are multiple plots, they are plotted on a single device
 #'    using the \code{"mfrow"} graphical parameter. If many plots are requested
 #'    at once, it is advisable to write them to image files.
+#' @param values A logical. Should the sequences corresponding to the
+#'    horizontal and vertical variable(s) be returned in a \code{list} object?
 #' @param ... Arguments to be passed to methods, such as graphical parameters
 #'    (see \code{\link{par}}), parameters for \code{\link[graphics]{plot}},
 #'    for \code{\link[grDevices:png]{graphics devices}},
@@ -76,7 +78,7 @@
 #'
 
 hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity",
-                     filetype = NULL, ...) {
+                     filetype = NULL, values = FALSE, ...) {
 
   args <- list(...)
   grdevargnames <- c("filename", "width", "height", "units", "pointsize", "bg",
@@ -118,7 +120,7 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
 
   p <- ncol(X)
   n <- nrow(X)
-  M <- diag(n) - X %*% solve(t(X) %*% X) %*% t(X)
+  M <- fastM(X, n)
   sigma_hat_sq <- sum(mainlm$residuals ^ 2) / n
   s_sq <- sum(mainlm$residuals ^ 2) / (n - p)
 
@@ -182,14 +184,12 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
     ylinebase
   }))
 
-  print(cbind(names(y_ver), unlist(yline_mtext)))
-
   opar <- graphics::par(no.readonly = TRUE)
   on.exit(graphics::par(opar))
+  numplots <- length(horzvar) * length(vertvar) * length(vertfun)
   if (is.null(filetype)) {
-    numplots <- length(horzvar) * length(vertvar) * length(vertfun)
     mfrow_dim <- plotdim(numplots)
-    if (max(mfrow_dim) > 5) warning("Large number of plots in one dimension")
+    if (max(mfrow_dim) >= 5) warning("Large number of plots in one dimension")
     graphics::par(mfrow = mfrow_dim)
     if (!las_passed) parargs$las <- 1
     if (!mar_passed) parargs$mar <- c(4, 5.5, 0.5, 1.5)
@@ -210,12 +210,12 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
     }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = FALSE),
     y_ver, names(y_ver), yline_mtext, SIMPLIFY = FALSE)
   } else {
-    if (!dir.exists(paste0(tempdir(),"\\hetplot"))) {
-      dir.create(paste0(tempdir(),"\\hetplot"))
+    if (!dir.exists(paste0(tempdir(),"/hetplot"))) {
+      dir.create(paste0(tempdir(),"/hetplot"))
     }
     mapply(function(y, ynames, yline) mapply(function(x, xnames, y, ynames, yline) {
       if (!filename_passed) {
-        grdevargs$filename <- paste0(tempdir(),"\\hetplot\\",xnames, "_",
+        grdevargs$filename <- paste0(tempdir(),"/hetplot/",xnames, "_",
                           ynames, "_", gsub("[[:space:]]|[[:punct:]]",
                                   "_", Sys.time()), ".", filetype)
       }
@@ -233,9 +233,12 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
           side = 1, line = 2.5, las = 1, cex = ifelse(cex_passed, parargs$cex, 1.2))
       if (!ylab_passed) graphics::mtext(parselabels(ynames, theaxis = "y"),
           side = 2, line = yline, las = 1, cex = ifelse(cex_passed, parargs$cex, 1.2))
-      if (length(grDevices::dev.list()) > 60) grDevices::graphics.off()
+      if (length(grDevices::dev.list()) > 59) {
+        grDevices::graphics.off()
+      }
     }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = FALSE),
            y_ver, names(y_ver), yline_mtext, SIMPLIFY = FALSE)
   }
-  list("horizontal" = x_hor, "vertical" = y_ver)
+  grDevices::graphics.off()
+  if (values) list("horizontal" = x_hor, "vertical" = y_ver)
 }

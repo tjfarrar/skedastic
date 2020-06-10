@@ -13,9 +13,16 @@
 #'     explanatory variables is large.
 #' @param method A character indicating which of the two tests derived in
 #'    \insertCite{Li19;textual}{skedastic} should be implemented. Possible
-#'    values are "alrt" (approximate likelihood-ratio test) and "cvt"
-#'    (coefficient-of-variation test). Default is "alrt". It is acceptable to
-#'    specify only the first letter.
+#'    values are \code{"alrt"} (approximate likelihood-ratio test) and
+#'    \code{"cvt"} (coefficient-of-variation test). Default is \code{"cvt"}.
+#'    Partial matching is used.
+#' @param baipanyin A logical. Should the central limit theorem of
+#'    \insertCite{Bai16;textual}{skedastic} be used to determine the
+#'    \eqn{p}-value for the coefficient-of-variation test (assuming normally
+#'    distributed errors)? If \code{FALSE}, the asymptotic null distribution
+#'    in \insertCite{Li19;textual}{skedastic} is used, which requires the
+#'    assumption that the design variables are random and normally distributed.
+#'    This argument is ignored if \code{method} is \code{"alrt"}.
 #' @inheritParams breusch_pagan
 #'
 #' @return An object of \code{\link[base]{class}} "htest". If object is not
@@ -29,9 +36,10 @@
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' li_yao(mtcars_lm, method = "alrt")
 #' li_yao(mtcars_lm, method = "cvt")
+#' li_yao(mtcars_lm, method = "cvt", baipanyin = FALSE)
 #'
 
-li_yao <- function (mainlm, method = "alrt") {
+li_yao <- function (mainlm, method = c("cvt", "alrt"), baipanyin = TRUE) {
 
   if (class(mainlm) == "list") {
     y <- mainlm[[1]]
@@ -43,26 +51,45 @@ li_yao <- function (mainlm, method = "alrt") {
       X <- X[-badrows, drop = FALSE]
     }
     mainlm <- stats::lm.fit(X, y)
+  } else if (class(mainlm) == "lm") {
+    X <- stats::model.matrix(mainlm)
   }
 
-  method <- match.arg(method, c("alrt", "cvt"))
+  method <- match.arg(method, c("cvt", "alrt"))
   e <- mainlm$residuals
   n <- length(e)
+  p <- ncol(X)
 
   if (method == "alrt") {
-    T1 <- log(( 1 / n * sum(e ^ 2)) / (prod(e ^ 2) ^ (1 / n)))
-    teststat <- (T1 - (log(2) - digamma(1))) / sqrt((pi ^ 2 / 2 - 2) / n)
+    teststat <- log(( 1 / n * sum(e ^ 2)) / (prod(e ^ 2) ^ (1 / n)))
     fullmethod <- "Approximate Likelihood-Ratio Test"
+    pval <- stats::pnorm((teststat - (log(2) - digamma(1))) /
+                sqrt((pi ^ 2 / 2 - 2) / n), lower.tail = FALSE)
   } else if (method == "cvt") {
     mbar <- 1 / n * sum(e ^ 2)
-    T2 <- (1 / n * sum((e ^ 2 - mbar) ^ 2)) / mbar ^ 2
-    teststat <- (T2 - 2) / sqrt(24 / n)
+    teststat <- (1 / n * sum((e ^ 2 - mbar) ^ 2)) / mbar ^ 2
+    if (baipanyin) {
+      M <- fastM(X, n)
+      MoM <- M * M
+      trMom <- sum(diag(MoM))
+      a <- as.double(3 * n * trMom / ((n - p) ^ 2 + 2 * (n - p)) - 1)
+      Delta <- c(n / ((n - p) ^ 2 + 2 * (n - p)), 3 * n ^ 2 * trMom /
+                   ((n - p) ^ 2 + 2 * (n - p)) ^ 2)
+      Theta11 <- 72 * t(diag(M)) %*% MoM %*% diag(M) + 24 * trMom ^ 2
+      Theta22 <- 8 * (n - p) ^ 3 / n ^ 2
+      Theta12 <- (n - p) / n * 24 * trMom
+      Theta <- matrix(data = c(Theta11, Theta12, Theta12, Theta22), nrow = 2,
+                      ncol = 2)
+      b <- as.double(t(Delta) %*% Theta %*% Delta)
+      pval <- stats::pnorm((teststat - a) / sqrt(b), lower.tail = FALSE)
+    } else {
+      pval <- stats::pnorm((teststat - 2) / sqrt(24 / n), lower.tail = FALSE)
+    }
     fullmethod <- "Coefficient-of-Variation Test"
   } else stop("Invalid `method` argument")
 
-  pval <- 1 - stats::pnorm(teststat)
   rval <- structure(list(statistic = teststat, p.value = pval,
-               null.value = "Homoskedasticity", alternative = "Heteroskedasticity",
+               null.value = "Homoskedasticity", alternative = "greater",
                method = fullmethod), class = "htest")
   broom::tidy(rval)
 }

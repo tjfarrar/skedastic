@@ -74,16 +74,16 @@ white_lm <- function (mainlm, interactions = FALSE) {
   esq <- mainlm$residuals ^ 2
   auxlm <- stats::lm.fit(Z, esq)
   iota <- rep(1, n)
-  N <- diag(n) - 1 / n * (iota %*% t(iota))
+  N <- diag(n) - 1 / n * (tcrossprod(iota))
   e_aux <- auxlm$residuals
-  teststat <- n * (1 - (t(e_aux) %*% e_aux) / (t(esq) %*% N %*% esq))
+  teststat <- n * (1 - crossprod(e_aux) / (t(esq) %*% N %*% esq))
 
   df <- ncol(Z) - 1
-  pval <- 1 - stats::pchisq(teststat, df = df)
+  pval <- stats::pchisq(teststat, df = df, lower.tail = FALSE)
 
   rval <- structure(list(statistic = teststat, parameter = df, p.value = pval,
                          null.value = "Homoskedasticity",
-                         alternative = "Heteroskedasticity",
+                         alternative = "greater",
                          method = "White's Test"), class = "htest")
   broom::tidy(rval)
 }

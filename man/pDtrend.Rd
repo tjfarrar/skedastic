@@ -4,15 +4,21 @@
 \alias{pDtrend}
 \title{Cumulative distribution function of nonparametric trend statistic \eqn{D}}
 \usage{
-pDtrend(n, k, lower.tail = TRUE, exact = (n <= 10), correct = !exact)
+pDtrend(
+  k,
+  n,
+  lower.tail = TRUE,
+  exact = (n <= 10),
+  correct = TRUE,
+  tiefreq = NULL
+)
 }
 \arguments{
+\item{k}{An integer of \code{length} 1; the value must be between 0 and
+\eqn{\frac{n(n-1)(n+1)}{3}} inclusive.}
+
 \item{n}{A positive integer representing the number of observations in the
 series.}
-
-\item{k}{An integer or a sequence of integers strictly incrementing by 1,
-with all values between 0 and \code{n - 1} inclusive. Represents the
-number of peaks in the series.}
 
 \item{lower.tail}{A logical. Should lower tailed cumulative probability be
 calculated? Defaults to \code{TRUE}. Note that both lower- and upper-
@@ -20,7 +26,8 @@ tailed cumulative probabilities are computed inclusive of \code{k}.}
 
 \item{exact}{A logical. Should exact distribution of \eqn{D} be used by
 calling \code{\link{dDtrend}}? If \code{FALSE}, a normal approximation
-is used.}
+is used. If \code{tiefreq} is not \code{NULL} (ties are present),
+normal approximation is used regardless of the value of \code{exact}.}
 
 \item{correct}{A logical. Should continuity correction be used in normal
 approximation? Defaults to \code{TRUE}. Since the support of \eqn{D}
@@ -29,6 +36,10 @@ correction consists of adding 1 to \eqn{D} when approximating the
 lower-tail probability \eqn{\Pr(D \le k)} and subtracting 1 from
 \eqn{D} when approximating the upper-tail probability
 \eqn{\Pr(D \ge k)}.}
+
+\item{tiefreq}{A double vector corresponding to the value of \eqn{d_i}
+in \insertCite{Lehmann75;textual}{skedastic}. These are the frequencies
+of the various tied ranks. If ties are absent, \code{NULL} (the default).}
 }
 \value{
 A double between 0 and 1 representing the probability/ies of \eqn{D}
@@ -50,13 +61,13 @@ case.
 \examples{
 # For an independent sample of size 9, the probability that D is <= 50 is
 # 0.05399857
-pDtrend(9, 50)
+pDtrend(k = 50, n = 9)
 # Normal approximation of the above with continuity correction is
 # 0.05193808
-pDtrend(9, 50, exact = FALSE, correct = TRUE)
+pDtrend(k = 50, n = 9, exact = FALSE, correct = TRUE)
 # For an independent sample of size 50, the probability that D is >= 20000 is
 # is 0.6093583
-pDtrend(50, 2e4, lower.tail = FALSE)
+pDtrend(k = 2e4, n = 50, lower.tail = FALSE)
 
 }
 \references{

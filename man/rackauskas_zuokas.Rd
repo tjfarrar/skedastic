@@ -8,9 +8,9 @@ rackauskas_zuokas(
   mainlm,
   alpha = 0,
   pvalmethod = c("data", "sim"),
-  R = 1000,
-  m = n,
-  sqZ = TRUE,
+  R = 2^14,
+  m = 2^17,
+  sqZ = FALSE,
   seed = 1234
 )
 }
@@ -58,12 +58,14 @@ observations is small. Ignored if \code{pvalmethod == "data"}.}
 \item{seed}{An integer representing the seed to be used for pseudorandom
 number generation when simulating values from the asymptotic null
 distribution. This is to provide reproducibility of test results.
-Ignored if \code{pvalmethod == "data"}.}
+Ignored if \code{pvalmethod == "data"}. If user does not wish to set
+the seed, pass \code{NULL}.}
 }
 \value{
 An object of \code{\link[base]{class}} "htest". If object is not
    assigned, its attributes are displayed in the console as a
    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
+   \code{parameter} in the output object is the \eqn{\alpha} value.
 }
 \description{
 This function implements the two methods of
@@ -81,6 +83,8 @@ Rackauskas and Zuokas propose a class of tests that entails determining the
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 rackauskas_zuokas(mtcars_lm)
 rackauskas_zuokas(mtcars_lm, alpha = 7 / 16)
+n <- length(mtcars_lm$residuals)
+rackauskas_zuokas(mtcars_lm, pvalmethod = "sim", m = n, sqZ = TRUE)
 
 }
 \references{

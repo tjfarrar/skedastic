@@ -88,7 +88,7 @@ breusch_pagan <- function (mainlm, auxdesign = NULL, koenker = TRUE) {
     message("Column of 1's added to `auxdesign`")
   }
 
-  p <- ncol(Z) - 1
+  q <- ncol(Z) - 1
   n <- nrow(Z)
   sigma_hatsq <- sum(mainlm$residuals ^ 2) / n
   w_hat <- mainlm$residuals ^ 2 - sigma_hatsq
@@ -100,10 +100,10 @@ breusch_pagan <- function (mainlm, auxdesign = NULL, koenker = TRUE) {
     method <- "Breusch-Pagan (non-studentised)"
     teststat <- sum(stats::lm.fit(Z, w_hat)$fitted.values ^ 2) / (2 * sigma_hatsq ^ 2)
   }
-  pval <- 1 - stats::pchisq(teststat, df = p)
+  pval <- stats::pchisq(teststat, df = q, lower.tail = FALSE)
 
-  rval <- structure(list(statistic = teststat, parameter = p, p.value = pval,
+  rval <- structure(list(statistic = teststat, parameter = q, p.value = pval,
                null.value = "Homoskedasticity",
-               alternative = "Heteroskedasticity", method = method), class = "htest")
+               alternative = "greater", method = method), class = "htest")
   broom::tidy(rval)
 }

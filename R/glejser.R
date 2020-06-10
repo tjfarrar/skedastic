@@ -15,6 +15,14 @@
 #'    Under the null hypothesis of homoskedasticity, the distribution of the
 #'    test statistic is asymptotically chi-squared with \code{parameter} degrees
 #'    of freedom. The test is right-tailed.
+#'
+#' @param sigmaest A character indicating which model residuals to use in the
+#'    \eqn{\hat{\sigma}^2} estimator in the denominator of the test statistic.
+#'    If \code{"main"} (the default), the OLS residuals from the original model
+#'    are used; this produces results identical to the Glejser Test in SHAZAM
+#'    software. If \code{"auxiliary"}, the OLS residuals from the auxiliary
+#'    model are used, as in \insertCite{Mittelhammer00;textual}{skedastic}.
+#'    Partial matching is used.
 #' @inheritParams breusch_pagan
 #'
 #' @return An object of \code{\link[base]{class}} "htest". If object is not
@@ -32,8 +40,10 @@
 #' glejser(mtcars_lm)
 #'
 
-glejser <- function (mainlm, auxdesign = NULL) {
+glejser <- function (mainlm, auxdesign = NULL,
+                     sigmaest = c("main", "auxiliary")) {
 
+  sigmaest <- match.arg(sigmaest, c("main", "auxiliary"))
   if (class(mainlm) == "lm") {
     X <- stats::model.matrix(mainlm)
   } else if (class(mainlm) == "list") {
@@ -67,17 +77,22 @@ glejser <- function (mainlm, auxdesign = NULL) {
     message("Column of 1's added to `auxdesign`")
   }
 
-  p <- ncol(Z) - 1
+  q <- ncol(Z) - 1
   n <- nrow(Z)
   auxresponse <- abs(mainlm$residuals)
   auxres <- stats::lm.fit(Z, auxresponse)$residuals
-  sigma_hatsq <- sum(mainlm$residuals ^ 2) / n
+  if (sigmaest == "main") {
+    sigma_hatsq <- sum(mainlm$residuals ^ 2) / n
+  } else if (sigmaest == "auxiliary") {
+    sigma_hatsq <- sum(auxres ^ 2) / n
+  }
 
-  teststat <- (sum(auxresponse ^ 2) - n * mean(auxresponse) ^ 2 - sum(auxres ^ 2)) / (sigma_hatsq * (1 - 2 / pi))
-  pval <- 1 - stats::pchisq(teststat, df = p)
+  teststat <- (sum(auxresponse ^ 2) - n * mean(auxresponse) ^ 2 -
+                 sum(auxres ^ 2)) / (sigma_hatsq * (1 - 2 / pi))
+  pval <- stats::pchisq(teststat, df = q, lower.tail = FALSE)
 
-  rval <- structure(list(statistic = teststat, parameter = p, p.value = pval,
+  rval <- structure(list(statistic = teststat, parameter = q, p.value = pval,
                null.value = "Homoskedasticity",
-               alternative = "Heteroskedasticity"), class = "htest")
+               alternative = "greater"), class = "htest")
   broom::tidy(rval)
 }

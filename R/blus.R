@@ -30,6 +30,7 @@
 #'    \code{NULL} (the default), all possible combinations are attempted
 #'    (which could result in very slow execution if \eqn{n} is large).
 #' @inheritParams breusch_pagan
+#' @inheritParams wilcox_keselman
 #'
 #' @return A double vector of length \eqn{n} containing the BLUS residuals
 #'    (with \code{NA_real_}) for omitted observations), or a double vector
@@ -41,7 +42,7 @@
 #' @seealso H. D. Vinod's online article,
 #'    \href{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2412740}{Theil's
 #'    BLUS Residuals and R Tools for Testing and Removing Autocorrelation and
-#'    Heteroscedasticity}, for an alternative function for extracting BLUS
+#'    Heteroscedasticity}, for an alternative function for computing BLUS
 #'    residuals.
 #'
 #' @examples
@@ -55,7 +56,7 @@
 #'
 
 blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
-                  exhaust = NULL) {
+                  exhaust = NULL, seed = 1234) {
 
   if (class(mainlm) == "lm") {
     X <- stats::model.matrix(mainlm)
@@ -75,7 +76,8 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
   n <- nrow(X)
   p <- ncol(X)
 
-  omitfunc <- do_omit(omit, n, p)
+  if (!is.null(seed)) set.seed(seed)
+  omitfunc <- do_omit(omit, n, p, seed)
   Xmats <- do_Xmats(X, n, p, omitfunc$omit_ind)
   singular_matrix <- FALSE
 
@@ -88,6 +90,9 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
     message("Passed `omit` argument resulted in singular matrix; BLUS residuals
           could not be computed. Randomly chosen combinations of indices to
           omit will be attempted according to `exhaust` argument passed.")
+    if (!is.null(exhaust) && exhaust == 0) {
+      stop("`exhaust` set to 0; no attempts made to find subset to omit")
+    }
     all_possible_omit <- t(utils::combn(n, p))
     if (omitfunc$omit_passed == "first") {
       all_possible_omit <- all_possible_omit[-1, ]
@@ -101,22 +106,22 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
     }
 
     maxrow <- ifelse(is.null(exhaust), nrow(all_possible_omit), exhaust)
+
     rowstodo <- sample(1:nrow(all_possible_omit), maxrow, replace = FALSE)
 
     for (r in 1:maxrow) {
       omitfunc <- do_omit(all_possible_omit[rowstodo[r], ], n, p)
       Xmats <- do_Xmats(X, n, p, omitfunc$omit_ind)
       if (!matrixcalc::is.singular.matrix(Xmats$X_ord_sq,
-                        tol = .Machine$double.eps) &&
+                                          tol = .Machine$double.eps) &&
           !matrixcalc::is.singular.matrix(Xmats$X0,
-                        tol = .Machine$double.eps)) {
+                                          tol = .Machine$double.eps)) {
         singular_matrix <- FALSE
         message(paste0("Success! Subset of indices found that does not yield singular
-                       matrix: ", paste(omitfunc$omit_ind, collapse = ",")))
+                     matrix: ", paste(omitfunc$omit_ind, collapse = ",")))
         break
       }
     }
-
   }
   if (singular_matrix) stop("No subset of indices to omit was found that
                             avoided a singular matrix.")
@@ -124,10 +129,11 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
   keep_ind <- setdiff(1:n, omitfunc$omit_ind)
   G <- Xmats$X0 %*% solve(Xmats$X_ord_sq) %*% t(Xmats$X0)
   Geig <- eigen(G, symmetric = TRUE)
-  d <- sqrt(Geig$values)
+  lambda <- sqrt(Geig$values)
   q <- as.data.frame(Geig$vectors)
-  Z <- Reduce(`+`, mapply(`*`, d / (1 + d),
-                          lapply(q, function(x) x %*% t(x)), SIMPLIFY = FALSE))
+  Z <- Reduce(`+`, mapply(`*`, lambda / (1 + lambda),
+                          lapply(q, function(x) tcrossprod(x)),
+                          SIMPLIFY = FALSE))
   e0 <- e[omitfunc$omit_ind]
   e1 <- e[keep_ind]
   e_tilde <- c(e1 - Xmats$X1 %*% solve(Xmats$X0) %*% Z %*% e0)

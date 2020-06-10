@@ -2,7 +2,7 @@
 % Please edit documentation in R/peaks.R
 \name{countpeaks}
 \alias{countpeaks}
-\title{Count peaks in a data series}
+\title{Count peaks in a data sequence}
 \usage{
 countpeaks(x)
 }
@@ -11,17 +11,17 @@ countpeaks(x)
 }
 \value{
 An integer value between \code{0} and \code{length(x) - 1}
-   representing the number of peaks in the series.
+   representing the number of peaks in the sequence.
 }
 \description{
-This function computes the number of peaks in a univariate data series, with
+This function computes the number of peaks in a double vector, with
 peak defined as per \insertCite{Goldfeld65;textual}{skedastic}. The function
 is used in the Goldfeld-Quandt nonparametric test for heteroskedasticity in
 a linear model.
 }
 \examples{
 set.seed(9586)
-countpeaks(rnorm(20))
+countpeaks(stats::rnorm(20))
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 countpeaks(mtcars_lm$residuals)
 

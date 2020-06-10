@@ -5,7 +5,9 @@
 \alias{T_alpha}
 \title{Pseudorandom numbers from Asymptotic Null Distribution of Test Statistic for
 Method of \insertCite{Rackauskas07;textual}{skedastic}}
-\format{An object of class \code{matrix} with 16384 rows and 16 columns.}
+\format{
+An object of class \code{matrix} (inherits from \code{array}) with 16384 rows and 16 columns.
+}
 \usage{
 T_alpha
 }

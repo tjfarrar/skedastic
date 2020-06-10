@@ -91,7 +91,7 @@ bamset <- function(mainlm, k = 3, deflator = NULL, correct = TRUE,
     } else stop("`deflator` must be integer or character")
 
     y <- y[order(X[, deflator])]
-    X <- X[order(X[, deflator]), ]
+    X <- X[order(X[, deflator]), , drop = FALSE]
     mainlm <- list(y, X)
 
   } else {
@@ -131,16 +131,16 @@ bamset <- function(mainlm, k = 3, deflator = NULL, correct = TRUE,
 
   teststat <- nprime * log(s_sq_tot) - sum(v * log(s_sq))
   if (correct) {
-    scaling_constant <- 1 + sum(1 / v - 1 / nprime) / (3 * (k - 1))
+    scaling_constant <- 1 + (sum(1 / v) - 1 / nprime) / (3 * (k - 1))
     teststat <- teststat / scaling_constant
   }
 
   df <- k - 1
-  pval <- 1 - stats::pchisq(teststat, df = df)
+  pval <- stats::pchisq(teststat, df = df, lower.tail = FALSE)
 
   rval <- structure(list(statistic = teststat, parameter = df, p.value = pval,
                          null.value = "Homoskedasticity",
-                         alternative = "Heteroskedasticity", method = "BAMSET"),
+                         alternative = "greater", method = "BAMSET"),
                     class = "htest")
   broom::tidy(rval)
 }

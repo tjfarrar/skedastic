@@ -76,10 +76,10 @@ harvey <- function (mainlm, auxdesign = NULL) {
 
   teststat <- (sum(auxresponse ^ 2) - n * mean(auxresponse) ^ 2
                - sum(auxres ^ 2)) / pracma::psi(1, 1 / 2)
-  pval <- 1 - stats::pchisq(teststat, df = p)
+  pval <- stats::pchisq(teststat, df = p, lower.tail = FALSE)
 
   rval <- structure(list(statistic = teststat, parameter = p, p.value = pval,
                null.value = "Homoskedasticity",
-               alternative = "Heteroskedasticity"), class = "htest")
+               alternative = "greater"), class = "htest")
   broom::tidy(rval)
 }

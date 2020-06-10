@@ -4,23 +4,23 @@
 \alias{dDtrend}
 \title{Probability mass function of nonparametric trend statistic \eqn{D}}
 \usage{
-dDtrend(n, k = "all")
+dDtrend(k = "all", n)
 }
 \arguments{
+\item{k}{An integer of \code{length} 1
+or a character \code{"all"} indicating that the probability mass function
+should be computed across the entire support of \eqn{D}.}
+
 \item{n}{A positive integer representing the number of observations in the
 series. Note that computation time increases rapidly with \eqn{n} and is
 infeasible for \eqn{n>11}.}
-
-\item{k}{An integer or a sequence of integers strictly incrementing by 1,
-or a character "all" indicating that the probability mass function should
-be computed across the entire support of \eqn{D}.}
 }
 \value{
 A \code{data.frame} containing two objects: \code{"value"}, an
   integer vector containing values specified in \code{k} (or the support of
   \eqn{D}, if \code{k == "all"}); and \code{"prob"}, a double vector
   representing the probability that \eqn{D} takes on each corresponding
-  value in the \code{"values"} object
+  value in the \code{"value"} object
 }
 \description{
 This function computes \eqn{\Pr(D = k)}, i.e. the probability mass
@@ -29,23 +29,21 @@ statistic proposed by \insertCite{Lehmann75;textual}{skedastic}, under the
 assumption that the ranks \eqn{R_i} are computed on a series of \eqn{n}
 independent and identically distributed random variables with no ties. The
 function is used within \code{\link{horn}} in computing \eqn{p}-values for
-Horn's nonparametric test for heteroskedasticity in a linear regression model
-(when sample size \eqn{n \leq 10}) \insertCite{Horn81}{skedastic}. Note that
-Lehmann and Horn use a \eqn{D} statistic without the \eqn{\frac{1}{2}}
-factor; this has been included so that support consists of whole numbers
-incremented by 1, rather than incremented by 2. The support of \eqn{D}
+Horn's nonparametric test for heteroskedasticity in a linear regression
+model \insertCite{Horn81}{skedastic}. The support of \eqn{D}
 consists of consecutive even numbers from 0 to \eqn{\frac{n(n-1)(n+1)}{3}},
 with the exception of the case \eqn{n=3}, when the value 4 is excluded from
 the support.
 }
 \examples{
-dvar <- dDtrend(9)
-plot(c(dvar$value[1], dvar$value[1]), c(0, dvar$prob[1]), type = "l",
-     axes = FALSE, xlab = expression(k), ylab = expression(Pr(D == k)),
-     xlim = c(0, 250), yaxs = "i", ylim = c(0, 1.05 * max(dvar$prob)))
-axis(side = 1, at = seq(0, 250, 25), las = 2)
-for (i in seq_along(dvar$value)) {
-   lines(c(dvar$value[i], dvar$value[i]), c(0, dvar$prob[i]))
+prob <- dDtrend(k = "all", n = 9)
+values <- as.integer(names(dvar))
+plot(c(values[1], values[1]), c(0, prob[1]), type = "l",
+  axes = FALSE, xlab = expression(k), ylab = expression(Pr(D == k)),
+  xlim = c(0, 250), yaxs = "i", ylim = c(0, 1.05 * max(prob)))
+  axis(side = 1, at = seq(0, 250, 25), las = 2)
+for (i in seq_along(values)) {
+ lines(c(values[i], values[i]), c(0, prob[i]))
 }
 
 }

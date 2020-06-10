@@ -32,9 +32,6 @@
 #'    \eqn{D} in the presence of ties, so in this case the normal approximation
 #'    is used regardless of \eqn{n}.
 #'
-#' @param restype A character specifying which residuals to use: OLS residuals
-#'    (the default) or the \link[=blus]{BLUS residuals} of
-#'    \insertCite{Theil65;textual}{skedastic}.
 #' @param alternative A character specifying the form of alternative
 #'    hypothesis; one of "two.sided" (default), "greater", or "less".
 #'    "two.sided" corresponds to any trend in the absolute residuals when
@@ -44,10 +41,18 @@
 #'    \code{deflator}. (Notice that \eqn{D} tends to be small when there is a
 #'    positive trend.)
 #' @param exact A logical. Should exact \eqn{p}-values be computed? If
-#'    \code{FALSE} (the default), the normalised statistic \eqn{Z}
+#'    \code{FALSE}, a normal approximation is used. Defaults to \code{TRUE}
+#'    only if the number of absolute residuals being ranked is \eqn{\le 10}.
 #' @param correct A logical. Should a continuity correction be used when
 #'    computing the \eqn{p}-value? This parameter is ignored if
 #'    \code{exact == TRUE} or if ties are present in the ranks.
+#' @param restype A character specifying which residuals to use: \code{"ols"}
+#'    for OLS residuals (the default) or the \code{"blus"} for
+#'    \link[=blus]{BLUS} residuals. The advantage of using BLUS residuals is
+#'    that, under the null hypothesis, the assumption that the random series
+#'    is independent and identically distributed is met (whereas with OLS
+#'    residuals it is not). The disadvantage of using BLUS residuals is that
+#'    only \eqn{n-p} residuals are used rather than the full \eqn{n}.
 #' @param ... Optional further arguments to pass to \code{\link{blus}}.
 #'
 #' @inheritParams breusch_pagan
@@ -68,7 +73,7 @@
 
 horn <- function (mainlm, deflator = NULL, restype = c("ols", "blus"),
                   alternative = c("two.sided", "greater", "less"),
-                  exact = (n <= 10), correct = !exact, ...) {
+                  exact = (m <= 10), correct = TRUE, ...) {
 
   restype <- match.arg(restype, c("ols", "blus"))
   alternative <- match.arg(alternative, c("two.sided", "greater", "less"))
@@ -120,7 +125,6 @@ horn <- function (mainlm, deflator = NULL, restype = c("ols", "blus"),
     } else if (restype == "blus") {
       absres <- abs(blus(mainlm, ...))
       absres <- absres[!is.na(absres)]
-      n <- length(absres)
     }
   } else {
     if (restype == "ols") {
@@ -128,44 +132,44 @@ horn <- function (mainlm, deflator = NULL, restype = c("ols", "blus"),
     } else if (restype == "blus") {
       absres <- abs(blus(mainlm, ...)[order(X[, deflator])])
       absres <- absres[!is.na(absres)]
-      n <- length(absres)
     }
   }
+  m <- length(absres)
 
-  R <- rank(absres, ties.method = "average")
-  teststat <- sum((R - 1:n) ^ 2)
-  ties <- ifelse(sum(R) != n * (n + 1) / 2, TRUE, FALSE)
-  if (ties) {
-    if (exact) warning("Ties are present and exact distribution is not
-                       available for D in presence of ties. Normal
-                       approximation will be used.")
+  R <- data.table::frank(absres, ties.method = "average")
+  teststat <- sum((R - 1:m) ^ 2)
+  d <- table(R)
+  is.ties <- (max(d) > 1)
 
-    d <- as.double(names(table(R)))
-    if (max(d) / n == 1) warning("Normal approximation may not be accurate
-                                 since maximum rank / n = 1. See
-                                 Lehmann (1975), p. 294.")
-    ED <- (n ^ 3 - n) / 6 - sum(d ^ 3 - d) / 12
-    VD <- (n ^ 2 * (n + 1) ^ 2 * (n - 1)) / 36 * (1 - sum(d ^ 3 - d) /
-                                                    (n ^ 3 - n))
-    teststat <- (teststat - ED) / sqrt(VD)
-    pval <- switch(alternative, "greater" = stats::pnorm(teststat,
-                  lower.tail = FALSE), "less" = stats::pnorm(teststat,
-                  lower.tail = TRUE), "two.sided" =
-                     2 * stats::pnorm(abs(teststat),
-                                      lower.tail = FALSE))
+  if (is.ties) {
+    if (exact) {
+      warning("Ties are present and exact distribution is not available for D in presence of ties. Normal approximation will be used.")
+      exact <- FALSE
+    }
+    if (max(d) / m == 1) warning("Normal approximation may not be accurate since maximum rank / m = 1. See Lehmann (1975), p. 294.")
   } else {
-    pval <- switch(alternative, "greater" = pDtrend(n, teststat,
-                                      lower.tail = FALSE, exact, correct),
-                                "less" = pDtrend(n, teststat,
-                                      lower.tail = TRUE, exact, correct),
-                                "two.sided" = 2 * pDtrend(n, abs(teststat),
-                                      lower.tail = ifelse(exact,
-                                        teststat < (n * (n - 1) * (n + 1) / 6),
-                                        FALSE), exact, correct))
+    d <- NULL
   }
 
-  rval <- structure(list(statistic = teststat, p.value = pval, parameter = n,
-               null.value = "Homoskedasticity", alternative = alternative),
+  twosided <- function(teststat, m) {
+    if (teststat > (m * (m - 1) * (m + 1) / 6)) {
+      return(2 * pDtrend(k = teststat, n = m, lower.tail = FALSE,
+                         exact, correct, tiefreq = d))
+    } else if (teststat < (m * (m - 1) * (m + 1) / 6)) {
+      return(2 * pDtrend(k = teststat, n = m, lower.tail = TRUE,
+                         exact, correct, tiefreq = d))
+    } else if (teststat == (m * (m - 1) * (m + 1) / 6)) {
+      return(1)
+    }
+  }
+  pval <- switch(alternative, "greater" = pDtrend(k = teststat, n = m,
+                 lower.tail = FALSE, exact, correct, tiefreq = d),
+                 "less" = pDtrend(k = teststat, n = m,
+                 lower.tail = TRUE, exact, correct, tiefreq = d),
+                 "two.sided" = twosided(teststat, m))
+
+  rval <- structure(list(statistic = teststat, p.value = pval,
+               alternative = alternative),
                class = "htest")
   broom::tidy(rval)
 }
