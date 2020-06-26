@@ -14,21 +14,23 @@
 #' regression. Under the null hypothesis of homoskedasticity, the distribution
 #' of the test statistic is asymptotically chi-squared with \eqn{q} degrees of
 #' freedom. The test is right-tailed.
-#' @param hetfun A character describing the functional form of
-#'    the error variance under the heteroskedastic alternative. Possible values
-#'    are \code{"additive"} (the default) and
-#'    \code{"multiplicative"}, corresponding to the two cases considered in
-#'    \insertCite{Cook83;textual}{skedastic}, or the name of a function in the
-#'    environment (passed as a character). If the name of a function, it
-#'    will be applied to auxiliary design element \eqn{z_{ij}} to obtain the
-#'    corresponding element of \eqn{D}, according to the notation used in
-#'    \insertCite{Cook83;textual}{skedastic}. The value \code{"additive"}
-#'    corresponds to the function \code{identity} and \code{"multiplicative"}
-#'    to the function \code{log}. Partial matching is NOT used.
+#' @param hetfun A character describing the form of \eqn{w(\cdot)}, the error
+#'    variance function under the heteroskedastic alternative. Possible values
+#'    are \code{"mult"} (the default), corresponding to
+#'    \eqn{w(Z_i,\lambda)=\exp\left\{\sum_{j=1}^{q}\lambda_j Z_{ij}\right\}},
+#'    \code{"add"}, corresponding to
+#'    \eqn{w(Z_i,\lambda)=\left(1+\sum_{j=1}^{q} \lambda_j Z_{ij}\right)^2}, and
+#'    \code{"logmult"}, corresponding to
+#'    \eqn{w(Z_i,\lambda)=\exp\left\{\sum_{j=1}^{q}\lambda_j \log Z_{ij}\right\}}.
+#'    The multiplicative and log-multiplicative cases are considered in
+#'    \insertCite{Cook83;textual}{skedastic}; the additive case is discussed,
+#'    \emph{inter alia}, by \insertCite{Griffiths86;textual}{skedastic}.
+#'    Results for the additive and multiplicative models are identical for this
+#'    test. Partial matching is used.
 #' @inheritParams breusch_pagan
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -47,31 +49,23 @@
 #' @examples
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' cook_weisberg(mtcars_lm)
-#' cook_weisberg(mtcars_lm, auxdesign = "fitted.values", hetfun = "multiplicative")
+#' cook_weisberg(mtcars_lm, auxdesign = "fitted.values", hetfun = "logmult")
 #'
 
-cook_weisberg <- function (mainlm, auxdesign = NULL, hetfun = "additive") {
+cook_weisberg <- function(mainlm, auxdesign = NULL,
+                  hetfun = c("mult", "add", "logmult"), statonly = FALSE) {
 
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
-                                                    is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    mainlm <- stats::lm.fit(X, y)
-  }
+  hetfun <- match.arg(hetfun, c("mult", "add", "logmult"))
+
+  auxfitvals <- ifelse(is.null(auxdesign), FALSE, auxdesign == "fitted.values")
+  processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
+                needp = FALSE)
 
   if (is.null(auxdesign)) {
     Z <- X
   } else if (is.character(auxdesign)) {
     if (auxdesign == "fitted.values") {
-      Z <- t(t(mainlm$fitted.values))
+      Z <- t(t(yhat))
     } else stop("Invalid character value for `auxdesign`")
   } else {
     Z <- auxdesign
@@ -88,18 +82,19 @@ cook_weisberg <- function (mainlm, auxdesign = NULL, hetfun = "additive") {
   q <- ncol(Z)
   n <- nrow(Z)
 
-  if (hetfun == "additive") {
+  if (hetfun == "mult") {
     Z <- cbind(1, Z)
-  } else if (hetfun == "multiplicative") {
+  } else if (hetfun == "logmult") {
     Z <- cbind(1, log(Z))
-  } else {
-    Z <- cbind(1, get(hetfun)(Z))
-  }
+  } else if (hetfun == "add") {
+    Z <- cbind(1, 2 * Z)
+  } else stop("Invalid hetfun argument")
 
-  sigma_hatsq <- sum(mainlm$residuals ^ 2) / n
-  std_res_sq <- mainlm$residuals ^ 2 / sigma_hatsq
+  sigma_hatsq <- sum(e ^ 2) / n
+  std_res_sq <- e ^ 2 / sigma_hatsq
   auxres <- stats::lm.fit(Z, std_res_sq)$residuals
   teststat <- (sum(std_res_sq ^ 2) - n * mean(std_res_sq) ^ 2 - sum(auxres ^ 2)) / 2
+  if (statonly) return(teststat)
   method <- hetfun
   pval <- stats::pchisq(teststat, df = q, lower.tail = FALSE)
   rval <- structure(list(statistic = teststat, parameter = q, p.value = pval,

@@ -36,8 +36,8 @@
 #' @inheritParams breusch_pagan
 #' @inheritParams carapeto_holt
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -51,28 +51,14 @@
 #' evans_king(mtcars_lm, deflator = "qsec", method = "LM")
 #'
 
-evans_king <- function (mainlm, method = c("GLS", "LM"), deflator = NULL,
-                        lambda_star = 5, qfmethod = "imhof") {
+evans_king <- function(mainlm, method = c("GLS", "LM"), deflator = NULL,
+                      lambda_star = 5, qfmethod = "imhof", statonly = FALSE) {
 
   method <- match.arg(toupper(method), c("GLS", "LM"))
+  processmainlm(m = mainlm, needy = FALSE)
 
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-    p <- ncol(X)
-    hasintercept <- columnof1s(X)
-    y <- stats::model.response(stats::model.frame(mainlm))
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
-                                        is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    p <- ncol(X)
-    hasintercept <- columnof1s(X)
+  hasintercept <- columnof1s(X)
+  if (class(mainlm) == "list") {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
       colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
@@ -83,25 +69,12 @@ evans_king <- function (mainlm, method = c("GLS", "LM"), deflator = NULL,
 
   n <- nrow(X)
 
-  if (is.numeric(deflator) && deflator == as.integer(deflator)) {
-    if (hasintercept[[1]] && deflator == 1) {
-      stop("deflator cannot be the model intercept")
-    } else if (deflator > p) {
-      stop("`deflator` is not the index of a column of design matrix")
-    }
-  } else if (is.character(deflator)) {
-    if (deflator == "(Intercept)") {
-      stop("deflator cannot be the model intercept")
-    } else if (!deflator %in% colnames(X)) {
-      stop("`deflator` is not the name of a column of design matrix")
-    }
-  } else if (!is.null(deflator)) stop("`deflator` must be integer or character")
+  checkdeflator(deflator, X, p, hasintercept[[1]])
 
   if (!is.null(deflator)) {
-    y <- y[order(X[, deflator])]
+    e <- e[order(X[, deflator])]
     X <- X[order(X[, deflator]), , drop = FALSE]
   }
-  e <- stats::lm.fit(X, y)$residuals
   M <- fastM(X, n)
 
   if (method == "GLS") {
@@ -111,12 +84,14 @@ evans_king <- function (mainlm, method = c("GLS", "LM"), deflator = NULL,
     Xstar <- t(sapply(1:n, function(i) X[i, ] / w[i], USE.NAMES = FALSE))
     Mstar <- fastM(Xstar, n)
     teststat <- as.double((t(e) %*% R %*% Mstar %*% R %*% e) / crossprod(e))
+    if (statonly) teststat <- FALSE
     pval <- pvalRQF(r = teststat, A = M %*% R %*% Mstar %*% R %*% M,
                     B = M, algorithm = qfmethod, lower.tail = TRUE)
   } else if (method == "LM") {
     lambda_star <- NULL
     N <- diag((n - 1:n) / (n - 1))
     teststat <- as.double((t(e) %*% N %*% e) / crossprod(e))
+    if (statonly) teststat <- FALSE
     pval <- pvalRQF(r = teststat, A = M %*% N %*% M,
                     B = M, algorithm = qfmethod, lower.tail = TRUE)
   } else stop("Invalid `method` argument")

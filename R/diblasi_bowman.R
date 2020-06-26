@@ -38,8 +38,8 @@
 #' @inheritParams breusch_pagan
 #' @inheritParams wilcox_keselman
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -57,37 +57,21 @@
 #'
 
 diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
-                            H = 0.08, ignorecov = TRUE, B = 500L, seed = 1234) {
+                            H = 0.08, ignorecov = TRUE, B = 500L, seed = 1234,
+                           statonly = FALSE) {
 
   distmethod <- match.arg(distmethod, c("moment.match", "bootstrap"))
+  processmainlm(m = mainlm, needy = (distmethod == "bootstrap"),
+                needyhat = (distmethod == "bootstrap"))
 
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-    p <- ncol(X)
-    hasintercept <- columnof1s(X)
-    y <- stats::model.response(stats::model.frame(mainlm))
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
-                                        is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    p <- ncol(X)
-    hasintercept <- columnof1s(X)
-    if (hasintercept[[1]]) {
-      if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
-      colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
-    } else {
-      colnames(X) <- paste0("X", 1:p)
-    }
+  hasintercept <- columnof1s(X)
+  if (hasintercept[[1]]) {
+    if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
+    colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
+  } else {
+    colnames(X) <- paste0("X", 1:p)
   }
-
   n <- nrow(X)
-  e <- mainlm$residuals
   H <- as.matrix(H)
   if (max(dim(H)) == 1) {
     H <- as.double(H)
@@ -123,6 +107,7 @@ diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
   E0 <- gamma(3 / 4) * (2 * sigma_hat_sq * diag(M)) ^ (1 / 4) / sqrt(pi)
   s <- sqrt(abs(e)) - E0
   teststat <- as.double((t(s) %*% Cmat %*% s) / (t(s) %*% Bmat %*% s))
+  if (statonly) return(teststat)
 
   if (distmethod == "moment.match") {
     if (ignorecov) {
@@ -170,7 +155,7 @@ diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
     Tstar <- rep(NA_real_, B)
     if (!is.null(seed)) set.seed(seed)
     for (b in 1:B) {
-      ystar <- rnorm(n, mean = mainlm$fitted.values,
+      ystar <- rnorm(n, mean = yhat,
                      sd = sqrt(sigma_hat_sq))
       lmstar <- lm.fit(X, ystar)
       estar <- lmstar$residuals

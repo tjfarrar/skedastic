@@ -42,7 +42,7 @@ devtools::load_all()
 
 The following notation for the linear regression model is used throughout. The model equation is $$\bm{y}=\bm{X\beta}+\bm{\epsilon} \text{, }$$
 
-where $\bm{X}$ is an $n\times p$ design matrix that is assumed either to be nonstochastic or is conditioned on, $\bm{\beta}$ a $p$-vector of unknown parameters, and $\bm{\epsilon}$ an $n$-vector of random errors with $\epsilon_i \sim N(0, \sigma_i^2)$ (for $i=1,2,\ldots,n$) and $\Cov(\epsilon_i, \epsilon_j)=0$ (for $i \ne j$). (The assumptions of normality and/or no autocorrelation may be relaxed in certain of the heteroskedasticity tests.) In matrix notation, $\bm{\epsilon} \sim N_n(\bm{0}, \bm{\Sigma})$ where the variance-covariance matrix $\bm{\Sigma}$ is a diagonal matrix with $i$th diagonal element $\sigma_i^2$. $n$ is referred to as the number of observations and $p$ as the dimensionality of the regression. Note that the design matrix $\bm{X}$ may or may not include a column of ones (corresponding to a model intercept), and thus the number of explanatory variables may be $p-1$ or $p$.
+where $\bm{X}$ is an $n\times p$ design matrix that is assumed either to be nonstochastic or is conditioned on, $\bm{\beta}$ a $p$-vector of unknown parameters, and $\bm{\epsilon}$ an $n$-vector of random errors with $\epsilon_i \sim N(0, \sigma_i^2)$ (for $i=1,2,\ldots,n$) and $\Cov(\epsilon_i, \epsilon_j)=0$ (for $i \ne j$). (The assumptions of normality and/or no autocorrelation may be relaxed in certain of the heteroskedasticity tests.) In matrix notation, $\bm{\epsilon} \sim N_n(\bm{0}, \bm{\Sigma})$ where the variance-covariance matrix $\bm{\Sigma}$ is a diagonal matrix with $i$th diagonal element $\sigma_i^2$, $n$ is referred to as the number of observations and $p$ is the dimensionality of the regression. Note that the design matrix $\bm{X}$ may or may not include a column of ones (corresponding to a model intercept), and thus the number of explanatory variables may be $p-1$ or $p$.
 
 
 Of interest here is a test of the null hypothesis that all the error variances are equal (homoskedasticity), which can be expressed without loss of generality in scalar form as $\sigma_i^2 = \sigma^2$, $i=1,2,\ldots,n$ for some scalar $\sigma^2>0$, or in matrix form as $\bm{\Sigma}=\sigma^2 \bm{I}_n$, where $\bm{I}_n$ is the $n\times n$ identity matrix. The alternative hypothesis, under which not all error variances are equal, is referred to as heteroskedasticity.
@@ -53,13 +53,13 @@ $\hat{\sigma}^2=(n-p)^{-1}\bm{e}'\bm{e}=(n-p)^{-1}\sum_{i=1}^{n} e_i^2$ is an un
 
 ## The Problem of Heteroskedasticity in Linear Regression
 
-Under certain ideal conditions known as the Gauss-Markov assumptions or classical linear model (CLM) assumptions, the Gauss-Markov theorem states that the parameter estimator $\hat{\bm{\beta}}$ is the best linear unbiased estimator (BLUE) of $\bm{\beta}$. This means that, among all estimators that are unbiased (have expectation equal to the paramter being estimated) and linear (can be expressed as a linear combination of the response variables), $\hat{\bm{\beta}}$ is the 'best' in the sense of minimising the variance [@Wooldridge13, pp. 97-98]. One of the CLM assumptions is homoskedasticity, as already defined above. If instead the random errors are heteroskedastic, $\hat{\bm{\beta}}$ is still an unbiased and consistent estimator of $\bm{\beta}$, but the estimated variance of $\hat{\beta}_j$ is biased, $j=1,2,\ldots,p$. As a result, the standard errors used in inferences and confidence intervals on $\bm{\beta}$ and in prediction intervals on the response are incorrect. Hence, the resulting $t$ and $F$ ratios and $t$ quantiles are invalid [@Wooldridge13, pp. 104, 258-59; @Greene12, p. 299].
+Under certain ideal conditions known as the Gauss-Markov assumptions or classical linear model (CLM) assumptions, the Gauss-Markov theorem states that the parameter estimator $\hat{\bm{\beta}}$ is the best linear unbiased estimator (BLUE) of $\bm{\beta}$. This means that, among all estimators that are unbiased (have expectation equal to the paramter being estimated) and linear (can be expressed as a linear combination of the response variables), $\hat{\bm{\beta}}$ is the 'best' in the sense of minimising the variance [@Wooldridge13, pp. 97-98]. One of the CLM assumptions is homoskedasticity, as already defined above. If instead the random errors are heteroskedastic, $\hat{\bm{\beta}}$ is still an unbiased and consistent estimator of $\bm{\beta}$, but the estimated variance of $\hat{\beta}_j$ is biased, $j=1,2,\ldots,p$. As a result, the standard errors used in inferences on and confidence intervals for $\bm{\beta}$ and in prediction intervals for the response are incorrect. Hence, the resulting $t$ and $F$ ratios and $t$ quantiles are invalid [@Wooldridge13, pp. 104, 258-59; @Greene12, p. 299].
 
 
 Remedial action can be taken when heteroskedasticity is present. Specifically, this entails using heteroskedasticity-consistent covariance matrix estimation (HCCME). These remedial measures are not included in the `skedastic` package, because they have already been adequately implemented in the [`vcovHC`](http://math.furman.edu/~dcs/courses/math47/R/library/sandwich/html/vcovHC.html) function of the \hlink{sandwich package}{https://cran.r-project.org/web/packages/sandwich/index.html} [@Zeileis04]. However, using HCCME when the errors are homoskedastic is counterproductive, as it reduces the power of the standard significance tests and widens confidence and prediction intervals. This motivates the need for powerful heteroskedasticity diagnostic methods that will enable the best decision to be made about the use or non-use of HCCME.
 
 
-Since the 1960s, many diagnostic methods (mainly hypothesis tests) have been developed for detecting heteroskedasticity in linear regression models. However, very few of these methods have been implemented in standard statistical software, including R. Considering packages available on CRAN, the \hlink{Breusch-Pagan Test}{\#breusch_pagan} and \hlink{Goldfeld-Quandt Test}{\#goldfeld_quandt} (parametric version only) are available in the `bptest` and `gqtest` functions respectively of the \hlink{lmtest}{https://cran.r-project.org/web/packages/lmtest/index.html} package. The \hlink{Cook-Weisberg Test}{\#cook_weisberg} is available in the `ncvTest` function of the  \hlink{car}{https://cran.r-project.org/web/packages/car/index.html} package. Most other heteroskedasticity tests found in the literature are not implemented in any existing package on CRAN, nor in other statistical or econometrics software such as SAS, Stata, eViews, and SHAZAM. Accordingly, the purpose of the `skedastic` package is to make accessible to R users a wide range of heteroskedasticity diagnostic methods that have been published in the statistics and econometrics literature as of 2020.
+Since the 1960s, many diagnostic methods (mainly hypothesis tests) have been developed for detecting heteroskedasticity in linear regression models. However, very few of these methods have been implemented in standard statistical software, including R. Considering packages available on CRAN, the \hlink{Breusch-Pagan Test}{\#breusch_pagan} and \hlink{Goldfeld-Quandt Test}{\#goldfeld_quandt} (parametric version only) are available in the `bptest` and `gqtest` functions, respectively, of the \hlink{lmtest}{https://cran.r-project.org/web/packages/lmtest/index.html} package. The \hlink{Cook-Weisberg Test}{\#cook_weisberg} is available in the `ncvTest` function of the  \hlink{car}{https://cran.r-project.org/web/packages/car/index.html} package. Most other heteroskedasticity tests found in the literature are not implemented in any existing package on CRAN, nor in other statistical or econometrics software such as SAS, Stata, eViews, and SHAZAM. Accordingly, the purpose of the `skedastic` package is to make accessible to R users a wide range of heteroskedasticity diagnostic methods that have been published in the statistics and econometrics literature as of 2020.
 
 # Heteroskedasticity Tests {#het_tests}
 
@@ -71,16 +71,25 @@ The [`mtcars`](https://www.rdocumentation.org/packages/datasets/versions/3.6.2/t
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 ```
 
-All of the heteroskedasticity test functions take an argument `mainlm` that can be passed either as an `lm` object, or as a `list` object containing the response vector and the design matrix in that order. In the latter case, if the design matrix does not include a column of ones as its first column, the model is assumed not to include an intercept. Another feature common to all of the heteroskedasticity test functions is that all rows of observations containing at least one missing value are removed.
+All of the heteroskedasticity test functions take an argument `mainlm` that can be passed either as an `lm` object or as a `list` object. The former case is straightforward: the `lm` object will typically have been created by fitting a linear model using the `lm` function in the `stats` package. It is anticipated that most practitioners will choose this option when passing the `mainlm` argument. The latter case is more complicated but results in performance gains since heteroskedasticity functions within the package fit linear models using `lm.fit` rather than `lm`. The list object passed as `mainlm` would typically be of the form `list(y, X)`, where `y` is the response vector and `X` is the design matrix. Note that if the list contains two unnamed objects, they are assumed to be the response vector and the design matrix _in that order_. Note further that the design matrix is passed 'as is' to `lm.fit`, so it must already contain a column of ones if an intercept is to be included. Thus, a `list` object to pass as the `mainlm` argument that would yield the same result as passing the `mtcars_lm` `lm` object above could be created as follows:
 
-The output for each of the heteroskedasticity functions is a `list` object of class `"htest"` that has been converted into a tidy `tibble` using the `broom::tidy` function. The named objects that are always present in the output object are `statistic` (the observed value of the test statistic), `pval` (the $p$-value), `null.value` (set to `"Homoskedasticity"` in cases where there is not a well-defined numerical null value), and `alternative` (one of `"two.sided"`, `"greater"`, or `"less"`, depending on whether the test is two-tailed, upper-tailed, or lower-tailed respectively). Other named objects that may or may not be present are `parameter` and `method`. `parameter` represents some parameter that may vary in different applications of the test, such as degrees of freedom or some hyperparameter set by the practitioner. In cases where more than one method (e.g., statistical formula or computational technique) is available within a function, `method` indicates the method used.
+```{r example_list}
+data(mtcars)
+mtcars_X <- cbind(1, mtcars$wt, mtcars$qsec, mtcars$am)
+mtcars_list <- list(mtcars$mpg, mtcars_X)
+```
 
+The user can also indicate the roles of the two objects by naming the response vector `"y"` and the design matrix `"X"`. Thus, following on the above example, passing `list("X" = mtcars_X, "y" = mtcars$mpg)` would produce the same result, but passing `list(mtcars_X, mtcars$mpg)` would result in an error: `Error in stats::lm.fit(X, y) : 'x' must be a matrix`. Finally, the user can also pass the vector of OLS residuals from the associated linear model as an object within the `list` object. This object should be named `"e"`. Depending on the heteroskedasticity test, it may be all that is needed (e.g., \hlink{Li-Yao Tests}{\#li_yao}), or (more commonly) the design matrix and/or response vector must also be passed. Thus, for instance, the list object `list("e" = mtcars_lm$residuals)` could be passed as the `mainlm` argument to `li_yao`. The list object `list("X" = mtcars_X, "e" = mtcars_lm$residuals)` (where `mtcars_X` is as assigned in the above code chunk) could be passed as the `mainlm` argument to `breusch_pagan` to implement the \hlink{Breusch-Pagan Test}{\#breusch_pagan} with the original design matrix serving as the auxiliary design matrix.
+
+Another feature common to all of the heteroskedasticity test functions is that all rows of observations containing at least one missing value are removed. This corresponds to the 'factory' setting of the `na.action` option, `na.omit`.
+
+The output for each of the heteroskedasticity test functions is a `list` object of class `"htest"` that has been converted into a tidy `tibble` using the `broom::tidy` function. The named objects that are always present in the output object are `statistic` (the observed value of the test statistic), `pval` (the $p$-value), `null.value` (set to `"Homoskedasticity"` in cases where there is not a well-defined numerical null value), and `alternative` (one of `"two.sided"`, `"greater"`, or `"less"`, depending on whether the test is two-tailed, upper-tailed, or lower-tailed, respectively). Other named objects that may or may not be present are `parameter` and `method`. `parameter` represents some parameter that may vary in different applications of the test, such as degrees of freedom or some hyperparameter set by the practitioner. In cases where more than one method (e.g., statistical formula or computational technique) is available within a function, `method` indicates the method used. Each of the heteroskedasticity test functions has a logical argument `statonly` that is by default set to `FALSE`; if set to `TRUE`, the function returns only the observed value of the test statistic rather than a `list` object of class `"htest"`. This option is included primarily to improve computational efficiency when computing simulated test statistic values for the test of \hlink{Dufour et al.}{\#dufour_etal}.
 
 The heteroskedasticity tests included in the package are described below in alphabetical order of the corresponding functions in the `skedastic` package. The following table lists all of the tests and some important information about each. 'Info Required' indicates what information must be available about the form of heteroskedasticity under the alternative hypothesis, if any. 'Asymp. Null Dist.' refers to the (asymptotic) null distribution of the test statistic. 'Hyperparam' indicates whether implementation of the test requires some hyperparameter or tuning parameter to be set. 
 
 \footnotesize
 ```{r, echo=FALSE}
-table1dat <- data.frame("Test" = c("\\hlink{Anscombe}{\\#anscombe} [@Anscombe61]", "\\hlink{BAMSET}{\\#bamset} [@Ramsey69]", "\\hlink{Bickel}{\\#bickel} [@Bickel78]", "\\hlink{Breusch-Pagan}{\\#breusch_pagan} [@Breusch79]", "\\hlink{Carapeto-Holt}{\\#carapeto_holt} [@Carapeto03]", "\\hlink{Cook-Weisberg}{\\#cook_weisberg} [@Cook83]", "\\hlink{Diblasi-Bowman}{\\#diblasi_bowman} [@Diblasi97]", "\\hlink{Evans-King}{\\#evans_king} [@Evans88]", "\\hlink{Glejser}{\\#glejser} [@Glejser69]", "\\hlink{Goldfeld-Quandt}{\\#goldfeld_quandt} Par. [@Goldfeld65]", "\\hlink{Goldfeld-Quandt}{\\#goldfeld_quandt} Nonpar. [@Goldfeld65]", "\\hlink{Harvey}{\\#harvey} [@Harvey76]", "\\hlink{Honda}{\\#honda} [@Honda89]", "\\hlink{Horn}{\\#horn} [@Horn81]", "\\hlink{Li-Yao}{\\#li_yao} [@Li19]", "\\hlink{Račkauskas-Zuokas}{\\#rackauskas_zuokas} [@Rackauskas07accents]", "\\hlink{Szroeter}{\\#szroeter} [@Szroeter78]", "\\hlink{White}{\\#white_lm} [@White80]", "\\hlink{Wilcox-Keselman}{\\#wilcox_keselman} [@Wilcox06]"), "Function" = c("`anscombe`", "`bamset`", "`bickel`", "`breusch_pagan`", "`carapeto_holt`", "`cook_weisberg`", "`diblasi_bowman`", "`evans_king`", "`glejser`", "`goldfeld_quandt`", "`goldfeld_quandt`", "`harvey`", "`honda`", "`horn`", "`li_yao`", "`rackauskas_zuokas`", "`szroeter`", "`white_lm`", "`wilcox_keselman`"), "Info" = c("None", "Deflator", "None", "Aux. Design", "Deflator", "Aux. Design", "None", "Deflator", "Aux. Design", "Deflator", "Deflator", "Aux. Design", "Deflator", "Deflator", "None", "None", "Deflator", "None", "None"), "NullDist" = c("Normal", "Chi-Squared", "Normal", "Chi-Squared", "Ratio of Quad. Forms", "Chi-Squared", "Chi-Squared", "Ratio of Quad. Forms", "Chi-Squared", "$F$", "Exact", "Chi-Squared", "Ratio of Quad. Forms", "Normal; Exact", "Normal", "Simulated", "Ratio of Quad. Forms", "Chi-Squared", "Normal"), "Hyperparam" = c("No", "Yes", "Yes", "No", "Yes", "No", "No", "No", "No", "Yes", "No", "No", "No", "No", "No", "Yes", "Yes", "No", "No"))
+table1dat <- data.frame("Test" = c("\\hlink{Anscombe}{\\#anscombe} [@Anscombe61]", "\\hlink{BAMSET}{\\#bamset} [@Ramsey69]", "\\hlink{Bickel}{\\#bickel} [@Bickel78]", "\\hlink{Breusch-Pagan}{\\#breusch_pagan} [@Breusch79]", "\\hlink{Carapeto-Holt}{\\#carapeto_holt} [@Carapeto03]", "\\hlink{Cook-Weisberg}{\\#cook_weisberg} [@Cook83]", "\\hlink{Diblasi-Bowman}{\\#diblasi_bowman} [@Diblasi97]", "\\hlink{Dufour et al.}{\\#dufour_etal} [@Dufour04]", "\\hlink{Evans-King}{\\#evans_king} [@Evans88]", "\\hlink{Glejser}{\\#glejser} [@Glejser69]", "\\hlink{Goldfeld-Quandt}{\\#goldfeld_quandt} Par. [@Goldfeld65]", "\\hlink{Goldfeld-Quandt}{\\#goldfeld_quandt} Nonpar. [@Goldfeld65]", "\\hlink{Harvey}{\\#harvey} [@Harvey76]", "\\hlink{Honda}{\\#honda} [@Honda89]", "\\hlink{Horn}{\\#horn} [@Horn81]", "\\hlink{Li-Yao}{\\#li_yao} [@Li19]", "\\hlink{Račkauskas-Zuokas}{\\#rackauskas_zuokas} [@Rackauskas07accents]", "\\hlink{Simonoff-Tsai}{\\#simonoff_tsai} [@Simonoff94]", "\\hlink{Szroeter}{\\#szroeter} [@Szroeter78]", "\\hlink{Verbyla}{\\#verbyla} [@Verbyla93]", "\\hlink{White}{\\#white_lm} [@White80]", "\\hlink{Wilcox-Keselman}{\\#wilcox_keselman} [@Wilcox06]"), "Function" = c("`anscombe`", "`bamset`", "`bickel`", "`breusch_pagan`", "`carapeto_holt`", "`cook_weisberg`", "`diblasi_bowman`", "`dufour_etal`", "`evans_king`", "`glejser`", "`goldfeld_quandt`", "`goldfeld_quandt`", "`harvey`", "`honda`", "`horn`", "`li_yao`", "`rackauskas_zuokas`", "`simonoff_tsai`", "`szroeter`", "`verbyla`", "`white_lm`", "`wilcox_keselman`"), "Info" = c("None", "Deflator", "None", "Aux. Design", "Deflator", "Aux. Design", "None", "Varies", "Deflator", "Aux. Design", "Deflator", "Deflator", "Aux. Design", "Deflator", "Deflator", "None", "None", "Aux. Design", "Deflator", "Aux. Design", "None", "None"), "NullDist" = c("Normal", "Chi-Squared", "Normal", "Chi-Squared", "Ratio of Quad. Forms", "Chi-Squared", "Chi-Squared", "Empirical", "Ratio of Quad. Forms", "Chi-Squared", "$F$", "Exact", "Chi-Squared", "Ratio of Quad. Forms", "Normal; Exact", "Normal", "Simulated", "Chi-Squared", "Ratio of Quad. Forms", "Chi-Squared", "Chi-Squared", "Normal"), "Hyperparam" = c("No", "Yes", "Yes", "No", "Yes", "No", "No", "Varies", "No", "No", "Yes", "No", "No", "No", "No", "No", "Yes", "No", "Yes", "No", "No", "No"))
 knitr::kable(table1dat, booktabs = TRUE, caption = "Heteroskedasticity Tests Implemented in `skedastic` Package", 
              escape = FALSE, col.names = c("Test", "Function", "Info Required", "(Asymp.) Null Dist.", "Hyperparam"), align = "lllll")
 ```
@@ -126,7 +135,7 @@ anscombe(mainlm = mtcars_lm, studentise = FALSE)
 @Ramsey69 proposed a test of heteroskedasticity that he called BAMSET, an acronym for Bartlett's $M$ Specification Error Test. The test entails partitioning the model residuals into $k$ subsets and conducting Bartlett's $M$ Test for heterogeneity of variances using these subsets as its samples. The user specifies $k$ (an integer $\ge 2$) using the `k` argument of the `bamset` function. The default value of `k` is 3, as recommended in @Ramsey69. Prior to partitioning, the observations are ordered according to some 'deflator' variable (one of the explanatory variables) that is suspected (under the alternative hypothesis of heteroskedasticity) to be monotonically related to the error variance. The deflator is specified using the `deflator` argument, which can be a character specifying a column name in the design matrix _or_ an integer representing the column number in the design matrix. If `deflator` is set to `NULL`, the observations are not reordered. This setting should be used if it is suspected that the observations are already arranged in increasing or decreasing order of error variance.
 
 
-Bartlett's $M$ Test requires an assumption of independence between the $k$ populations (in this case, between $k$ subsets of OLS residuals $\bm{e}$). This assumption does not apply in this case, because under homoskedasticity (when $\mathop{\rm Cov}(\bm{\epsilon})=\sigma^2 \bm{I}_n$), the variance-covariance matrix of $\bm{e}$ is not diagonal; rather, $\mathop{\rm Cov}(e_i,e_j)=\sigma^2 m_{ij}$ (where $m_{ij}$ is the $i,j$th element of $\bm{M}$ as defined \hlink{above}{\#notation}). Hence, in order to satisfy the independence assumption, BAMSET uses the \hlink{BLUS}{\#blus} residuals derived by @Theil65 (see also @Theil68), which are uncorrelated. Computing the BLUS residuals yields only $n-p$ observations rather than $n$, and so in implementing BAMSET one must specify how to decide which $p$ observations should be omitted. By setting the `omitatmargins` argument to `TRUE` when calling `bamset` (which is the default), one indicates that the $p$ omitted observations are those nearest to the breaks between subsets. Thus, for example, if $n=20$, $p=2$, and $k=3$, the initial subsets would contain observations 1 to 7, 8 to 14, and 15 to 20, respectively. The two observations to be omitted would be the 7th and the 14th, leaving three subsets each containing six observations. The advantage of omitting at the margins between subsets is that, under the alternative hypothesis, this could accentuate the heterogeneity in variances between groups, and therefore increase the power of the test, while under the null hypothesis it would make no difference which observations were omitted. If `omitatmargins` is set to `FALSE`, the function looks at the `omit` argument (explained under the [`blus`](#blus) function) to decide which observations to omit.
+Bartlett's $M$ Test requires an assumption of independence between the $k$ populations (in this case, between $k$ subsets of OLS residuals $\bm{e}$). This assumption does not apply in this case, because under homoskedasticity (when $\mathop{\rm Cov}(\bm{\epsilon})=\sigma^2 \bm{I}_n$), the variance-covariance matrix of $\bm{e}$ is not diagonal; rather, $\mathop{\rm Cov}(e_i,e_j)=\sigma^2 m_{ij}$ (where $m_{ij}$ is the $i,j$th element of $\bm{M}$ as defined \hlink{above}{\#notation}, $i=1,2,\ldots,n$, $j=1,2,\ldots,n$). Hence, in order to satisfy the independence assumption, BAMSET uses the \hlink{BLUS}{\#blus} residuals derived by @Theil65 (see also @Theil68), which are uncorrelated. Computing the BLUS residuals yields only $n-p$ observations rather than $n$, and so in implementing BAMSET one must specify how to decide which $p$ observations should be omitted. By setting the `omitatmargins` argument to `TRUE` when calling `bamset` (which is the default), one indicates that the $p$ omitted observations are those nearest to the breaks between subsets. Thus, for example, if $n=20$, $p=2$, and $k=3$, the initial subsets would contain observations 1 to 7, 8 to 14, and 15 to 20, respectively. The two observations to be omitted would be the 7th and the 14th, leaving three subsets each containing six observations. The advantage of omitting at the margins between subsets is that, under the alternative hypothesis, this could accentuate the heterogeneity in variances between groups, and therefore increase the power of the test, while under the null hypothesis it would make no difference which observations were omitted. If `omitatmargins` is set to `FALSE`, the function looks at the `omit` argument (explained under the [`blus`](#blus) function) to decide which observations to omit.
 
 
 Let the BLUS residuals be $\tilde{e}_i$, $i=1,2,\ldots,n$, but with $\tilde{e}_i$ undefined for the omitted indices. Further define $\ell_j$ to be the set of (non-omitted) indices within the $j$th subset, $j=1,2,\ldots,k$, and let $\nu_j$ be the number of observations in the $j$th subset, from which it follows that $\sum_{j=1}^{k}\nu_j=n-p\equiv \nu$.
@@ -147,7 +156,7 @@ $$s_j^2= \nu_j^{-1} \sum_{i \in \ell_j} \tilde{e}_i^2\text{.}$$
 The asymptotic null distribution of $T$ is $\chi^2(k-1)$ and the test is upper-tailed. The fit to the null distribution can be improved by dividing by a scaling constant and using the statistic 
 $$T'=\frac{T}{1+\left[3(k-1)\right]^{-1}\left(\sum_{j=1}^{k} \nu_j^{-1}-\nu^{-1}\right)} \text{.}$$
 
-The rescaling of the statistic is done by default but can be avoided by setting the argument `correct` to `FALSE`. Note that @Ramsey69[p. 368] erroneously includes $\nu^{-1}$ within the sum in the formula for the scaling constant. Code and output for an implementation of this test with $k=3$ and $k=4$ subsets respectively (and, as per the default, omitting indices at margins between subsets) is given below. The choice of $k$ should be governed in part by the number of observations $n$. Certainly, if $n$ is small, $k$ should be no more than 3 or 4.
+The rescaling of the statistic is done by default but can be avoided by setting the argument `correct` to `FALSE`. Note that @Ramsey69[p. 368] erroneously includes $\nu^{-1}$ within the sum in the formula for the scaling constant. Code and output for an implementation of this test with $k=3$ and $k=4$ subsets, respectively, is given below (indices are omitted at margins, as per the default). The choice of $k$ should be governed in part by the number of observations $n$. Certainly, if $n$ is small, $k$ should be no more than 3 or 4.
 
 ```{r ex_bamset}
 bamset(mtcars_lm, deflator = "wt", k = 3)
@@ -159,7 +168,7 @@ bamset(mtcars_lm, deflator = "wt", k = 4)
 @Bickel78 proposes a robust test of heteroskedasticity that extends the method of @Anscombe61, replacing the OLS residuals and estimated standard error with $M$ estimators. The first step in implementing the test is to obtain model residuals. These can be obtained via OLS or via robust regression using an $M$ estimator (to further enhance the robustness of the method), by specifying the `fitmethod` argument as `"lm"` or `"rlm"` respectively. In the latter case, the model is fit using `MASS::rlm`. The residuals will be denoted as $\bm{e}$ in either case. The default value of `fitmethod` is `"lm"` (corresponding to OLS).
 
 
-The user must specify a function $a(\cdot)$ to apply to the fitted values (using argument `a`) and a function $b(\cdot)$ to apply to the residuals (using argument `b`) to obtain a statistic based on an $M$ estimator. The argument `a` can be any function that takes one argument and returns a `numeric` value of `length` 1. Alternatively, the argument `a` can be a `numeric` value of `length` 1, in which case the function is taken to be $a(\tau)=\tau^q$, where $q$ is the value passed for argument `a`. The default $a(\cdot)$ function is $a(\tau)=\tau$ (as suggested by @Bickel78[p. 274]), represented in R by `identity`. The $b(\cdot)$ function corresponds to the $\psi(\cdot)$ function used to construct $M$ estimators and must be even, bounded, and twice-differentiable. In the `bickel` function, currently only two functions are supported for $b(\cdot)$: Huber's function squared and $b(\tau)=\tanh(\tau)^2$. These are called by passing the characters `"hubersq"` and `"tanhsq"` respectively for the `b` argument. Huber's function squared, the default---as suggested by @Carroll81---is
+The user must specify a function $a(\cdot)$ to apply to the fitted values (using argument `a`) and a function $b(\cdot)$ to apply to the residuals (using argument `b`) to obtain a statistic based on an $M$ estimator. The argument `a` can be any function that takes one argument and returns a `numeric` value of `length` 1. Alternatively, the argument `a` can be a `numeric` value of `length` 1, in which case the function is taken to be $a(\tau)=\tau^q$, where $q$ is the value passed for argument `a`. The default $a(\cdot)$ function is $a(\tau)=\tau$ (as suggested by @Bickel78[p. 274]), represented in R by `identity`. The $b(\cdot)$ function corresponds to the $\psi(\cdot)$ function used to construct $M$ estimators and must be even, bounded, and twice-differentiable. In the `bickel` function, currently only two functions are supported for $b(\cdot)$: Huber's function squared and $b(\tau)=\tanh(\tau)^2$. These are called by passing the character `"hubersq"` or `"tanhsq"`, respectively, for the `b` argument. Huber's function squared, the default---as suggested by @Carroll81---is
 $$b(\tau)=\begin{dcases*}\tau^2 & if $|\tau| \le k$\\
 k^2 & if $|\tau| > k$\\
 \end{dcases*} \text{.}$$
@@ -169,8 +178,9 @@ The test statistic is then $$\begin{aligned}T&=\sigma_b^{-2} \sum_{i=1}^{n} \lef
 
 where
 
-$$\begin{aligned}\sigma_b^2&=(n-p)^{-1} \sum_{i=1}^{n} \left(a(\hat{y}_i)-\bar{a}\right)^2 \sum_{i=1}^{n} \left(b(e_i)-\bar{b}\right)^2\text{,}\\
-\bar{a}&=n^{-1}\sum_{i=1}^{n} a(\hat{y}_i)\text{,}\end{aligned}$$
+$$\sigma_b^2=(n-p)^{-1} \sum_{i=1}^{n} \left(a(\hat{y}_i)-\bar{a}\right)^2 \sum_{i=1}^{n} \left(b(e_i)-\bar{b}\right)^2\text{,}$$
+
+$$\bar{a}=n^{-1}\sum_{i=1}^{n} a(\hat{y}_i)\text{,}$$
 
 and
 
@@ -179,7 +189,7 @@ $$\bar{b}=n^{-1}\sum_{i=1}^{n} b(e_i)\text{.}$$
 @Carroll81 note that this test statistic is not scale-invariant, and that this can be rectified by replacing $b(e_i)$ in the above expression with $b\left(e_i/\hat{\sigma}\right)$, where $\hat{\sigma}^2$ is an estimator of $\sigma^2$. In keeping with the method's emphasis on robustness, and as recommended by @Bickel78[p. 279], the estimator used in `bickel` is $\hat{\sigma}=\mathop{\rm median}\{|e_1|,|e_2|,\ldots,|e_n|\}/\Phi^{-1}(0.75)$ (where $\Phi(\cdot)$ is the standard normal cumulative distribution function). This modification to the test statistic can be implemented by setting the `scale_invariant` argument to `TRUE` (as it is by default).
 
 
-The asymptotic null distribution of $T$ is standard normal and thus the two-sided $p$-value for the test is computed from the standard normal distribution. Below are code and output for an implementation of the test with three different settings: $b(\cdot)$ as Huber's function squared and OLS residuals, $b(\cdot)$ as Huber's function squared and robust regression residuals, and $b(\cdot)$ as the hyperbolic tangent function with OLS residuals.
+The asymptotic null distribution of $T$ is standard normal and thus the two-sided $p$-value for the test is computed from the standard normal distribution. Below are code and output for an implementation of the test with three different settings: $b(\cdot)$ as Huber's function squared and OLS residuals, $b(\cdot)$ as Huber's function squared and robust regression residuals, and $b(\cdot)$ as the hyperbolic tangent function squared with OLS residuals.
 
 ```{r ex_bickel}
 bickel(mtcars_lm, b = "hubersq")
@@ -191,14 +201,14 @@ It is evident that these settings can make a huge difference in the outcome of t
 
 ## Breusch-Pagan Test (`breusch_pagan`) {#breusch_pagan}
 
-@Breusch79 propose a test for heteroskedasticity that has become one of the most well-known and frequently cited. A prerequisite for applying the test is that one must have an _auxiliary design matrix_ $\bm{Z}$, i.e., an $n\times (q+1)$ matrix consisting of an intercept and $q$ nonstochastic variables that are believed to be related to the error variance. Perhaps the most obvious choice of $\bm{Z}$, in the absence of more specific prior information, is the original design matrix, $\bm{X}$. Another option is to let $\bm{Z}=\bm{X}|\bm{X}^{(2)}$, i.e. the horizontal concatenation of $\bm{X}$ with $\bm{X}^{(2)}$, a matrix whose $j$th column contains the squares of the $j$th column of $\bm{X}$ (but with a single column of ones that is not repeated). This special case of the Breusch-Pagan Test is \hlink{White's Test}{\#white_lm}, and is more conveniently implemented using the `white_lm` function. The auxiliary regression matrix is specified in `breusch_pagan` using the `auxdesign` argument. The default value of `NULL` indicates that the original design matrix, $\bm{X}$, is also the auxiliary design matrix $\bm{Z}$. Setting `auxdesign` to the character value `"fitted.values"` corresponds to $\bm{Z}=\left[\bm{1} \text{\hspace{0.25cm}} \hat{\bm{y}}\right]$. Otherwise, the user should pass a real-valued matrix as `auxdesign`. (Note that a column of ones will be prepended to this matrix if it does not already include a column of ones.)
+@Breusch79 propose a test for heteroskedasticity that has become one of the most well-known and frequently cited. A prerequisite for applying the test is that one must have an _auxiliary design matrix_ $\bm{Z}$, i.e. an $n\times q$ matrix consisting $q$ nonstochastic variables that are believed to be related to the error variance. Perhaps the most obvious choice of $\bm{Z}$, in the absence of more specific prior information, is the original design matrix, $\bm{X}$. Another option is to let $\bm{Z}=\bm{X}|\bm{X}^{(2)}$, i.e. the horizontal concatenation of $\bm{X}$ with $\bm{X}^{(2)}$, a matrix whose $j$th column contains the squares of the $j$th column of $\bm{X}$. This special case of the Breusch-Pagan Test is \hlink{White's Test}{\#white_lm}, and is more conveniently implemented using the `white_lm` function. The auxiliary regression matrix is specified in `breusch_pagan` using the `auxdesign` argument. The default value of `NULL` indicates that the original design matrix, $\bm{X}$, is also the auxiliary design matrix $\bm{Z}$. Setting `auxdesign` to the character value `"fitted.values"` corresponds to $\bm{Z}=\left[\bm{1} \text{\hspace{0.25cm}} \hat{\bm{y}}\right]$. Otherwise, the user should pass a real-valued matrix as `auxdesign`. (Note that a column of ones will be prepended to this matrix if it does not already include a column of ones.)
 
 
 The original procedure for computing the Breusch-Pagan test statistic is as follows:
 
 1. Compute $\bar{\sigma}^2=n^{-1} \sum_{i=1}^{n} e_i^2$ and $\hat{\bm{w}}$, an $n$-vector whose $i$th element is $\hat{w}_i=e_i^2-\bar{\sigma}^2$.
 
-2. Fit an auxiliary regression model (using OLS) with response vector $\hat{\bm{w}}$ and design matrix $\bm{Z}$, and obtain the model's fitted values $\tilde{w}_i$, $i=1,2,\ldots,n$.
+2. Fit an auxiliary regression model (using OLS) with response vector $\hat{\bm{w}}$ and design matrix $\bm{Z}$, and obtain the model's fitted values $\tilde{w}_i$, $i=1,2,\ldots,n$. Note that the auxiliary regression invariably includes an intercept term despite $\bm{Z}$, as defined here, not including a column of ones.
 
 3. Compute 
 $$T = (2 \bar{\sigma}^2)^{-1} \sum_{i=1}^{n} \tilde{w}_i ^ 2 \text{.}$$
@@ -214,10 +224,10 @@ breusch_pagan(mtcars_lm, koenker = FALSE)
 
 ## Carapeto and Holt's Test (`carapeto_holt`) {#carapeto_holt}
 
-@Carapeto03 propose a heteroskedasticity test that is similar in its logic to the \hlink{Goldfeld-Quandt Test}{\#goldfeld_quandt}. A prerequisite of the test is that the observations are ordered by some 'deflator' variable such that, under the alternative hypothesis, the observations are in order of error variance. As Carapeto and Holt constructed the test, the observations must be in _decreasing_ order of error variance, and as a result the test is right-tailed. This is the default circumstance for the `carapeto_holt` function. However, the function also allows the user to conduct a left-tailed test (if the observations have been put in suspected _increasing_ order of error variance) or a two-tailed test (if the deflator is suspected of being monotonically related to the error variance, but the direction of the relationship is unknown). This setting is controlled using the `alternative` argument. (See under [`goldfeld_quandt`](#goldfeld_quandt) or [`bamset`](#bamset) for details of specifying the deflator using the `deflator` argument.)
+@Carapeto03 propose a heteroskedasticity test that is similar in its logic to the \hlink{Goldfeld-Quandt Test}{\#goldfeld_quandt}. A prerequisite of the test is that the observations are ordered by some 'deflator' variable such that, under the alternative hypothesis, the observations are in order of error variance. As Carapeto and Holt constructed the test, the observations must be in _decreasing_ order of error variance, and as a result the test is right-tailed. This is the default circumstance for the `carapeto_holt` function. However, the function also allows the user to conduct a left-tailed test (if the observations have been put in suspected _increasing_ order of error variance) or a two-tailed test (if the deflator is suspected of being monotonically related to the error variance, but the direction of the relationship is unknown). This setting is controlled using the `alternative` argument. (See [`goldfeld_quandt`](#goldfeld_quandt) or [`bamset`](#bamset) for details of specifying the deflator using the `deflator` argument.)
 
 
-The test proceeds by first removing some proportion $c=\frac{n-2m}{n}$ of central observations, leaving two subsets consisting of the first $m$ and last $m$ observations, respectively. The proportion $c$ is specified using the argument `prop_central`, with default value $\frac{1}{3}$; the proportion is rounded, if necessary, within the function to ensure that $m$ is an integer. The sums of squared residuals of these two subsets are then compared using the following statistic:
+The test proceeds by first removing some proportion $c=\frac{n-2m}{n}$ of central observations, leaving two subsets consisting of the first $m$ and last $m$ observations, respectively. The proportion $c$ is specified using the argument `prop_central`, with default value $\frac{1}{3}$; the proportion is rounded, if necessary, within the function to ensure that $m$ is an integer. (See [`goldfeld_quandt`](#goldfeld_quandt) on the `group1prop` argument, which allows the user to specify subsets of unequal size if desired). The sums of squared residuals of these two subsets are then compared using the following statistic:
 $$T=\frac{\hat{\sigma}_1^2}{\hat{\sigma}_2^2}=\frac{\bm{e}'\bm{I^\star}\bm{e}}{\bm{e}'\bm{I_\star}\bm{e}}=\frac{\bm{\epsilon}' \bm{M}' \bm{I^\star} \bm{M} \bm{\epsilon}}{\bm{\epsilon}'\bm{M}'\bm{I_\star}\bm{M}\bm{\epsilon}}\text{,}$$
 where $\bm{I^\star}$ is an $n\times n$ diagonal matrix whose first $m$ diagonal elements are ones and other diagonal elements are zeroes, and $\bm{I_\star}$ is an $n\times n$ diagonal matrix whose last $m$ diagonal elements are ones and other diagonal elements are zeroes. Under the null hypothesis (together with the assumptions of normality and no autocorrelation), $T$ is a ratio of quadratic forms in a multivariate normal random variable having mean vector $\bm{0}$ and covariance matrix $\sigma^2 \bm{I}_n$. The $\sigma^2$ will cancel in the ratio, so that $T$ is scale-invariant. The null hypothesis will be rejected if $T$ is too large.
 
@@ -241,24 +251,34 @@ carapeto_holt(mtcars_lm, deflator = "qsec", prop_central = 0.25, alternative = "
 
 ## Cook and Weisberg's Score Test (`cook_weisberg`) {#cook_weisberg}
 
-@Cook83 propose a test similar in character to the \hlink{Breusch-Pagan Test}{\#breusch_pagan}. It entails fitting an auxiliary regression model in which the response vector is $\bm{d}=\bar{\sigma}^{-2}\bm{e}$, where $\bar{\sigma}^2=n^{-1}\bm{e}'\bm{e}$, and the design matrix consists of a column of ones concatenated with $w(\bm{Z})$, where $\bm{Z}$ an $n\times (q+1)$ matrix consisting of a column of ones and $q$ exogenous variables and $w(\cdot)$ is a twice-differentiable, real-valued function applied elementwise to $\bm{Z}$. The choice of $w(\cdot)$ depends on the form of the error variance under the alternative hypothesis of heteroskedasticity. Specifically, $w(\cdot)$ is the inverse of $h(\cdot)$, the heteroskedastic function that governs the relationship between $\sigma_i^2$ and $\bm{Z}_i$, the $i$th row of $\bm{Z}$.
+@Cook83 propose a score test similar in character to the \hlink{Breusch-Pagan Test}{\#breusch_pagan}. They assume that, in general, the errors $\bm{\epsilon}$ follow a multivariate normal distribution with mean 0 and variance $\sigma^2 \bm{W}$, where $\bm{W}$ is a diagonal matrix with $i$th diagonal element $w_i=w(\bm{Z}_i, \bm{\lambda})$. Here, $\bm{Z}_i$ is the $i$th row of a $n\times q$ auxiliary design matrix $\bm{Z}$ consisting of $q$ nonstochastic variables, $w(\cdot)$ is a twice-differentiable, real-valued function applied elementwise to $\bm{Z}_i$, and $\bm{\lambda}$ is a $q$-vector of unknown parameters. Note that, although $\bm{Z}$ as defined here does not include a column of ones, an intercept *is* included in the auxiliary regression model. It is assumed that there is some value $\bm{\lambda}_0$ for which $w_i=1$, $i=1,2,\ldots,n$, and thus the null hypothesis of homoskedasticity is equivalent to $\bm{\lambda}=\bm{\lambda}_0$. The choice of $w(\cdot)$ depends on the form of the error variance under the alternative hypothesis. Three well-known choices of heteroskedastic model (see @Cook83; @Griffiths86) are
 
+$$w(\bm{Z}_i,\bm{\lambda})=\left(1+\sum_{j=1}^{q} \lambda_j Z_{ij}\right)^2 \text{ (additive model),}$$
 
-If $\sigma_i^2$ is assumed to have an additive functional form, i.e., $\sigma_i^2=h(\bm{Z}_t \bm{\lambda})=\bm{Z}_t \bm{\lambda}$, then $w(\bm{Z})=\bm{Z}$. On the other hand, if $\sigma_i^2$ is assumed to have a multiplicative functional form, i.e., $\sigma_i^2 =h(\bm{Z}_t \bm{\lambda}) \exp(\bm{Z}_i \bm{\lambda})$, then $w(\bm{Z})=\log(\bm{Z})$ (again, applied elementwise to $\bm{Z}$; this transformation, of course, requires that all elements of $\bm{Z}$ are positive). The form of $w(\cdot)$ is specified indirectly in `cook_weisberg` using the argument `hetfun`. A character value of `"additive"` or `"multiplicative"` corresponds to the two cases above; otherwise `hetfun` can be a function representing $w(\cdot)$ to apply elementwise to $\bm{Z}$. The auxiliary design matrix is specified using the argument `auxdesign`, exactly as in [`breusch_pagan`](#breusch_pagan).
+$$w(\bm{Z}_i,\bm{\lambda})=\exp\left\{\sum_{j=1}^{q} \lambda_j Z_{ij}\right\}=\prod_{j=1}^{q}\exp\left\{\lambda_j Z_{ij}\right\} \text{ (multiplicative model),}$$
 
+and
 
-The test statistic is $$\begin{aligned}
+$$w(\bm{Z}_i,\bm{\lambda})=\exp\left\{\sum_{j=1}^{q}\lambda_j \log Z_{ij}\right\}=\prod_{j=1}^{q} Z_{ij}^{\lambda_j} \text{ (log-multiplicative model).}$$
+
+In the log-multiplicative model it is required that $Z_{ij}>0$ for all $i=1,2,\ldots,n$, $j=1,2,\ldots,q$. In all three models, $\bm{\lambda}_0$ is the zero vector, and so a heteroskedasticity test is equivalent to a test of the null hypothesis $\bm{\lambda}=\bm{0}$.
+
+The test entails fitting an auxiliary regression model in which the response vector is the $n$-vector $\bm{d}$ whose $i$th element is $\bar{\sigma}^{-2}e_i^2$, where $\bar{\sigma}^2=n^{-1}\bm{e}'\bm{e}$, and the design matrix is an $n\times (q+1)$ matrix consisting of a column of ones concatenated with $\bm{J}$, an $n\times q$ Jacobian matrix whose $(i,j)$th element is $\frac{\partial w(\bm{Z}_i,\bm{\lambda})}{\partial \lambda_j}$, evaluated at $\bm{\lambda}=\bm{\lambda}_0$. It is easily shown that this $(i,j)$th derivative term reduces to $2 Z_{ij}$ in the additive model, to $Z_{ij}$ in the multiplicative model, and to $\log Z_{ij}$ in the log-multiplicative model. The test statistic is then $$\begin{aligned}
 T&=2^{-1}\left(\bm{d}'\bm{d}-n \bar{d}^2 - \bm{u}'\bm{u}\right)\text{,}\end{aligned}$$
 
 where
 
 $$\bar{d}=n^{-1} \sum_{i=1}^{n} d_i \text{,}$$
 
-and $\bm{u}$ is the vector of OLS residuals from the auxiliary regression. Evidently, $T$ represents half the regression sum of squares from the auxiliary regression. Under the null hypothesis of homoskedasticity, $T \sim \chi^2(q)$, and we reject the null hypothesis for large $T$. Code and output for implementations of `cook_weisberg` under two different settings are shown below. In the first case, the auxiliary design matrix is $\bm{X}$ and $w(\bm{Z})=\bm{Z}$ (since `hetfun` is set to `"additive"` by default); in the second case, the auxiliary design matrix is $\left[\bm{1} \text{\hspace{0.25cm}} \hat{\bm{y}}\right]$ and $w(\bm{Z})=\log \bm{Z}$.
+and $\bm{u}$ is the vector of OLS residuals from the auxiliary regression. $T$ can be interpreted as half the regression sum of squares from the aforementioned auxiliary regression. Under the null hypothesis of homoskedasticity, $T$ has an asymptotic $\chi^2(q)$ distribution, and the null hypothesis is rejected for large $T$. 
+
+The form of $w(\cdot)$ is specified indirectly in `cook_weisberg` using the argument `hetfun`, which can take one of three character values, `"add"`, `"mult"`, or `"logmult"`, corresponding to the three heteroskedastic models described above. (Note, however, that this test produces identical results for the additive and multiplicative models). The auxiliary design matrix $\bm{Z}$ is specified using the argument `auxdesign`, exactly as in [`breusch_pagan`](#breusch_pagan).
+
+Code and output for implementations of `cook_weisberg` under two different settings are shown below. In the first case, the auxiliary design matrix is $\bm{X}$ and the multiplicative alternative is used (since `hetfun` is set to `"mult"` by default); in the second case, the auxiliary design matrix is $\left[\bm{1} \text{\hspace{0.25cm}} \hat{\bm{y}}\right]$ and the log-multiplicative alternative is used.
 
 ```{r ex_cook_weisberg}
 cook_weisberg(mtcars_lm)
-cook_weisberg(mtcars_lm, auxdesign = "fitted.values", hetfun = "multiplicative")
+cook_weisberg(mtcars_lm, auxdesign = "fitted.values", hetfun = "logmult")
 ```
 
 ## Diblasi and Bowman's Test (`diblasi_bowman`) {#diblasi_bowman}
@@ -269,7 +289,7 @@ $$s_i=\sqrt{|e_i|}-\E_0(\sqrt{|e_i|})\text{, } i=1,2,\ldots,n\text{, }$$
 
 where $\E_0$ denotes expectation under the null hypothesis of homoskedasticity (an explicit expression for $\E_0(\sqrt{|e_i|})$ is given below). The relationship between the $s_i$ and the corresponding observations of the explanatory variable(s) is modelled using the Nadaraya-Watson kernel estimation method of nonparametric regression. Thus, in the simple linear regression case, using the normal kernel function $$K(x)=\left(2\pi\right)^{-1/2} \exp\left\{ -\displaystyle\frac{1}{2}x^2\right\}\text{,}$$
 
-we have
+it follows that
 
 $$\tilde{s}(x_i)=\sum_{j=1}^{n} w_j(x_i) s_j\text{,}$$
 
@@ -279,7 +299,7 @@ $$\begin{aligned}w_j(x_i)&=\displaystyle\frac{K\left(\displaystyle\frac{x_i-x_j}
 	&=\displaystyle\frac{\left(2\pi\right)^{-1/2} \exp \left\{ -\displaystyle\frac{1}{2}\left(\displaystyle\frac{x_i-x_j}{h}\right)^2\right\}}{\left(2\pi\right)^{-1/2} \displaystyle\sum_{k=1}^{n}\exp \left\{ -\displaystyle\frac{1}{2}\left(\displaystyle\frac{x_i-x_k}{h}\right)^2\right\}} \\
 	&=\displaystyle\frac{\exp \left\{ -\displaystyle\frac{1}{2}\left(\displaystyle\frac{x_i-x_j}{h}\right)^2\right\}}{\displaystyle\sum_{k=1}^{n}\exp \left\{ -\displaystyle\frac{1}{2}\left(\displaystyle\frac{x_i-x_k}{h}\right)^2\right\}}\text{,}\end{aligned}$$
 
-and $h$ is a hyperparameter known as the bandwidth.^[Note that @Diblasi97[p. 97] omit the $-\frac{1}{2}$ in the numerator and denominator of $w_j(\cdot)$, which seems to be an error.] @Diblasi97 do not discuss the extension of their test to the multiple linear regression model, but this is straightforward. We replace the bandwidth scalar $h$ with a $p'\times p'$ symmetric bandwidth matrix $\bm{H}$ (where $p'$ is the number of explanatory variables excluding an intercept if present), which is set in `diblasi_bowman` using the argument `H`. If `H` is passed as a single numeric value, it is treated as $h \bm{I}_{p'}$ where $h$ is the scalar passed. If `H` is passed as a $p'$-vector, it is treated as the diagonal of a $p'\times p'$ diagonal matrix. The multivariate normal kernel function is then given by 
+and $h$ is a hyperparameter known as the bandwidth.^[Note that @Diblasi97[p. 97] omit the $-\frac{1}{2}$ in the numerator and denominator of $w_j(\cdot)$, which seems to be an error.] @Diblasi97 do not discuss the extension of their test to the multiple linear regression model, but this is straightforward.  The bandwidth scalar $h$ is replaced with a $p'\times p'$ symmetric bandwidth matrix $\bm{H}$ (where $p'$ is the number of explanatory variables excluding an intercept if present), which is set in `diblasi_bowman` using the argument `H`. If `H` is passed as a single numeric value, it is treated as $h \bm{I}_{p'}$ where $h$ is the scalar passed. If `H` is passed as a $p'$-vector, it is treated as the diagonal of a $p'\times p'$ diagonal matrix. The multivariate normal kernel function is then given by 
 
 $$K(\bm{x})=\left(2\pi\right)^{-p/2} \exp\left\{ -\displaystyle\frac{1}{2}\bm{x}' \bm{x}\right\}\text{.}$$
 
@@ -296,7 +316,7 @@ where
 
 $$\bar{s}=n^{-1}\sum_{i=1}^{n} s_i\text{.}$$
 
-@Diblasi97 observe that the statistic is analogous to the \enquote*{lack-of-fit} statistic in parametric regression. Under the null hypothesis, the terms in the numerator will have little difference, but under heteroskedasticity the first term will dominate the second. Thus the test is right-tailed. They note that if we denote the $n\times n$ matrix whose $i,j$th element is $w_j(x_i)$ by $\bm{W}$, then $\tilde{\bm{s}}=\bm{Ws}$ and the quadratic form $\sum_{i=1}^{n}(s_i-\tilde{s}_i)^2$ can be expressed as $\bm{s}' \bm{Bs}$, where $\bm{B}=(\bm{I}_n-\bm{W})'(\bm{I}_n-\bm{W})$. Thus, the test statistic can be rewritten as 
+@Diblasi97 observe that the statistic is analogous to the \enquote*{lack-of-fit} statistic in parametric regression. Under the null hypothesis, the terms in the numerator will have little difference, but under heteroskedasticity the first term will dominate the second. Thus the test is right-tailed. They note that if the $n\times n$ matrix whose $i,j$th element is $w_j(x_i)$ is denoted by $\bm{W}$, then $\tilde{\bm{s}}=\bm{Ws}$ and the quadratic form $\sum_{i=1}^{n}(s_i-\tilde{s}_i)^2$ can be expressed as $\bm{s}' \bm{Bs}$, where $\bm{B}=(\bm{I}_n-\bm{W})'(\bm{I}_n-\bm{W})$. Thus, the test statistic can be rewritten as 
 
 $$T=\frac{\bm{s}'\bm{As}-\bm{s}'\bm{Bs}}{\bm{s}'\bm{Bs}}=\frac{\bm{s}'\bm{Cs}}{\bm{s}'\bm{Bs}}\text{,}$$
 
@@ -305,12 +325,12 @@ where
 $$\begin{aligned}\bm{A}&=\bm{I}_n-n^{-1}\bm{1}_n\text{,}\\
 \bm{C}&=\bm{A}-\bm{B}\text{,}\end{aligned}$$
 
-and $\bm{1}_n$ is an $n\times n$ matrix of ones. Because $T$ is not a ratio of quadratic forms in _normal_ random variables, we cannot use the Imhof algorithm to compute $p$-values from the exact null distribution, as is the case for some other tests in the package. Instead, @Diblasi97 propose to compute an approximate $p$-value by matching cumulants with those of a shifted $\chi^2$ distribution. They first observe that the $p$-value of the test can be written as follows:
+and $\bm{1}_n$ is an $n\times n$ matrix of ones. Because $T$ is not a ratio of quadratic forms in _normal_ random variables, he Imhof algorithm cannot be used to compute $p$-values from the exact null distribution, as is the case for some other tests in the package. Instead, @Diblasi97 propose to compute an approximate $p$-value by matching cumulants with those of a shifted $\chi^2$ distribution. They first observe that the $p$-value of the test can be written as follows:
 
    $$\begin{aligned} \Pr\left(T>t_1\middle| \mathrm{H}_0 \text{ true}\right)&= \Pr\left(\frac{\bm{s}'\bm{Cs}}{\bm{s}'\bm{Bs}}>t_1 \middle| \mathrm{H}_0 \text{ true}\right)\\
 &=\Pr\left(\bm{s}'(\bm{C}-t_1\bm{B})\bm{s} > 0 \middle| \mathrm{H}_0 \text{ true}\right)\end{aligned}\text{.}$$
 
-Specifically, the authors propose to match the first three cumulants of the quadratic form $\bm{s}^\top \left(\bm{C}-t_1 \bm{B}\right)\bm{s}$ with those of a random variable $U=a+b \chi_c^2$ (where $\chi_c^2$ has the chi-square distribution with $c$ degrees of freedom). The cumulants of the quadratic form are
+Specifically, the authors propose to match the first three cumulants of the quadratic form $\bm{s}^\top \left(\bm{C}-t_1 \bm{B}\right)\bm{s}$ with those of a random variable $U$ of the form $a+b \chi_c^2$ (where $\chi_c^2$ has the chi-square distribution with $c$ degrees of freedom). The cumulants of the quadratic form are
 
 $$k_j(\bm{C}-t_1 \bm{B}) = 2^{j-1}(j-1)! \tr\left\{((\bm{C}-t_1 \bm{B})\bm{\Sigma}_0)^j\right\} \text{ for } j=1,2,3,$$
 
@@ -356,7 +376,7 @@ and
 
 $$\Cov_0\left(\sqrt{|e_i|}, \sqrt{|e_j|}\right)=\E_0\left(\sqrt{|e_i e_j|}\right)-\E_0\left(\sqrt{|e_i|}\right)\E_0\left(\sqrt{|e_j|}\right)\text{, } i \ne j\text{.}$$
 
-In practice we replace $\sigma^2$ in these formulas with the estimator $\hat{\sigma}^2=(n-p)^{-1}\sum_{i=1}^{n}e_i^2$. Observe that, since $\E_0(\sqrt{|e_i|})$ is constant and $\E_0(s_i)=\E_0\left(\sqrt{|e_i|}-\E_0(\sqrt{|e_i|})\right)=0$, it follows that $\Var_0(s_i)=\Var_0(\sqrt{|e_i|})$ and $\Cov_0(s_i,s_j)=\Cov_0(\sqrt{|e_i|},\sqrt{|e_j|})$. Hence, the above expressions for $\Var_0(\sqrt{|e_i|})$ and $\Cov_0(\sqrt{|e_i|},\sqrt{|e_j|})$ give the diagonal and off-diagonal elements respectively for the $\bm{\Sigma}_0$ matrix. The $\E_0(\sqrt{|e_i e_j|})$ are not available analytically but can be evaluated through numerical integration of the relevant integral (noting that the joint probability distribution of $e_i$ and $e_j$ is bivariate normal for $i\ne j$). The `diblasi_bowman` function calls the `adaptIntegrate` function from \hlink{cubature}{https://cran.r-project.org/web/packages/cubature/index.html} package to evaluate the required double integrals. An $n\times n$ matrix has $n^2-n$ off-diagonal elements and thus (due to the symmetry of the matrix) there are $(n^2-n)/2$ double integrals to evaluate to estimate $\bm{\Sigma}_0$. The computation time thus increases rapidly with $n$. For this reason, @Diblasi97 suggest that since the residual covariances are generally small, we can disregard them and take $\bm{\Sigma}_0$ to be a diagonal matrix, thus saving hugely on computational efficiency. This simplication can be turned on by setting the `ignorecov` argument to `TRUE`, which is the default setting.
+In practice, $\sigma^2$ is replaced in these formulas with the estimator $\hat{\sigma}^2=(n-p)^{-1}\sum_{i=1}^{n}e_i^2$. Observe that, since $\E_0(\sqrt{|e_i|})$ is constant and $\E_0(s_i)=\E_0\left(\sqrt{|e_i|}-\E_0(\sqrt{|e_i|})\right)=0$, it follows that $\Var_0(s_i)=\Var_0(\sqrt{|e_i|})$ and $\Cov_0(s_i,s_j)=\Cov_0(\sqrt{|e_i|},\sqrt{|e_j|})$. Hence, the above expressions for $\Var_0(\sqrt{|e_i|})$ and $\Cov_0(\sqrt{|e_i|},\sqrt{|e_j|})$ give the diagonal and off-diagonal elements respectively for the $\bm{\Sigma}_0$ matrix. The $\E_0(\sqrt{|e_i e_j|})$ are not available analytically but can be evaluated through numerical integration of the relevant integral (noting that the joint probability distribution of $e_i$ and $e_j$ is bivariate normal for $i\ne j$). The `diblasi_bowman` function calls the `adaptIntegrate` function from the  \hlink{cubature}{https://cran.r-project.org/web/packages/cubature/index.html} package to evaluate the required double integrals. An $n\times n$ matrix has $n^2-n$ off-diagonal elements and thus (due to the symmetry of the matrix) there are $(n^2-n)/2$ double integrals to evaluate to estimate $\bm{\Sigma}_0$. The computation time thus increases rapidly with $n$. For this reason, @Diblasi97 suggest that since the residual covariances are generally small, we can disregard them and take $\bm{\Sigma}_0$ to be a diagonal matrix, thus saving hugely on computational efficiency. This simplification can be turned on by setting the `ignorecov` argument to `TRUE`, which is the default setting.
 
 
 @Diblasi97 also offer a parametric bootstrap procedure for estimating $p$-values of the test as follows:
@@ -389,6 +409,58 @@ A further example is provided below. This one involves the `catsM` dataset from 
 malecats_lm <- lm(Hwt ~ Bwt, data = boot::catsM)
 diblasi_bowman(malecats_lm, H = (max(boot::catsM$Bwt) - min(boot::catsM$Bwt)) / 8)
 ```
+
+## Dufour, Khalaf, Bernard, and Genest's Monte Carlo Test (`dufour_etal`) {#dufour_etal}
+
+@Dufour04 propose an ingenious Monte Carlo procedure for estimating $p$-values from the exact null distribution of the test statistic of other heteroskedasticity tests. This method is implemented as though a separate heteroskedasticity test, but the function takes as one of its arguments `hettest`, which is one of the other heteroskedasticity test functions in the package. Not all tests are suitable, because the procedure requires that the test statistic be continuous (which rules out \hlink{Goldfeld and Quandt's Nonparametric Peaks Test}{\#goldfeld_quandt} and \hlink{Horn's Nonparametric Test}{\#horn} in the exact case). It further requires that the test statistic is invariant with respect to the nuisance parameters $\bm{\beta}$ and $\sigma^2$, and that the test statistic can be computed from the OLS residuals $\bm{e}$, the design matrix $\bm{X}$, and any other nonstochastic auxiliary variables. Tests for which $\bm{y}$ and/or $\hat{\bm{y}}$ are directly required to compute the test statistic (e.g., \hlink{Anscombe's Test}{\#anscombe} and \hlink{Bickel's Test}{\#bickel}) are thus unsuitable. For tests with an `auxdesign` argument, the user should also not specify `"fitted.values"` for this argument when using `dufour_etal`.
+
+The Monte Carlo Procedure is straightforward and can be described as follows. Note that the number of replications $R$ is specified using the `R` argument.
+
+1. Compute the test statistic value $T_0$ from the observed data.
+
+2. Generate $R$ random error vectors $\bm{\epsilon}^{(j)}$, $j=1,2,\ldots,R$ from a specified continuous distribution with mean 0 and scalar covariance matrix (the scale does not matter, due to the requirement that the test be invariant with respect to $\sigma^2$). (By default, $\bm{\epsilon^{(j)}}$ is generated from $N(\bm{0}, \bm{I}_n)$; the distribution is specified using the `errorgen` argument). The `errorparam` argument can be used to pass distributional parameters to `errorgen` to ensure that the error distribution has zero mean.
+
+3. Compute $R$ OLS residual vectors $\bm{e}^{(j)}=\bm{M}\bm{\epsilon}^{(j)}$, $j=1,2,\ldots,R$.
+
+4. Using $\bm{e}^{(j)}$ and nonstochastic variables, hyperparameters, etc., compute $R$ simulated test statistic values $\bm{T}^{(j)}$.
+
+5. Compute the $p$-value estimate as, 
+
+$$\displaystyle\frac{\sum_{j=1}^{n} 1_{T^{(j)} \ge T_0}+1}{R + 1}\text{,}$$
+where $1_{\bullet}$ is the indicator function. The above formula is for a right-tailed test. For a left-tailed test, the indicator is instead $1_{T^{(j)} \le T_0}$. For a two-tailed test, the one-sided $p$-value is doubled (i.e., the [`twosidedpval`](#twosidedpval) is not used, due to the distribution being an empirical one); thus it is computed as,
+
+$$2\left[\displaystyle\frac{\min\left\{\sum_{j=1}^{n} 1_{T^{(j)} \ge T_0},\sum_{j=1}^{n} 1_{T^{(j)} \le T_0}\right\}+1}{R + 1}\right]\text{.}$$
+Note that steps 3 and 4 above differ when `hettest` is `goldfeld_quandt` (\hlink{Goldfeld and Quandt's Parametric Test}{\#goldfeld_quandt}), because the $F$ statistic can be computed without using the response vector, but not exactly as described above. Note further that the user _must_ always specify the tailedness of the test using the `alternative` argument (which defaults to `"greater"`), even if the corresponding test function passed as `hettest` does not require this as an argument.
+
+The following code shows implementation of the method of @Dufour04 with \hlink{the Breusch-Pagan Test}{\#horn}, \hlink{Horn's Nonparametric Trend Test}{\#horn} (normal approximation), \hlink{Honda's Test}{\#honda}, \hlink{the Li-Yao ALRT Test}{\#li_yao}, and the \hlink{Račkauskas-Zuokas Test}{\#rackauskas_zuokas}.
+
+```{r dufour}
+# Breusch-Pagan
+dufour_etal(mtcars_lm, hettest = breusch_pagan)
+# Compare p-value from asymptotic null distribution:
+breusch_pagan(mtcars_lm)$p.value
+# Breusch-Pagan Test where errors are assumed to be Uniform(-1, 1)-distributed
+dufour_etal(mtcars_lm, hettest = breusch_pagan, errorgen = runif, 
+            errorparam = list(min = -1, max = 1))
+# Horn's Nonparametric Test, Lower-Tailed
+dufour_etal(mtcars_lm, hettest = horn, alternative = "less", deflator = "qsec", 
+            restype = "blus")
+# Compare p-value from asymptotic null distribution:
+horn(mtcars_lm, deflator = "qsec", restype = "blus", alternative = "less")$p.value
+# Honda's Test, Two-Sided
+dufour_etal(mtcars_lm, hettest = honda, alternative = "two.sided", deflator = "wt")
+# Compare p-value from null distribution:
+suppressWarnings(honda(mtcars_lm, deflator = "wt", alternative = "two.sided")$p.value)
+# Li-Yao ALRT Test
+dufour_etal(mtcars_lm, hettest = li_yao)
+# Compare p-value from asymptotic null distribution:
+li_yao(mtcars_lm, method = "alrt")$p.value
+# Rackauskas-Zuokas Test
+dufour_etal(mtcars_lm, hettest = rackauskas_zuokas)
+# Compare p-value from simulated null distribution (big discrepancy)
+rackauskas_zuokas(mtcars_lm, pval = "data")$p.value
+```
+
 
 ## Evans and King's Tests (`evans_king`) {#evans_king}
 
@@ -429,7 +501,7 @@ evans_king(mtcars_lm, deflator = "qsec", method = "LM")
 
 ## Glejser's Test (`glejser`) {#glejser}
 
-@Glejser69 proposed examining the absolute OLS residuals as a means of detecting heteroskedasticity. The article did not formalise the test, and so different versions of 'Glejser's Test' can be found in the literature. The fundamental idea is to fit an auxiliary regression model with response vector $\{|e_1|,|e_2|,\ldots,|e_n|\}'$ and $n\times (q+1)$ design matrix $\bm{Z}$. The design matrix is defined exactly as in the \hlink{Breusch-Pagan Test}{\#breusch_pagan} and is passed in the same way as in [`breusch_pagan`] using the argument `auxdesign`. The test implemented in `glejser` follows the procedure described in @Mittelhammer00[p. 541]. The test statistic is $$\begin{aligned}T&=\frac{\sum_{i=1}^{n} e_i^2 - n^{-1}\left(\sum_{i=1}^{n} |e_i|\right)^2-\sum_{i=1}^{n} u_i^2}{(1-2\pi^{-1})\bar{\sigma}^2}\text{,}\end{aligned}$$
+@Glejser69 proposed examining the absolute OLS residuals as a means of detecting heteroskedasticity. The article did not formalise the test, and so different versions of 'Glejser's Test' can be found in the literature. The fundamental idea is to fit an auxiliary regression model with response vector $\{|e_1|,|e_2|,\ldots,|e_n|\}'$ and $n\times q$ nonstochastic design matrix $\bm{Z}$ (concatenated to a column of ones, so that the auxiliary regression has an intercept). The design matrix is defined exactly as in the \hlink{Breusch-Pagan Test}{\#breusch_pagan} and is passed in the same way as in [`breusch_pagan`](#breusch_pagan) using the argument `auxdesign`. The test implemented in `glejser` follows the procedure described in @Mittelhammer00[p. 541]. The test statistic is $$\begin{aligned}T&=\frac{\sum_{i=1}^{n} e_i^2 - n^{-1}\left(\sum_{i=1}^{n} |e_i|\right)^2-\sum_{i=1}^{n} u_i^2}{(1-2\pi^{-1})\bar{\sigma}^2}\text{,}\end{aligned}$$
 
 where $u_i$ is the $i$th OLS residual from the auxiliary model. @Mittelhammer00[p. 537] recommends using a $\sigma^2$ estimator from the auxiliary model, i.e. $\hat{\sigma}_a^2=n^{-1}\sum_{i=1}^{n} u_i^2$. This, however, seems counterintuitive. A more conventional approach would be to use $\bar{\sigma}^2=n^{-1}\sum_{i=1}^{n} e_i^2$ (as, for instance, is done in \hlink{SHAZAM software}{http://www.econometrics.com/intro/testhet.htm}). The `sigmaest` argument allows the user to implement either of these two approaches: if it is set to `"main"` (the default), the OLS residuals from the main model are used, while if it is set to `"auxiliary"`, the OLS residuals from the auxiliary model are used.
 
@@ -447,16 +519,16 @@ glejser(mtcars_lm, sigmaest = "auxiliary")
 
 Having put the observations in increasing order of the deflator, the parametric test procedure proceeds as follows:
 
-1. Remove some proportion $c$ of central observations. $c$ is specified using the argument `prop_central`; the function will adjust $c$ if necessary to ensure that $nc$, the number of observations to remove, is an integer.
+1. Remove some proportion $c$ of central observations. $c$ is specified using the argument `prop_central` (which defaults to `1 / 3`); the function will adjust $c$ if necessary to ensure that $nc$, the number of observations to remove, is an integer.
 
-2. Separate OLS regressions are fit to the first $(n-c)/2$ observations and to the last $(n-c)/2$ observations, resulting in residual vectors $\bm{e}_\mathrm{first}$ and $\bm{e}_\mathrm{last}$ respectively.
+2. Separate OLS regressions are fit to the first $(n-c)/2$ observations and to the last $(n-c)/2$ observations, resulting in residual vectors $\bm{e}_\mathrm{first}$ and $\bm{e}_\mathrm{last}$ respectively. (N.B. By default, the two subsets each contain an equal number of observations, $(n-c)/2$, but this can be changed by setting the `group1prop`, representing the proportion of non-removed observations allocated to the first subset, to a value other than `1 / 2`. This alters the form of the $F$ statistic below as the degrees of freedom in numerator and denominator will no longer cancel).
 
 3. The following variance ratio statistic is computed: $$T=\frac{\bm{e}_\mathrm{last}'\bm{e}_\mathrm{last}}{\bm{e}_\mathrm{first}'\bm{e}_\mathrm{first}}\text{.}$$
 
-4. $T$ is compared with its null distribution, which is an $F$ distribution with $(n-c)/2-p$ numerator and denominator degrees of freedom. For the right-tailed test that is implemented by default (i.e., with `alternative` set to `"greater"`), we reject the null hypothesis of homoskedasticity for large values of $T$.
+4. $T$ is compared with its null distribution, which is an $F$ distribution with $(n-c)/2-p$ degrees of freedom in the numerator and denominator. For the right-tailed test that is implemented by default (i.e. with `alternative` set to `"greater"`), the null hypothesis of homoskedasticity is rejected for large values of $T$.
 
 
-To implement the nonparametric test the observations are likewise put in increasing order of the deflator variable. The test statistic $T'$ is then the number of 'peaks' in the series of absolute residuals $\{|e_1|,|e_2|,\ldots,|e_n|\}$, where $|e_j|$ is defined as a 'peak,' for $j=2,3,\ldots,n$, if $|e_j|\ge |e_i|$ for all $i<j$. For the right-tailed test that is implemented by default (i.e., with `alternative` set to `"greater"`), the null hypothesis of homoskedasticity is rejected for large values of $T'$. The statistic is compared to the distribution of the number of peaks in a series of independent and identically distributed continuous random variables (which is free of the distribution of these random variables). $p$-values from this exact distribution are computed from the cumulative distribution function by calling [`ppeak`](#peaks), which in turn calls [`dpeak`](#peaks) to compute probability mass values. Because this function is computationally slow for large $n$, the values and probability masses of this distribution for $n=1,2,\ldots,1000$ are stored in a dataset called [`dpeakdat`](#datasets). Passing the vector of probabilities for the required $n$ to `goldfeld_quandt` as the `prob` argument enables the nonparametric test to be implemented much more rapidly. Otherwise, if `prob` is set to `NULL` (the default), `ppeak` (and, indirectly, 
+To implement the nonparametric test the observations are likewise put in increasing order of the deflator variable. The test statistic $T'$ is then the number of 'peaks' in the series of absolute residuals $\{|e_1|,|e_2|,\ldots,|e_n|\}$, where $|e_j|$ is defined as a 'peak,' for $j=2,3,\ldots,n$, if $|e_j|\ge |e_i|$ for all $i<j$. For the right-tailed test that is implemented by default (i.e. with `alternative` set to `"greater"`), the null hypothesis of homoskedasticity is rejected for large values of $T'$. The statistic is compared to the distribution of the number of peaks in a series of independent and identically distributed continuous random variables (which is free of the distribution of these random variables). $p$-values from this exact distribution are computed from the cumulative distribution function by calling [`ppeak`](#peaks), which in turn calls [`dpeak`](#peaks) to compute probability mass values. Because this function is computationally slow for large $n$, the values and probability masses of this distribution for $n=1,2,\ldots,1000$ are stored in a dataset called [`dpeakdat`](#datasets). Passing the vector of probabilities for the required $n$ to `goldfeld_quandt` as the `prob` argument enables the nonparametric test to be implemented much more rapidly. Otherwise, if `prob` is set to `NULL` (the default), `ppeak` (and, indirectly, 
 `dpeak`) is called to compute the probabilities. These functions will also access the probabilities in the [`dpeakdat`](#datasets) dataset rather than computing them, as long as $n \le 1000$. If $n>1000$, the nonparametric test will be extremely slow. The `restype` character argument controls which residuals are used in the nonparametric test: `"ols"` (for OLS residuals) or `"blus"` (for \hlink{BLUS}{\#blus} residuals). `"ols"` is the default only because they are used in the test as proposed by @Goldfeld65 (Theil's BLUS residuals procedure had not been published yet). However, `"blus"` may be preferable, because, while $p$ residuals are lost in the process of computing the BLUS residuals, the BLUS residuals under homoskedasticity do constitute an i.i.d. sequence of random variables, which the OLS residuals do not.
 
 
@@ -470,7 +542,7 @@ goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric",
 
 ## Harvey's Test (`harvey`) {#harvey}
 
-@Harvey76 proposes a heteroskedasticity test based on an auxiliary regression of the logarithm of the squared OLS residuals on some nonstochastic $n\times (q+1)$ design matrix $\bm{Z}$. This design matrix is defined exactly as in the \hlink{Breusch-Pagan Test}{\#breusch_pagan}, and is specified in `harvey` precisely as in `breusch_pagan`, using the argument `auxdesign`. The test statistic, as formally stated in @Mittelhammer00[p. 540], is 
+@Harvey76 proposes a heteroskedasticity test based on an auxiliary regression of the logarithm of the squared OLS residuals on some nonstochastic $n\times q$ design matrix $\bm{Z}$ (concatenated to a column of ones, so that an intercept is always included in the auxiliary regression). This design matrix is defined exactly as in the \hlink{Breusch-Pagan Test}{\#breusch_pagan}, and is specified in `harvey` precisely as in `breusch_pagan`, using the argument `auxdesign`. The test statistic, as formally stated in @Mittelhammer00[p. 540], is 
 
 $$\begin{aligned}T&=\frac{\sum_{i=1}^{n} e_i^2 - n^{-1}\left(\sum_{i=1}^{n} |e_i|\right)^2-\sum_{i=1}^{n} u_i^2}{\psi^{(1)}\left(\frac{1}{2}\right)}\text{,}\end{aligned}$$
 
@@ -509,12 +581,12 @@ The exact null distribution of $D$ can be easily calculated for $m \le 10$ but b
 
 
 When no ties are present in the absolute residuals, the expectation and variance of $D$ under the null hypothesis are respectively 
-$$\begin{aligned}\E(D)&=\frac{1}{6}(m^3-m)\end{aligned}$$
+$$\begin{aligned}\E(D)&=\frac{1}{6}(m^3-m)\text{,}\end{aligned}$$
 and
 
 $$\begin{aligned}\Var(D)&= \frac{1}{36}m^2(m+1)^2(m-1)\text{.} \end{aligned}$$
 
-For $m>10$, we can use a normal approximation. An upper-tailed $p$-value is computed as $1-\Phi\left(\frac{D-\E(D)-1}{\sqrt{\Var(D)}}\right)$, where $\Phi(\cdot)$ is the standard normal cumulative distribution function. The $-1$ in the numerator is a continuity correction, since $D$ takes on only even integer values. (The continuity correction can be suppressed by setting the `correct` argument to `FALSE`, but this is not recommended as the normal approximation is then very poor.) Similarly, a lower-tailed $p$-value is computed as $\Phi\left(\frac{D-\E(D)+1}{\sqrt{\Var(D)}}\right)$. The two-tailed $p$-value is of course computed by doubling the one-sided $p$-value. `horn` can handle ties in the absolute residuals, following @Lehmann75[pp. 293-94]. However, it is anticipated that ties will be very rare, and thus the modification is not described here. The code and output below show an implementation of Horn's Test with OLS residuals and with BLUS residuals respectively.
+For $m>10$, a normal approximation can be used. An upper-tailed $p$-value is computed as $1-\Phi\left(\frac{D-\E(D)-1}{\sqrt{\Var(D)}}\right)$, where $\Phi(\cdot)$ is the standard normal cumulative distribution function. The $-1$ in the numerator is a continuity correction, since $D$ takes on only even integer values. (The continuity correction can be suppressed by setting the `correct` argument to `FALSE`, but this is not recommended as the normal approximation is then very poor.) Similarly, a lower-tailed $p$-value is computed as $\Phi\left(\frac{D-\E(D)+1}{\sqrt{\Var(D)}}\right)$. The two-tailed $p$-value is of course computed by doubling the one-sided $p$-value. `horn` can handle ties in the absolute residuals, following @Lehmann75[pp. 293-94]. However, it is anticipated that ties will be very rare, and thus the modification is not described here. The code and output below show an implementation of Horn's Test with OLS residuals and with BLUS residuals respectively.
 
 ```{r ex_horn}
 horn(mtcars_lm, deflator = "qsec")
@@ -524,7 +596,7 @@ horn(mtcars_lm, deflator = "qsec", restype = "blus")
 
 ## Li and Yao's Tests (`li_yao`) {#li_yao}
 
-@Li19 propose two tests of heteroskedasticity that are distinctive in that no prior information is required about the form of the heteroskedasticity under the alternative hypothesis. The tests are intended to have high power especially in high-dimensional regressions (i.e., when $p$ is large) but also adequate power in low-dimensional regressions. Both tests are upper-tailed, despite having asymptotic null distributions that are normal.
+@Li19 propose two tests of heteroskedasticity that are distinctive in that no prior information is required about the form of the heteroskedasticity under the alternative hypothesis. The tests are intended to have high power especially in high-dimensional regressions (i.e. when $p$ is large) but also adequate power in low-dimensional regressions. Both tests are upper-tailed, despite having asymptotic null distributions that are normal.
 
 
 The first test is called the Approximate Likelihood Ratio Test (ALRT), and is called by setting the `method` argument in `li_yao` to `"alrt"`. The test statistic is then 
@@ -542,7 +614,7 @@ $$\bar{m}=n^{-1}\sum_{i=1}^{n} e_i^2 \text{.}$$
 They show that the asymptotic null distribution of $T_2$ is normal with mean $2$ and variance $24n^{-1}$. 
 
 A possible limitation of both tests is that they rest on the assumption that the design matrix $\bm{X}$ is stochastic and the design variables are normally distributed. However, they find empirically that the tests still perform well in terms of size and power when the design variables are generated from other distributions, or when they are held fixed. In the case of the CVT method, @Bai16 derive the asymptotic null distribution under the more conventional assumption that the design matrix is nonstochastic. Retaining the normality assumption on the errors, $T_2$ is shown to converge in distribution (under the null hypothesis) to a normal distribution with mean $a$ and variance $b$, where
-$$\begin{aligned}a&=\frac{3n\tr(\bm{M} \circ \bm{M})}{(n-p)^2+2(n-p)}-1\end{aligned}$$
+$$\begin{aligned}a&=\frac{3n\tr(\bm{M} \circ \bm{M})}{(n-p)^2+2(n-p)}-1\end{aligned}\text{,}$$
 
 and
 
@@ -604,12 +676,65 @@ rackauskas_zuokas(mtcars_lm, pvalmethod = "sim", m = n, sqZ = TRUE)
 rackauskas_zuokas(mtcars_lm, pvalmethod = "sim", m = n, sqZ = TRUE, alpha = 7 / 32)
 ```
 
+## Simonoff and Tsai's Tests (`simonoff_tsai`) {#simonoff_tsai}
+
+@Simonoff94 propose two tests of heteroskedasticity that are both implemented by the `simonoff_tsai` function. The first test is a likelihood ratio test using a modified profile likelihood, and the second is a score test. The choice of test is controlled by the `method` argument: `"mlr"` for the (modified) likelihood ratio test, and `"score"` for the score test.
+
+Both tests assume a heteroskedastic model like those described under the \hlink{Cook-Weisberg Test}{\#cook_weisberg}. The $n\times 1$ error vector $\bm{\epsilon}$ is assumed to be multivariate normal with a mean of $\bm{0}$ and variance-covariance matrix $\sigma^2 \bm{W}$. Let $\bm{Z}$ be a $n\times q$ auxiliary design matrix (with $q$ explanatory variables; no intercept column). $\bm{W}$ is an $n\times n$ diagonal matrix with $i$th diagonal element $w(\bm{Z}_i,\bm{\lambda})$, where $\bm{Z}_i$ is the $i$th row of $\bm{Z}$, $\bm{\lambda}$ is a $q$-vector of unknown parameters, and $w(\cdot)$ is a real-valued, twice-differentiable function having the property that there exists some $q$-vector $\bm{\lambda}_0$ such that $w(\bm{Z}_i,\bm{\lambda}_0)=1$ for $i=1,2,\ldots,n$. The three forms of $w(\cdot)$ that can be implemented in `simonoff_tsai` are the additive, multiplicative, and log-multiplicative forms that are defined under the \hlink{Cook-Weisberg Test}{\#cook_weisberg} and called by setting the `hetfun` argument to `"add"`, `"mult"`, or `"logmult"`, respectively (`"mult"` is the default). In all three cases, $\bm{\lambda}_0$ is the zero vector, and so the null hypothesis of homoskedasticity can be expressed as $\bm{\lambda}=\bm{0}$. Ignoring constants, the log-likelihood function for this model can be written 
+
+$$l(\bm{y};\bm{\lambda},\sigma^2, \bm{\beta})=-\frac{n}{2}\log \sigma^2 - \frac{1}{2}\sum_{i=1}^{n} \log w(\bm{Z}_i,\bm{\lambda}) - (2\sigma^2)^{-1} \left(\bm{y}-\bm{X\beta}\right)' \bm{W}^{-1}\left(\bm{y}-\bm{X\beta}\right)\text{.}$$
+
+As noted by @Simonoff94, the maximum likelihood estimate of $\bm{\lambda}$ can be obtained by maximising the profile log-likelihood:
+
+$$l_p(\bm{y};\bm{\lambda})=l(\bm{y};\bm{\lambda}, \hat{\sigma}_{\lambda}^2, \hat{\bm{\beta}}_{\lambda})\text{,}$$
+
+where 
+
+$$\hat{\bm{\beta}}_{\lambda}=(\bm{X}'\bm{W}^{-1}\bm{X})^{-1}\bm{X}'\bm{W}^{-1}\bm{y}$$ 
+
+and $$\hat{\sigma}_{\lambda}^2=n^{-1}(\bm{y}-\bm{X}\hat{\bm{\beta}}_{\lambda})'\bm{W}^{-1}(\bm{y}-\bm{X}\hat{\bm{\beta}}_{\lambda})\text{.}$$
+
+@Simonoff94 note that inference based on this profile likelihood can be problematic due to the lack of orthogonality between the parameters of interest, $\bm{\lambda}$, and the nuisance parameters, $(\sigma^2, \bm{\beta})$. Following on earlier theoretical work, they propose to perform a modification of the profile likelihood to achieve such orthogonality. They derive the modified profile likelihood ratio statistic,
+
+$$T_{\mathrm{MLR}}=\frac{n-p-2}{n}L + \log\left\{\frac{\det (\bm{X}'\bm{X})}{\det (\hat{\bm{X}}_m' \hat{\bm{X}}_m)}\right\} \text{,}$$
+
+where $L=-2\left\{l_p(\bm{y}; \bm{\lambda}_0)-l_p(\bm{y}; \hat{\bm{\lambda}}) \right\}$, and $\hat{\bm{X}}_m=\hat{G}^{-1/2}\bm{X}$ where $\hat{G}$ is the diagonal $n\times n$ matrix with $i$th diagonal entry $\displaystyle\frac{w(\bm{Z}_i,\hat{\bm{\lambda}})}{\left\{\displaystyle\prod_{j=1}^{n}w(\bm{Z}_j,\hat{\bm{\lambda}})\right\}^{1/n}}$. The asymptotic null distribution of the statistic is $\chi^2(q)$ and the test is right-tailed. 
+
+The maximum likelihood estimate of $\bm{\lambda}$ is computed using the Nelder-Mead algorithm as implemented in the `maxLik` function of the \hlink{maxLik}{https://cran.r-project.org/web/packages/maxLik/index.html} package. The user can specify the initial values for $\bm{\lambda}$ to be used in the Nelder-Mead algorithm (i.e. the `start` argument in `maxLik`) using the `mlestart` argument. If `mlestart` has `length` 1, and $q>1$, then the initial value is taken to be `rep(mlestart, q)`.
+
+@Ferrari04 derive a Bartlett correction for Simonoff and Tsai's modified profile likelihood ratio test, generalising an earlier proposal in @Ferrari02. The Bartlett correction improves the fit of the test statistic to the asymptotic null distribution, particularly for small sample sizes. The Bartlett-corrected test statistic is 
+
+$$T_{\mathrm{MLR}}'=\frac{T_{\mathrm{MLR}}}{1+\frac{c_m}{q}}\text{,}$$
+
+where $c_m$ is a correction factor. The notation in the expression for the correction factor is cumbersome; the reader is referred to Equation (7) in @Ferrari04[p. 430]. The authors derive an explicit expression for $c_m$ only for the multiplicative heteroskedastic model. It can be shown that, for the log-multiplicative model, the same expression for $c_m$ applies, except that the matrix $\bm{Z}-\bar{\bm{Z}}$ is replaced with $\bm{\Xi}-\bar{\bm{\Xi}}$, which has $i$th row $\bm{\xi}_i-\bar{\bm{\xi}}$, $i=1,2,\ldots,n$, where $\bm{\xi}_i=(\log Z_{i1}, \log Z_{i2}, \ldots, \log Z_{iq})$ and $\bar{\bm{\xi}}=(n^{-1} \sum_{i=1}^{n} \log Z_{i1}, n^{-1} \sum_{i=1}^{n} \log Z_{i2}, \ldots, n^{-1} \sum_{i=1}^{n} \log Z_{iq})$. The Bartlett correction is activated in `simonoff_tsai` by setting `bartlett` to `TRUE` (which is the default setting). Note that the Bartlett correction is not currently implemented for the additive heteroskedastic model, due to the extremely complicated expression for $c_m$ that results in this case. 
+
+The following code implements the modified likelihood ratio test using the different heteroskedastic alternatives. The test for the multiplicative model is implemented with and without the Bartlett correction for comparison. Note that the auxiliary design matrix needs to be modified in the last instance to exclude the `mtcars$am` explanatory variable, which is a dummy variable and thus contains zeroes, for which $w(\bm{Z}_i,\bm{\lambda})$ is undefined.
+
+```{r simonoff_tsai_mlr}
+simonoff_tsai(mtcars_lm, method = "mlr", hetfun = "add", bartlett = FALSE)
+simonoff_tsai(mtcars_lm, method = "mlr", hetfun = "mult")
+simonoff_tsai(mtcars_lm, method = "mlr", hetfun = "mult", bartlett = FALSE)
+simonoff_tsai(mtcars_lm, auxdesign = data.frame(mtcars$wt, mtcars$qsec), 
+              method = "mlr", hetfun = "logmult")
+```
+
+The score test of @Simonoff94 is designed to be a robust extension either of the \hlink{score test}{\#cook_weisberg} of @Cook83 or of the test of @Koenker81 (which is implemented within the \hlink{Breusch-Pagan Test}{\#breusch_pagan} in `breusch_pagan` by setting the `koenker` argument to `TRUE`). A nonstochastic auxiliary design matrix $\bm{Z}$, suspected of being related to the error variances, must be specified using the argument `auxdesign`, exactly as in `breusch_pagan` and `cook_weisberg`. The 'base test' to use is specified in `simonoff_tsai` by the `basetest` argument, which can be set to `"koenker"` (the default) or `"cook_weisberg"`. The test statistic of the base test is first computed (call it $S$) and the test statistic is then computed as 
+
+$$T_{\mathrm{score}}=S+\sum_{j=1}^{q} \left(\sum_{i=1}^{n} h_{ii} t_{ij}\right)\tau_j\text{,}$$
+
+where $h_{ii}$ is the $i$th diagonal element of the hat matrix $\bm{H}$, $t_{ij}$ is the $(i,j)$th element of the Jacobian matrix $\bm{J}$ (as defined above under the \hlink{Cook-Weisberg Test}{\#cook_weisberg}), and $\tau_j$ is the $j$th element of the $q$-vector $\left(\bar{\bm{J}}'\bar{\bm{J}}\right)^{-1}\bar{\bm{J}}'\bm{d}$. Here, exactly as in the formulation of the Cook-Weisberg Test, $\bm{d}$ is the $n$-vector having $i$th element $\bar{\sigma}^{-2}e_i^2$, where $\bar{\sigma}^2=n^{-1}\bm{e}'\bm{e}$, and $\bar{\bm{J}}=\left(\bm{I}_n-n^{-1}\bm{1}_{n\times n}\right)\bm{J}$. The form of the function $w(\bm{Z}_i,\bm{\lambda})$ (used in the computation of $\bm{J}$) is specified using the argument `hetfun` exactly as above under the likelihood ratio test. The asymptotic null distribution of $T_{\mathrm{score}}$ is also $\chi^2(q)$ and the test is likewise right-tailed. The following code implements the test using the Koenker Test and the Cook-Weisberg Test, respectively, as the base method. Note that the score test produces the same results for the additive and multiplicative alternatives.
+
+```{r simonoff_tsai_score}
+simonoff_tsai(mtcars_lm, method = "score", basetest = "koenker")
+simonoff_tsai(mtcars_lm, method = "score", basetest = "cook_weisberg")
+```
+
 ## Szroeter's Test (`szroeter`) {#szroeter}
 
-@Szroeter78 proposes a class of heteroskedasticity tests for which the test statistic is a ratio of quadratic forms in normal random vectors (as with, e.g., [`carapeto_holt`](#carapeto_holt), [`evans_king`](#evans_king), and [`honda`](#honda)). A prerequisite of the test is that the observations are ordered by some 'deflator' variable such that, under the alternative hypothesis, the observations are in order of error variance. As Carapeto and Holt constructed the test, the observations must be in _decreasing_ order of error variance, and as a result the test is right-tailed. (See under [`goldfeld_quandt`](#goldfeld_quandt) or [`bamset`](#bamset) for details of specifying the deflator using the `deflator` argument.)
+@Szroeter78 proposes a class of heteroskedasticity tests for which the test statistic is a ratio of quadratic forms in normal random vectors (as with, e.g., [`carapeto_holt`](#carapeto_holt), [`evans_king`](#evans_king), and [`honda`](#honda)). A prerequisite of the test is that the observations are ordered by some 'deflator' variable such that, under the alternative hypothesis, the observations are in order of error variance. As @Carapeto03 constructed the test, the observations must be in _decreasing_ order of error variance, and as a result the test is right-tailed. (See under [`goldfeld_quandt`](#goldfeld_quandt) or [`bamset`](#bamset) for details of specifying the deflator using the `deflator` argument.)
 
 The user must further specify a nondecreasing function $h(i)$ of the indices $i=1,2,\ldots,n$. The default in `szroeter` is 
-$$h(i)=2\left[1-\cos\left(\frac{\pi i}{n+1}\right)\right]\text{, } i=1,2,\ldots,n$$.
+$$h(i)=2\left[1-\cos\left(\frac{\pi i}{n+1}\right)\right]\text{, } i=1,2,\ldots,n\text{.}$$
 
 The test statistic is $$T=\frac{\bm{e}' \bm{\Delta e}}{\bm{e}'\bm{e}}\text{,}$$
 
@@ -621,6 +746,19 @@ Certain specifications of $h(\cdot)$ cause the test statistic to reduce to that 
 
 ```{r ex_szroeter}
 szroeter(mtcars_lm, deflator = "qsec")
+```
+
+## Verbyla's Test (`verbyla`) {#verbyla}
+
+@Verbyla93 proposes a heteroskedasticity test that uses the notion of residual maximum likelihood (REML) and is designed particularly to detect a log-linear dependence of the error variances on the design variables. The test statistic is a generalisation of that used in @Breusch79 and @Cook83. Its form is 
+
+$$T=\frac{1}{2}\bm{v}' \bm{Z} \left[\bm{Z}'(\bm{M}\circ \bm{M}) \bm{Z}\right]^{-1}\bm{v}\text{,}$$
+
+where $\bm{v}=\bm{d}-\diag\left\{\bm{M}\right\}$, $\bm{d}$ is the $n$-vector with $i$th element $\hat{\sigma}^{-2}e_i^2$, $\hat{\sigma}^2=(n-p)^{-1}\sum_{i=1}^{n} e_i^2$ is the unbiased estimator of $\sigma^2$, $\bm{M}\circ \bm{M}$ denotes the Hadamard product of $\bm{M}$ with itself (i.e. the matrix formed by squaring $\bm{M}$ elementwise), and $\bm{Z}$ is an $n \times q$ auxiliary design matrix. $T$ can be interpreted as half the regression sum of squares for a generalised least squares (GLS) regression of $\left(\bm{M}\circ \bm{M}\right)^{-1} \bm{d}\hat{\sigma}^{-2}$ on $\bm{Z}$ (augmented to include a column of ones, so that an intercept is included), with covariance matrix $\bm{M}\circ \bm{M}$. Under the null hypothesis of homoskedasticity, $T$ has an asymptotic distribution that is chi-squared with $q$ degrees of freedom. The matrix $\bm{Z}$ is specified using the `auxdesign` argument exactly as in [`breusch_pagan`](#breusch_pagan). The following code implements the test with the explanatory variables in $\bm{Z}$ taken as the original design matrix $\bm{X}$ and the column vector of fitted values $\hat{\bm{y}}$ respectively.
+
+```{r verbyla}
+verbyla(mtcars_lm, auxdesign = NULL)
+verbyla(mtcars_lm, auxdesign = "fitted.values")
 ```
 
 ## White's Test (`white_lm`) {#white_lm}
@@ -635,24 +773,11 @@ white_lm(mtcars_lm)
 white_lm(mtcars_lm, interactions = TRUE)
 ```
 
-## Verbyla's Test (`verbyla`) {#verbyla}
-
-@Verbyla93 proposes a heteroskedasticity test that uses the notion of residual maximum likelihood (REML) and is designed particularly to detect a log-linear dependence of the error variances on the design variables. The test statistic is a generalisation of that used in @Breusch79 and @Cook83. Its form is 
-
-$$T=\frac{1}{2}\bm{v}' \bm{Z} \left(\bm{Z}'\bm{M}\circ \bm{M} \bm{Z}\right)^{-1}\bm{v}\text{,}$$
-
-where $\bm{v}=\bm{d}\hat{\sigma}^{-2}-\diag\left\{\bm{M}\right\}$, $\hat{\sigma}^2=(n-p)^{-1}\sum_{i=1}^{n} e_i^2$ is the unbiased estimator of $\sigma^2$, $\bm{d}$ is the $n$-vector with $i$th element $e_i^2$, $\bm{M}\circ \bm{M}$ denotes the Hadamard product of $\bm{M}$ with itself (i.e., the matrix formed by squaring $\bm{M}$ elementwise), and $\bm{Z}$ is an $n \times (q+1)$ auxiliary design matrix of which the first column is a column of ones. $T$ can be interpreted as half the regression sum of squares for a generalised least squares (GLS) regression of $\left(\bm{M}\circ \bm{M}\right)^{-1} \bm{d}\hat{\sigma}^{-2}$ on $\bm{Z}$, with covariance matrix $\bm{M}\circ \bm{M}$. Under the null hypothesis of homoskedasticity, $T$ has an asymptotic distribution that is chi-squared with $q$ degrees of freedom. The matrix $\bm{Z}$ is specified using the `auxdesign` argument exactly as in [`breusch_pagan`](#breusch_pagan). The following code implements the test with the explanatory variables in $\bm{Z}$ taken as the original design matrix $\bm{X}$ and the column vector of fitted values $\hat{\bm{y}}$ respectively.
-
-```{r verbyla}
-verbyla(mtcars_lm, auxdesign = NULL)
-verbyla(mtcars_lm, auxdesign = "fitted.values")
-```
-
 ## Wilcox and Keselman's Test (`wilcox_keselman`) {#wilcox_keselman}
 
-@Wilcox06 propose a heteroskedasticity test that makes use of quantile regression. Consider first a simple linear regression with response variable $y$ and explanatory variable $X$. We assume that the $\gamma$ quantile of $Y$, given $X$, is given by $$y_\gamma=\alpha_\gamma+\beta_\gamma X\text{.}$$
+@Wilcox06 propose a heteroskedasticity test that makes use of quantile regression. Consider first a simple linear regression with response variable $y$ and explanatory variable $X$. It is assumed that the $\gamma$ quantile of $Y$, given $X$, is given by $$y_\gamma=\alpha_\gamma+\beta_\gamma X\text{.}$$
 
-Homoskedasticity of $y|X$ implies that $\beta_\gamma=\beta_{1-\gamma}$ for any $0 < \gamma < \frac{1}{2}$. Thus, we can use a quantile regression fit to test the null hypothesis $\beta_\gamma = \beta_{1-\gamma}$ for some $0<\gamma<\frac{1}{2}$ and use this to test for heteroskedasticity by proxy. The test statistic takes the form
+Homoskedasticity of $y|X$ implies that $\beta_\gamma=\beta_{1-\gamma}$ for any $0 < \gamma < \frac{1}{2}$. Thus, a quantile regression model can be fit to test the null hypothesis $\beta_\gamma = \beta_{1-\gamma}$ for some $0<\gamma<\frac{1}{2}$ and thereby test for heteroskedasticity by proxy. The test statistic takes the form
 
 $$T=\frac{D}{\widehat{\mathrm{SE}}(D)}\text{,}$$
 
@@ -678,7 +803,11 @@ wilcox_keselman(mtcars_lm, B = 100L, p.adjust.method = "none", matchWRS = TRUE)
 ```
 
 
-# Other Functions {#otherfunctions}
+# Supporting Functions and Datasets {#supportingfunctions}
+
+Each of the functions discussed in the previous section implements a particular type of heteroskedasticity test. In keeping with the principles of functional programming, the code of many of these functions calls certain supporting functions and/or datasets that assist with some element of the algorithm. In some cases, where these functions play a minor role and would add little value to practitioners using the package, they have not been exported. However, a number of these objects have been exported, particularly where they may have broader applications than their use in the heteroskedasticity tests in the package. 
+
+The [`hetplot`](#hetplot) function is not really a supporting function but a major component of the package; it is included in this section because it does not implement a heteroskedasticity test but rather produces plots that can be used in heteroskedasticity diagnostics. The BLUS residuals computed by the [`blus`](#blus) function are useful, for instance, in autocorrelation diagnostics and not only heteroskedasticity diagnostics. The rest of the functions in this section, as well as the two \hlink{datasets}{\#datasets}, assist with computation of $p$-values for tests, either by computing or storing probabilities from a certain distribution ([`dpeak`](#peaks), [`ppeak`](#peaks), [`dpeakdat`](#datasets), [`T_alpha`](#datasets), [`dDtrend`](#trend), [`pDtrend`](#trend), [`pvalRQF`](#pvalRQF)), or by computing two-sided $p$-values from any given asymmetric distribution ([`twosidedpval`](#twosidedpval)).
 
 ## Computation of Best Linear Unbiased Scalar-Covariance (BLUS) Residuals (`blus`) {#blus}
 
@@ -690,7 +819,13 @@ One problem with using the OLS residuals $\bm{e}$ in heteroskedasticity tests is
 
 $$\begin{bmatrix}\bm{y}_0\\ \bm{y}_1\end{bmatrix}=\begin{bmatrix}\bm{X}_0\\ \bm{X}_1\end{bmatrix}\bm{\beta}+\begin{bmatrix}\bm{\epsilon}_0\\ \bm{\epsilon}_1\end{bmatrix}\text{,}$$
 
-where $\bm{y}_0$ consists of the first $p$ observations and $\bm{y}_1$ of the last $n-p$, and similarly for $\bm{X}$ and $\bm{\epsilon}$. It is assumed that $\bm{X}_0$ is nonsingular. We also partition $\bm{e}$ into $\begin{bmatrix}\bm{e}_0\\ \bm{e}_1\end{bmatrix}$ in the same manner.
+where 
+
+$$\bm{y}_0 \text{ consists of the first $p$ observations,}$$
+
+$$\bm{y}_1 \text{ consists of the last $n-p$ observations,}$$
+
+and similarly for $\bm{X}$ and $\bm{\epsilon}$. It is assumed that $\bm{X}_0$ is nonsingular. We also partition $\bm{e}$ into $\begin{bmatrix}\bm{e}_0\\ \bm{e}_1\end{bmatrix}$ in the same manner.
 
 3. Compute the BLUS residuals as follows:
 
@@ -698,13 +833,15 @@ $$\tilde{\bm{e}}_1=\bm{e}_1-\bm{X}_1\bm{X}_0^{-1}\left[\sum_{j=1}^{p} \frac{\lam
 
 where 
 
-$\lambda_j^2$, $j=1,2,\ldots,p$ are the eigenvalues of $\bm{X}_0(\bm{X}'\bm{X})^{-1}\bm{X}_0'$, and $\bm{q}_j$ are the corresponding eigenvectors.
+$$\lambda_j^2\text{,} j=1,2,\ldots,p \text{ are the eigenvalues of } \bm{X}_0(\bm{X}'\bm{X})^{-1}\bm{X}_0'\text{,}$$ 
+
+and $$\bm{q}_j \text{ are the corresponding eigenvectors.}$$
 
 The `omit` argument of `blus` controls which $p$ observations are not represented in the BLUS residual vector. This argument can be a numeric vector of length $p$ specifying the indices to omit. Alternatively, it can be a character value, either `"first"` (indicating that the first $p$ observations should be omitted), `"last"` (indicating that the last $p$ observations should be omitted), or `"random"` (indicating that $p$ randomly chosen observations should be omitted). It can happen that the algorithm fails due to $\bm{X}_0$ being numerically singular. In this case, `blus` by default chooses instead a random subset of observations to omit. If this also results in a singular $\bm{X}_0$, another random subset is attempted, and so on until a subset is found for which the BLUS residuals can be computed. By default, the function will cycle through all ${n \choose p}$ possible subsets, if necessary, attempting to find one that works. However, the user can pass an integer value for the argument `exhaust` to force the function to stop attempting random combinations after `exhaust` attempts. The `seed` argument can be used to make a random choice of omitted indices reproducible by setting the seed of the pseudorandom number generator.
 
 The `keepNA` logical argument controls the structure of the BLUS residual vector $\tilde{\bm{e}}$. If `TRUE` (the default), an $n$-vector is returned, with `NA_real_` as the value for the $p$ indices that were omitted. If `FALSE`, an $(n-p)$-vector is returned with no missing values.
 
-Code and output for implementations of the BLUS procedure are given below. Note that an \href{online article}{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2412740} by H. D. Vinod also provides R code for computing BLUS residuals, though Vinod's function does not seem to be implemented in an R package on CRAN or Github.
+Code and output for implementations of the BLUS procedure are given below. Note that an \hlink{online article}{https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2412740} by H. D. Vinod also provides R code for computing BLUS residuals, though Vinod's function does not seem to be implemented in an R package on CRAN or Github.
 
 ```{r ex_blus}
 blus(mtcars_lm)
@@ -726,18 +863,20 @@ Let $T$ be a test statistic with observed value $q$ and null distribution $F$. F
 
 $$P_w^A(q)=\min\left\{1, \frac{F(q)}{w_L}1_{q \le A}+\frac{1-F(q)}{w_R}1_{q > A}\right\}\text{,}$$
 
-where $1_{\cdot}$ is the indicator function and $w_L$ and $w_R$ are positive weights satisfying $w_L+w_R=1$. If we set $w_L=w_R=\frac{1}{2}$, then $P_w^A(q)$ is a version of the doubled one-sided $p$-value that will never exceed 1. The conditional two-sided $p$-value centred at $A$ is obtained by setting $w_L=F(A)$ and $w_R=1-F(A)$; thus
+where $1_{\bullet}$ is the indicator function and $w_L$ and $w_R$ are positive weights satisfying $w_L+w_R=1$. If we set $w_L=w_R=\frac{1}{2}$, then $P_w^A(q)$ is a version of the doubled one-sided $p$-value that will never exceed 1. The conditional two-sided $p$-value centred at $A$ is obtained by setting $w_L=F(A)$ and $w_R=1-F(A)$; thus
 
 $$\begin{aligned}P_C^A(q)=\frac{F(q)}{F(A)}1_{q \le A} + \frac{1-F(q)}{1-F(A)}1_{q > A}\end{aligned}\text{.}$$
 
-This is a smooth function of $q$ (except at $A$), with a maximum of 1 at $q=A$.^[The definition of $P_C^A$ given in @Kulinskaya08[p. 6] is confusing and technically incorrect. It expresses $P_w^A$ with weights $w_L=F(A)$ and $w_R=1-F(A)$ as a sum of conditional probabilities involving the test statistic and an independent random variable (call it $T'$) having the same distribution. This is invalid because if $T$ and $T'$ are independent, the conditional distribution of $T|T'$ is simply the marginal distribution of $T$. In fact, the two-sided $p$-value proposed by @Kulinskaya08 does not technically involve a conditional probability and thus might be better named 'tail-weighted two-sided $p$-value.'] The function strictly increases for $x<A$ and strictly decreases for $x>A$. (For this reason is redundant to take the minimum of the weighted probability expression and 1).
+This is a smooth function of $q$ (except at $A$), with a maximum of 1 at $q=A$.^[The definition of $P_C^A$ given in @Kulinskaya08[p. 6] is confusing and technically incorrect. It expresses $P_w^A$ with weights $w_L=F(A)$ and $w_R=1-F(A)$ as a sum of conditional probabilities involving the test statistic and an independent random variable (call it $T'$) having the same distribution. This is invalid because if $T$ and $T'$ are independent, the conditional distribution of $T|T'$ is simply the marginal distribution of $T$. In fact, the two-sided $p$-value proposed by @Kulinskaya08 does not technically involve a conditional probability and thus might be better named 'tail-weighted two-sided $p$-value.'] The function strictly increases for $x<A$ and strictly decreases for $x>A$. (For this reason, it is redundant to take the minimum of the weighted probability expression and 1).
 
-For the discrete case, the definition of the conditional two-sided $p$-value centred at $A$, as per @Kulinskaya08[p. 11], depends on whether $A$ is attainable, i.e. belongs to the support of $T$.
+For the discrete case, the definition of the conditional two-sided $p$-value centred at $A$, as per @Kulinskaya08[p. 11], depends on whether $A$ is attainable, i.e. belongs to the support of $T$:
 
+\small
 $$P_C^A(q)=\begin{dcases*}\frac{\Pr(T \le q)}{\Pr(T < A)}1_{q < A} + \frac{\Pr(T \ge q)}{\Pr(T> A)}1_{q > A} & if $A$ is not attainable\\
 \frac{\Pr(T \le q)}{\Pr(T\le A)/\left(1+\Pr(T=A)\right)}1_{q<A} + 1_{q=A} + 
 \frac{\Pr(T \ge q)}{\Pr(T\ge A)/\left(1+\Pr(T=A)\right)}1_{q>A} & if $A$ is attainable
 \end{dcases*}$$
+\normalsize
 
 The $A$ parameter is specified in `twosidedpval` using the `Aloc` argument. The null value of the parameter being tested or the null distribution mean are two plausible choices for this parameter. If `Aloc` is not specified, `twosidedpval` attempts to compute the distribution mean from `CDF` and sets `Aloc` to this value. This has been tested for the cumulative distribution functions of well-known distributions included in the `stats` package (e.g., `pchisq`, `pbinom`), but may fail or yield unexpected results for other choices of `CDF`, especially user-defined functions. If `CDF` corresponds to the cumulative distribution function $F$ and the null distribution is continuous, the distribution mean is computed by evaluating the following expression using `stats::integrate`:
 
@@ -745,13 +884,13 @@ $$\E_0(T)=\displaystyle\int_{0}^{\infty} (1 - F(t)) dt - \displaystyle\int_{-\in
 
 If the null distribution is discrete, its distribution mean is computed by evaluating the following expression:
 
-$$\E_0(T)=\sum_{t=0}^{\infty} (1 - F(t)) - \sum_{t=-\infty}^{-1} F(t)$$
+$$\E_0(T)=\sum_{t=0}^{\infty} (1 - F(t)) - \sum_{t=-\infty}^{-1} F(t)\text{.}$$
 
 Since `sum` cannot take a vector of infinite length, the function truncates the vector at `1e6` rather than `Inf`.
 
 When calling `twosidedpval`, the user specifies the cumulative distribution function with the argument `CDF` (which should be a function). Distribution parameters to be passed to `CDF` may also be specified as this function has a `...` argument. Optionally, the user may specify the minimum and maximum values in the support of a discrete distribution using the `supportlim` argument; this will improve computational efficiency if the `"minlikelihood"` method is used or if the function must compute the distribution mean to use as the `Aloc` value. The user must also specify whether the null distribution is continuous or discrete using the logical argument `continuous`. Finally, the `method` argument is used to specify which of three methods should be used to compute the two-sided $p$-value. Setting `method` to `"doubled"` will result in the doubled one-sided $p$-value being returned. Setting `method` to `"kulinskaya"` will produce the conditional two-sided $p$-value from @Kulinskaya08 as described above. Setting `method` to `"minlikelihood"` will result in a $p$-value that is the sum of probabilities of all values with probability less than or equal to that of the observed value. Currently the `"minlikelihood"` method is only available for discrete distributions.
 
-The following is an example of a computation of two-sided $p$-values for an $F$ test for equality of variances based on two normally distributed random samples.
+The following is an example of the computation of two-sided $p$-values for an $F$ test for equality of variances based on two normally distributed random samples.
 
 ```{r ex1_twosidedpval}
 n1 <- 10L
@@ -806,7 +945,7 @@ plot(1:1000, expval[1:1000], type = "l", xlab = parse(text = "n"),
       ylab = "Expected Number of Peaks")
 ```
 
-`T_alpha` is a $2^{14} \times 16$ of which the $j$th column contains $2^{14}$ pseudorandom replicates whose distribution is (approximately) that of $T_{\alpha}$ for $\alpha=\frac{j-1}{32}$, $j=1,2,\ldots,16$, to which the distribution of the test statistic of @Rackauskas07 converges asymptotically. This allows computation of Monte Carlo $p$-value estimates for this test. The example below generates overlapping histograms for the distribution with $\alpha=0$ and $\alpha=\frac{15}{32}$.
+`T_alpha` is a $2^{14} \times 16$ matrix of which the $j$th column contains $2^{14}$ pseudorandom replicates whose distribution is (approximately) that of $T_{\alpha}$ for $\alpha=\frac{j-1}{32}$, $j=1,2,\ldots,16$, to which the distribution of the test statistic of @Rackauskas07 converges asymptotically. This allows computation of Monte Carlo $p$-value estimates for this test. The example below generates overlapping histograms for the distribution with $\alpha=0$ and $\alpha=\frac{15}{32}$.
 
 ```{r ex2_datasets, out.width='75%', fig.align='center'}
 utils::data(T_alpha)
@@ -820,7 +959,7 @@ legend(4, 5000, legend = c(expression(alpha == 0), expression(alpha == frac(15, 
 
 ## Heteroskedasticity Diagnostic Plots (`hetplot`) {#hetplot}
 
-Graphical methods, and in particular, residual plots, provide a useful diagnostic and visualisation tool for heteroskedasticity in linear regression models. In undergraduate statistics courses, students are often introduced to heteroskedasticity diagnostics in linear regression using a scatter plot with the OLS residuals $e_i$ on the vertical axis and the OLS fitted values $\hat{y}_i$, or one of the explanatory variables, on the horizontal axis. @Cook83 suggest several ways to improve on this basic plot for graphical heteroskedasticity diagnostics. First, they suggest that the squared residuals $e_i^2$ are a better choice for the variable plotted on the vertical axis, because this doubles the sample size in a visual sense. Moreover, they point out that even under homoskedasticity, the variance of the OLS residuals is not constant but equals $\sigma^2 m_{ii}$. Thus, to reduce the risk of a spurious pattern, it would be better to consider $e_i/\sqrt{m_{ii}}$, a random variable that _does_ have constant variance under homoskedasticity.
+Graphical methods, and in particular residual plots, provide a useful diagnostic and visualisation tool for heteroskedasticity in linear regression models. In undergraduate statistics courses, students are often introduced to heteroskedasticity diagnostics in linear regression using a scatter plot with the OLS residuals $e_i$ on the vertical axis and the OLS fitted values $\hat{y}_i$, or one of the explanatory variables, on the horizontal axis. @Cook83 suggest several ways to improve on this basic plot for graphical heteroskedasticity diagnostics. First, they suggest that the squared residuals $e_i^2$ are a better choice for the variable plotted on the vertical axis, because this doubles the sample size in a visual sense. Moreover, they point out that even under homoskedasticity, the variance of the OLS residuals is not constant but equals $\sigma^2 m_{ii}$. Thus, to reduce the risk of a spurious pattern, it would be better to consider $e_i/\sqrt{m_{ii}}$, a random variable that _does_ have constant variance under homoskedasticity.
 
 The `hetplot` function incorporates these and other possibilities to offer a customisable heteroskedasticity plotting tool built around the basic scatter plot functionality of the `plot` function in base R. The three key arguments that define the plot(s) are `horzvar`, `vertvar`, and `vertfun`. `horzvar` is a character argument specifying the variable(s) to plot on the horizontal axis. Possible values and the variables they represent are displayed in the table below.
 
@@ -833,7 +972,7 @@ knitr::kable(table1dat, booktabs = TRUE, caption = "Possible Values for `horzvar
              escape = FALSE, col.names = c("`horzvar` Value", "Variable Plotted"))
 ```
 
-Needless to say, `"explanatory"` and `"log_explanatory"` exclude the intercept column of $\bm{X}$, if present. If one wants to plot only one explanatory variable, one can pass the `names` element of the `data.frame` corresponding to that variable; by concatenating `"log"` with the `names` element, one can plot the natural logarithm of the specified explanatory variable. If the argument corresponds to more than one variable to plot on the horizontal axis (e.g., `"explanatory"` in a model with multiple explanatory variables), multiple plots will be produced.
+Needless to say, `"explanatory"` and `"log_explanatory"` exclude the intercept column of $\bm{X}$, if present. If one wants to plot only one explanatory variable, one can pass the `names` element of the `data.frame` corresponding to that variable; by concatenating `"log"` with the `names` element, one can plot the natural logarithm of the specified explanatory variable. If the argument corresponds to more than one variable to plot on the horizontal axis (e.g. `"explanatory"` in a model with multiple explanatory variables), multiple plots will be produced.
 
 `vertvar` is a character argument specifying the residual variable(s) to plot on the vertical axis. Possible values and the variables they represent are displayed in the table below.
 
@@ -850,7 +989,7 @@ The user may specify a character vector of `length` $>1$ with multiple values, i
 
 `vertfun` is a character argument specifying the name(s) of one or more functions to apply to the residual variable indicated by `vertvar`. A numeral passed as a character, such as `"2"`, results in this power being applied to the vertical axis variable. Other functions that one may want to specify include `"identity"` (to plot the `vertvar` variable without any functional transformation) and `"abs"` for the absolute value function.
 
-Since one can pass more than one value for both the `vertvar` and `vertfun` arguments, and since some of the `horzvar` arguments entail multiple horizontal variable arguments (e.g., `"explanatory"`, representing all explanatory variables), the total number of plots to be produced by one call of `hetplot` may be large. Accordingly, there are two ways to output the plot(s), which are specified using the `filetype` character argument. If `filetype` is set to `NULL` (the default), all required plots are passed to a single device where they are displayed in a matrix structure using the `mfrow` graphical parameter. The function will attempt to find an attractive dimensionality for the required number of plots; thus for instance if the number of plots required is 6, they will be displayed in a $2 \times 3$ structure. If the number of rows or columns in the plotting structure exceeds 4, a warning is produced. Alternatively, the `filetype` argument can be one of `"png"`, `"bmp"`, `"jpeg"`, or `"tiff"`, which results in each individual plot being written to an image file of that type. Since CRAN's \hlink{Repository Policy}{https://cran.r-project.org/web/packages/policies.html} stipulates that 'Packages should not write in the user’s home filespace (including clipboards), nor anywhere else on the file system apart from the R session's temporary directory,' these image files are written to a subfolder called `hetplot` within the R session's temporary directory. The path of the temporary directory can be obtained within the session using the `tempdir()` command. The filename of each image file names the horizontal and vertical variable for that plot and also includes a timestamp from `Sys.time()`. If the image files are needed after the R session is ended, the user should copy them to a permanent directory.
+Since one can pass more than one value for both the `vertvar` and `vertfun` arguments, and since some of the `horzvar` arguments entail multiple horizontal variable arguments (e.g. `"explanatory"`, representing all explanatory variables), the total number of plots to be produced by one call of `hetplot` may be large. Accordingly, there are two ways to output the plot(s), which are specified using the `filetype` character argument. If `filetype` is set to `NULL` (the default), all required plots are passed to a single device where they are displayed in a matrix structure using the `mfrow` graphical parameter. The function will attempt to find an attractive dimensionality for the required number of plots; thus for instance if the number of plots required is 6, they will be displayed in a $2 \times 3$ structure. If the number of rows or columns in the plotting structure exceeds 4, a warning is produced. Alternatively, the `filetype` argument can be one of `"png"`, `"bmp"`, `"jpeg"`, or `"tiff"`, which results in each individual plot being written to an image file of that type. Since CRAN's \hlink{Repository Policy}{https://cran.r-project.org/web/packages/policies.html} stipulates that 'Packages should not write in the user’s home filespace (including clipboards), nor anywhere else on the file system apart from the R session's temporary directory,' these image files are written to a subfolder called `hetplot` within the R session's temporary directory. The path of the temporary directory can be obtained within the session using the `tempdir()` command. The filename of each image file names the horizontal and vertical variable for that plot and also includes a timestamp from `Sys.time()`. If the image files are needed after the R session is ended, the user should copy them to a permanent directory.
 
 Besides these arguments, the user may pass other arguments such as graphical parameters to use in plotting (see [`par`](https://www.rdocumentation.org/packages/graphics/versions/3.6.2/topics/par)). The following code produces a $2\times 2$ matrix of plots in the R Console device. The horizontal variables are $i$ (corresponding to `"index"`) and $\hat{y}_i$ (corresponding to `"fitted.values"`), while the vertical variables are $\tilde{e}_i^2$ (corresponding to `"res_blus"` with `"2"`) and $|\tilde{e}_i|$ (corresponding to `"res_blus"` with `"abs"`).
 
@@ -877,12 +1016,12 @@ length(l)
 knitr::include_graphics(path = paste0(newpath, "/hetplot/", l[1:4]))
 ```
 
-## Functions Related to Peaks in an i.i.d. Random Sequence (`countpeaks`, `dpeak`, `ppeak`) {#peaks}
+## Functions Related to Peaks in an I.I.D. Random Sequence (`countpeaks`, `dpeak`, `ppeak`) {#peaks}
 
 Let $\left\{Q_1,Q_2,\ldots,Q_n\right\}$ be a sequence of independent and identically distributed continuous random variables. A random variable in the sequence is a 'peak' if its value exceeds the values of all previous random variables in the series. $Q_1$ is not considered a peak. Thus, the number of peaks $P$ in the sequence is defined as follows:
 
-$$P=\sum_{i=2}^{n} 1\left(Q_i \ge \max\left\{Q_1,Q_2,Q_{i-1}\right\}\right)\text{,}$$
-where $1(\cdot)$ is the indicator function. The support for the number of peaks consists of the integers $\left\{0,1,\ldots,n-1\right\}$.
+$$P=\sum_{i=2}^{n} 1_{Q_i \ge \max\left\{Q_1,Q_2,Q_{i-1}\right\}}\text{,}$$
+where $1_{\bullet}$ is the indicator function. The support for the number of peaks consists of the integers $\left\{0,1,\ldots,n-1\right\}$.
 
 The \hlink{Goldfeld-Quandt Nonparametric Test}{\#goldfeld_quandt} for heteroskedasticity uses the number of peaks in the absolute OLS (or BLUS) residuals as its test statistic. Therefore, to support the `goldfeld_quandt` function, the package exports three functions related to peaks in a random sequence. 
 
@@ -902,7 +1041,7 @@ par(mar = c(4, 4, 1, 1))
 plot(q, pch = 20, col = mycols)
 ```
 
-`dpeak` and `ppeak` compute the probability mass function and cumulative distribution function respectively for the number of peaks $P$ in an independent and identically distributed sequence of random variables. Since `ppeak` merely aggregates probabilities computed in `dpeak`, the discussion will focus primarily on `dpeak`. Following the notation used by @Goldfeld65[pp. 542-43], we define $N(n,k)$ as the number of permutations of a sequence of $n$ values containing $k$ peaks. Defining for convenience $N(1,0)=1$, the authors make note of the following recursive relations:
+`dpeak` and `ppeak` compute the probability mass function and cumulative distribution function, respectively, for the number of peaks $P$ in an independent and identically distributed sequence of random variables. Since `ppeak` merely aggregates probabilities computed in `dpeak`, the discussion will focus primarily on `dpeak`. Following the notation used by @Goldfeld65[pp. 542-43], define $N(n,k)$ as the number of permutations of a sequence of $n$ values containing $k$ peaks. Defining for convenience $N(1,0)=1$, the authors make note of the following recursive relations:
 
 $$\begin{aligned}N(n, n - 1) &= 1\\
 N(n,n-2) &= (n-1)N(n-1, n-2) + N(n-1,n-3)\\
@@ -941,7 +1080,7 @@ ppeak(k = 2, n = 10, lower.tail = TRUE, usedata = FALSE)
 
 ## Computation of $p$-Values for a Ratio of Quadratic Forms in a Normal Random Vector (`pvalRQF`) {#pvalRQF}
 
-The test statistic for a number of the tests implemented in the package ([`carapeto_holt`](#carapeto_holt), [`evans_king`](#evans_king), [`honda`](#honda), [`szroeter`](#szroeter)) are, under the null hypothesis, a ratio of quadratic forms in a normally distributed random vector with a scalar covariance matrix, i.e., the error vector $\bm{\epsilon}$. The R package \hlink{CompQuadForm}{https://cran.r-project.org/web/packages/CompQuadForm/index.html}, on which see @Duchesne10, contains functions that compute cumulative probabilities for a quadratic form in normally distributed random variables. Let us write our test statistic as 
+The test statistic for a number of the tests implemented in the package ([`carapeto_holt`](#carapeto_holt), [`evans_king`](#evans_king), [`honda`](#honda), [`szroeter`](#szroeter)) are, under the null hypothesis, a ratio of quadratic forms in a normally distributed random vector with a scalar covariance matrix, i.e. the error vector $\bm{\epsilon}$. The R package \hlink{CompQuadForm}{https://cran.r-project.org/web/packages/CompQuadForm/index.html}, on which see @Duchesne10, contains functions that compute cumulative probabilities for a quadratic form in normally distributed random variables. Let the test statistic be written as 
 
 $$T=\frac{\bm{\epsilon}'\bm{A \epsilon}}{\bm{\epsilon}'\bm{B \epsilon}}\text{,}$$
 
@@ -950,9 +1089,9 @@ where $\bm{A}$ and $\bm{B}$ are nonstochastic,  symmetric matrices, and $\bm{\ep
 $$\begin{aligned}\Pr\left(T > t_1\right) &=\Pr\left(\frac{\bm{\epsilon}'\bm{A \epsilon}}{\bm{\epsilon}'\bm{B \epsilon}} > t_1\right)\\
 &= \Pr\left(\bm{\epsilon}'\bm{A \epsilon} > t_1\bm{\epsilon}'\bm{B \epsilon}\right)\\
 &=\Pr\left(\bm{\epsilon}'(\bm{A}-t_1\bm{B}) \bm{\epsilon} > 0\right)
-\end{aligned}$$
+\end{aligned}\text{.}$$
 
-Thus, since we can write the $p$-value as a probability expression involving a quadratic form in normal random variables, we can use one of the functions from the `CompQuadForm` package to compute it. This is essentially what the `pvalRQF` function does: it is largely a wrapper for the methods implemented in `CompQuadForm`. There are four methods implemented in `CompQuadForm`, of which two can be called in `pvalRQF`: the algorithms of @Imhof61 (implemented in `imhof`) and @Davies80 (implemented in `davies`). The other two functions in `CompQuadForm`, `farebrother` and `liu`, are not supported in `pvalRQF` because the first requires that the matrix in the quadratic form be positive semi-definite (which $\bm{A}-t_1\bm{B}$ in general is not) and the second method is shown in @Duchesne10 to be inaccurate.
+Thus, since the $p$-value can be written as a probability expression involving a quadratic form in normal random variables, one of the functions from the `CompQuadForm` package can be used to compute it. This is essentially what the `pvalRQF` function does: it is largely a wrapper for the methods implemented in `CompQuadForm`. There are four methods implemented in `CompQuadForm` of which two can be called in `pvalRQF`: the algorithms of @Imhof61 (implemented in `imhof`) and @Davies80 (implemented in `davies`). The other two functions in `CompQuadForm`, `farebrother` and `liu`, are not supported in `pvalRQF` because the first requires that the matrix in the quadratic form be positive semi-definite (which $\bm{A}-t_1\bm{B}$ in general is not) and the second method is shown in @Duchesne10 to be inaccurate.
 
 The arguments to be passed to `pvalRQF` are `r`, corresponding to $t_1$ (the observed value of the ratio test statistic), `A` (corresponding to the matrix $\bm{A}$ in the numerator), `B` (corresponding to the matrix $\bm{B}$ in the denominator), `lower.tail` (a logical indicating whether a $\le$ probability is required), and `algorithm` (a character specifying the method to use). `lower.tail` defaults to `TRUE`, as the function was first written in support of `carapeto_holt`, which is a lower-tailed test. The three possible values for `algorithm` are `"imhof"` (the default), `"davies"`, and `"integrate"`. The first two correspond to calls of the functions of the same name in the `CompQuadForm` package. To make the function less dependent on this package, a third option is also available, `"integrate"`, which results in the Imhof algorithm integral being evaluated using the `integrate` function in the `stats` package. This is computationally slower than `"imhof"`, since `CompQuadForm::imhof` uses C code. The code below gives a couple of examples of the use of the function.
 
@@ -970,18 +1109,18 @@ system.time(replicate(1e3, pvalRQF(r = 1, A = Amat, B = Bmat, algorithm = "integ
 
 ## Functions Related to Lehmann's Nonparametric Trend Statistic (`dDtrend`, `pDtrend`) {#trend}
 
-Let $Q_1,Q_2,\ldots,Q_n$ be an independent and identically distributed random sample and let $R_i$ be the rank of $Q_i$, $i=1,2,\ldots,n$. @Lehmann75 proposed the following statistic $D$ as a nonparametric measure of trend in such a sample.
+Let $Q_1,Q_2,\ldots,Q_n$ be an independent and identically distributed random sample and let $R_i$ be the rank of $Q_i$, $i=1,2,\ldots,n$. @Lehmann75 proposed the following statistic $D$ as a nonparametric measure of trend in such a sample:
 
 $$D=\sum_{i=1}^{n} (R_i - i)^2\text{.}$$
 
 This statistic is applied to the absolute residuals (either OLS or \hlink{BLUS}{\#blus}) in \hlink{Horn's Test}{\#horn} for heteroskedasticity. Accordingly, the package contains functions to calculate probabilities, either exact or approximate, on $D$ under the null hypothesis. `dDtrend` computes the exact distribution of $D$ in the event that there are no ties in the sample. The support $\mathcal{S}$ of $D$ in this case is as follows:
 
 $$\mathcal{S}=\begin{dcases*}
-                \left\{0\right\} & $n=1$ \\
-                \left\{0, 2\right\} & $n=2$ \\
-                \left\{0, 2, 6, 8\right\} & $n=3$\\
-                \left\{0, 2, \ldots, \frac{n(n-1)(n+1)}{3}\right\} & $n \ge 4$
-                \end{dcases*}$$
+                \left\{0\right\}\text{,} & $n=1$ \\
+                \left\{0, 2\right\}\text{,} & $n=2$ \\
+                \left\{0, 2, 6, 8\right\}\text{,} & $n=3$\\
+                \left\{0, 2, \ldots, \frac{n(n-1)(n+1)}{3}\right\}\text{,} & $n \ge 4$
+                \end{dcases*}\text{.}$$
 
 Moreover, the distribution of $D$ is symmetric about $\frac{1}{6}(n ^ 3 - n)$. The exact distribution is computed by counting and tabulating permutations exhaustively. Due to the high complexity of the algorithm, it is prohibitively slow for $n > 10$. The value(s) of $D$ for which the probability should be computed is passed to `dDtrend` using the argument `k`. This argument can either be an integer of `length` 1 or a character `"all"` (the default), in which case the entire probability distribution of $D$ for the sample size $n$ (indicated using the argument `n`) is returned. `dDtrend` returns a double vector of probabilities with a `names` attribute representing the corresponding values of $D$. The following code computes the probability distribution for $n=9$ and represents it graphically.
 
@@ -999,9 +1138,9 @@ for (i in seq_along(values)) {
 }
 ```
 
-`pDtrend` computes cumulative probabilities on the nonparametric statistic $D$, either from the exact distribution of $D$, via `dDtrend` (only feasible for $n \le 10$, and where there are no ties) or using a normal approximation. The normal approximation differs depending on whether ties are present. Where there are no ties, the expectation and variance of $D$ are respectively
+`pDtrend` computes cumulative probabilities on the nonparametric statistic $D$, either from the exact distribution of $D$, via `dDtrend` (only feasible for $n \le 10$, and where there are no ties) or using a normal approximation. The normal approximation differs depending on whether ties are present. Where there are no ties, the expectation and variance of $D$ are, respectively,
 
-$$\E(D)= \frac{1}{6}(n^3-n)$$
+$$\E(D)= \frac{1}{6}(n^3-n)\text{,}$$
 
 and
 
@@ -1013,9 +1152,9 @@ $$\Pr\left(D \le k\right) \approx \Phi\left(\frac{k-\E(D)-1}{\sqrt{\Var(D)}}\rig
 
 where $\Phi(\cdot)$ is the standard normal cumulative distribution function. The $-1$ in the numerator is a continuity correction ($-1$ rather than $-0.5$ because the support of $D$ consists of even numbers incrementing by 2).
 
-It is not anticipated that ties will be present in absolute OLS or BLUS residuals from a linear regression model, since they are continuous. This could happen if two or more observations in the data are identical. In any case, for sake of completeness, the normal approximation for the case when ties are present is also implemented. Let $R_i^\star$ be the midrank of the $i$th observation in the sample. The midrank is the average of the ranks of all observations tied with the present observation; if the observation is not involved in a tie it is the usual rank. We then define the modified statistic $D^\star=\sum_{i=1}^{n} (R_i^\star-i)^2$. Suppose that the $n$ midranks take on $m$ distinct values, with $d_j$ being the frequency of the $j$th value, $j=1,2,\ldots,m$. The expectation and variance of $D^\star$ are then 
+It is not anticipated that ties will be present in absolute OLS or BLUS residuals from a linear regression model, since they are continuous. This could happen if two or more observations in the data are identical. In any case, for sake of completeness, the normal approximation for the case when ties are present is also implemented. Let $R_i^\star$ be the midrank of the $i$th observation in the sample. The midrank is the average of the ranks of all observations tied with the present observation; if the observation is not involved in a tie it is the usual rank. Now define the modified statistic $D^\star=\sum_{i=1}^{n} (R_i^\star-i)^2$. Suppose that the $n$ midranks take on $m$ distinct values, with $d_j$ being the frequency of the $j$th value, $j=1,2,\ldots,m$. The expectation and variance of $D^\star$ are then 
 
-$$\E(D^\star)=\frac{1}{6}(n^3-n)-\frac{1}{12}\sum_{j=1}^{m} (d_j^3-d_j)$$
+$$\E(D^\star)=\frac{1}{6}(n^3-n)-\frac{1}{12}\sum_{j=1}^{m} (d_j^3-d_j)\text{,}$$
 
 and
 

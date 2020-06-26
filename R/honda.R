@@ -5,8 +5,8 @@
 #'    in a linear regression model.
 #'
 #' The test assumes that heteroskedasticity, if present, would be either of
-#'    the additive form \eqn{\sigma_i^2 = \sigma^2(1+\theta z_i)} or of the
-#'    multiplicative form \eqn{\sigma_i^2 = \sigma^2 e^{\theta z_i}}, where
+#'    the form \eqn{\sigma_i^2 = \sigma^2(1+\theta z_i)} or of the
+#'    form \eqn{\sigma_i^2 = \sigma^2 e^{\theta z_i}}, where
 #'    where \eqn{z_i} is a deflator (a nonstochastic variable
 #'    suspected of being related to the error variance), \eqn{\sigma^2} is
 #'    some unknown constant, and \eqn{\theta} is an unknown parameter
@@ -29,8 +29,8 @@
 #' @inheritParams breusch_pagan
 #' @inheritParams carapeto_holt
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -41,50 +41,28 @@
 #' honda(mtcars_lm, deflator = "qsec")
 #'
 
-honda <- function (mainlm, deflator = NULL, alternative = c("two.sided",
+honda <- function(mainlm, deflator = NULL, alternative = c("two.sided",
                     "greater", "less"), twosidedmethod =
-                     c("doubled", "kulinskaya"), qfmethod = "imhof") {
+                     c("doubled", "kulinskaya"), qfmethod = "imhof",
+                     statonly = FALSE) {
 
   alternative <- match.arg(alternative, c("two.sided", "greater", "less"))
   twosidedmethod <- match.arg(twosidedmethod, c("doubled", "kulinskaya"))
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-    hasintercept <- columnof1s(X)
-    e <- mainlm$residuals
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
-                                        is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    hasintercept <- columnof1s(X)
+
+  processmainlm(m = mainlm, needy = FALSE)
+
+  hasintercept <- columnof1s(X)
+  if (class(mainlm) == "list") {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
       colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
     } else {
       colnames(X) <- paste0("X", 1:p)
     }
-    e <- stats::lm.fit(X, y)$residuals
   }
 
   n <- nrow(X)
-  if (is.numeric(deflator) && deflator == as.integer(deflator)) {
-    if (hasintercept[[1]] && deflator == 1) {
-      stop("deflator cannot be the model intercept")
-    } else if (deflator > p) {
-      stop("`deflator` is not the index of a column of design matrix")
-    }
-  } else if (is.character(deflator)) {
-    if (deflator == "(Intercept)") {
-      stop("deflator cannot be the model intercept")
-    } else if (!deflator %in% colnames(X)) {
-      stop("`deflator` is not the name of a column of design matrix")
-    }
-  } else if (!is.null(deflator)) stop("`deflator` must be integer or character")
+  checkdeflator(deflator, X, p, hasintercept[[1]])
 
   M <- fastM(X, n)
   if (is.null(deflator)) {
@@ -94,6 +72,7 @@ honda <- function (mainlm, deflator = NULL, alternative = c("two.sided",
   }
 
   teststat <- as.double((t(e) %*% A0 %*% e) / crossprod(e))
+  if (statonly) return(teststat)
   if (alternative == "greater") {
     pval <- pvalRQF(r = teststat, A = M %*% A0 %*% M,
                     B = M, algorithm = qfmethod, lower.tail = FALSE)

@@ -36,8 +36,8 @@
 #' @param ... Optional arguments to be passed to \code{\link[MASS]{rlm}}
 #'
 #' @inheritParams breusch_pagan
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -53,25 +53,14 @@
 #' bickel(mtcars_lm, scale_invariant = FALSE)
 #'
 
-bickel <- function (mainlm, fitmethod = c("lm", "rlm"),
+bickel <- function(mainlm, fitmethod = c("lm", "rlm"),
                     a = "identity", b = c("hubersq", "tanhsq"),
-                    scale_invariant = TRUE, k = 1.345, ...) {
+                    scale_invariant = TRUE, k = 1.345, statonly = FALSE, ...) {
 
   fitmethod <- match.arg(fitmethod, c("lm", "rlm"))
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-    y <- stats::model.response(stats::model.frame(mainlm))
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x), is.nan(x),
-                                                           is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-  }
+
+  processmainlm(m = mainlm, needyhat = TRUE)
+
   if (fitmethod == "lm") {
     mainlm <- stats::lm.fit(X, y)
   } else if (fitmethod == "rlm") {
@@ -101,6 +90,8 @@ bickel <- function (mainlm, fitmethod = c("lm", "rlm"),
   sigma_b_sq <- 1 / (n - p) * sum((afunc(yhat) - mean(afunc(yhat))) ^ 2) *
     sum((bfunc(e) - mean(bfunc(e))) ^ 2)
   teststat <- sum(afunc(yhat) - mean(afunc(yhat)) * bfunc(e)) / sigma_b_sq
+  if (statonly) return(teststat)
+
   pval <- 2 * stats::pnorm(abs(teststat), lower.tail = FALSE)
 
   rval <- structure(list(statistic = teststat, p.value = pval,

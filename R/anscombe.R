@@ -23,8 +23,8 @@
 #'    \insertCite{Anscombe61;textual}{skedastic} is used.
 #'
 #' @inheritParams breusch_pagan
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -35,29 +35,16 @@
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' anscombe(mtcars_lm)
 #' anscombe(mtcars_lm, studentise = FALSE)
+#' # Same as first example
+#' mtcars_list <- list("y" = mtcars$mpg, "X" = cbind(1, mtcars$wt, mtcars$qsec, mtcars$am))
+#' anscombe(mtcars_list)
 #'
 
-anscombe <- function (mainlm, studentise = TRUE) {
+anscombe <- function(mainlm, studentise = TRUE, statonly = FALSE) {
 
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-    y <- stats::model.response(stats::model.frame(mainlm))
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x), is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    mainlm <- stats::lm.fit(X, y)
-  }
+  processmainlm(m = mainlm, needyhat = TRUE)
 
-  p <- length(mainlm$coefficients)
   n <- nrow(X)
-  yhat <- mainlm$fitted.values
-  e <- mainlm$residuals
   M <- fastM(X, n)
 
   s_sq <- sum(e ^ 2) / (n - p)
@@ -73,6 +60,8 @@ anscombe <- function (mainlm, studentise = TRUE) {
       t(yhat - tbar) %*% (M ^ 2) %*% (yhat - tbar)
     teststat <- sum(e ^ 2 * (yhat - tbar)) / sqrt(sigma_tilde_sq)
   }
+
+  if (statonly) return(teststat)
 
   pval <- 2 * stats::pnorm(abs(teststat), lower.tail = FALSE)
 

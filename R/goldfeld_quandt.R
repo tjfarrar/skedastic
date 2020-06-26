@@ -44,7 +44,11 @@
 #'    \code{"parametric"} only). \code{\link[base]{round}} is
 #'    used to ensure the number of central observations is an integer. The
 #'    value must be small enough to allow the two auxiliary regressions to
-#'    be fit; otherwise an error is thrown. Defaults to \eqn{\frac{1}{3}}.
+#'    be fit; otherwise an error is thrown. Defaults to \code{1 / 3}.
+#' @param group1prop A double specifying the proportion of remaining
+#'    observations \emph{(after excluding central observations)} to allocate
+#'    to the first group. The default value of \code{1 / 2} means that an
+#'    equal number of observations is assigned to the first and second groups.
 #' @param alternative A character specifying the form of alternative
 #'    hypothesis. If it is suspected that the
 #'    error variance is positively associated with the deflator variable,
@@ -76,116 +80,91 @@
 #'
 #' @inheritParams breusch_pagan
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
 #' @export
-#' @seealso \code{\link[lmtest:gqtest]{lmtest::gqtest}}, which performs the
-#'    parametric version of the Goldfeld-Quandt Test. The `point` argument in
-#'    that function allows the splitting point of data set into subsets to be
-#'    other than the middle observation and thus allows the subsets to be of
-#'    different sizes.
+#' @seealso \code{\link[lmtest:gqtest]{lmtest::gqtest}}, another implementation
+#'    of the Goldfeld-Quandt Test (parametric method only).
 #'
 #' @examples
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' goldfeld_quandt(mtcars_lm, deflator = "qsec", prop_central = 0.25)
+#' # This is equivalent to lmtest::gqtest(mtcars_lm, fraction = 0.25, order.by = mtcars$qsec)
 #' goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric",
 #'  restype = "blus")
 #' goldfeld_quandt(mtcars_lm, deflator = "qsec", prop_central = 0.25, alternative = "two.sided")
 #' goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric",
 #'  restype = "blus", alternative = "two.sided")
 
-goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
-                    prop_central = 1 / 3, alternative = c("greater", "less",
-                    "two.sided"), prob = NULL, twosidedmethod = c("doubled",
-                    "kulinskaya"), restype = c("ols", "blus"), ...) {
+goldfeld_quandt <- function(mainlm, method = "parametric", deflator = NULL,
+                    prop_central = 1 / 3, group1prop = 1 / 2,
+                    alternative = c("greater", "less", "two.sided"),
+                    prob = NULL, twosidedmethod = c("doubled", "kulinskaya"),
+                    restype = c("ols", "blus"), statonly = FALSE, ...) {
 
   twosidedmethod <- match.arg(twosidedmethod, c("doubled", "kulinskaya"))
   alternative <- match.arg(alternative, c("greater", "less", "two.sided"))
   method <- match.arg(method, c("parametric", "nonparametric"))
   restype <- match.arg(restype, c("ols", "blus"))
 
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-    p <- ncol(X)
-    hasintercept <- columnof1s(X)
-    y <- stats::model.response(stats::model.frame(mainlm))
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
-                                        is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    p <- ncol(X)
-    hasintercept <- columnof1s(X)
+  processmainlm(m = mainlm, needy = (method == "parametric"))
+
+  hasintercept <- columnof1s(X)
+  if (class(mainlm) == "list") {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
       colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
     } else {
       colnames(X) <- paste0("X", 1:p)
     }
-    if (method == "nonparametric") mainlm <- stats::lm.fit(X, y)
   }
 
   n <- nrow(X)
 
-  if (is.numeric(deflator) && deflator == as.integer(deflator)) {
-    if (hasintercept[[1]] && deflator == 1) {
-      stop("deflator cannot be the model intercept")
-    } else if (deflator > p) {
-      stop("`deflator` is not the index of a column of design matrix")
-    }
-  } else if (is.character(deflator)) {
-    if (deflator == "(Intercept)") {
-      stop("deflator cannot be the model intercept")
-    } else if (!deflator %in% colnames(X)) {
-      stop("`deflator` is not the name of a column of design matrix")
-    }
-  } else if (!is.null(deflator)) stop("`deflator` must be integer or character")
+  checkdeflator(deflator, X, p, hasintercept[[1]])
 
   if (method == "parametric") {
 
-    k <- num_to_remove(n, prop_central)
+    theind <- gqind(n, prop_central, group1prop)
 
     if (!is.null(deflator)) {
       y <- y[order(X[, deflator])]
       X <- X[order(X[, deflator]), , drop = FALSE]
     }
-    ind_lo <- 1:((n - k) / 2)
-    ind_hi <- ((n + k) / 2 + 1):n
-    S_hi <- sum(stats::lm.fit(X[ind_hi, ], y[ind_hi])$residuals ^ 2)
-    S_lo <- sum(stats::lm.fit(X[ind_lo, ], y[ind_lo])$residuals ^ 2)
-    teststat <- S_hi / S_lo
-    param <- (n - k) / 2 - p
-    names(param) <- "df"
+    thedf2 <- (length(theind[[2]]) - p)
+    thedf1 <- (length(theind[[1]]) - p)
+    S2sq <- sum(stats::lm.fit(X[theind[[2]], ], y[theind[[2]]])$residuals ^ 2) / thedf2
+    S1sq <- sum(stats::lm.fit(X[theind[[1]], ], y[theind[[1]]])$residuals ^ 2) / thedf1
+    teststat <- S2sq / S1sq
+    if (statonly) return(teststat)
+    names(thedf1) <- "df1"
     if (alternative == "greater") {
-      pval <- stats::pf(teststat, df1 = param, df2 = param, lower.tail = FALSE)
+      pval <- stats::pf(teststat, df1 = thedf1, df2 = thedf2, lower.tail = FALSE)
     } else if (alternative == "less") {
-      pval <- stats::pf(teststat, df1 = param, df2 = param, lower.tail = TRUE)
+      pval <- stats::pf(teststat, df1 = thedf1, df2 = thedf2, lower.tail = TRUE)
     } else if (alternative == "two.sided") {
       pval <- twosidedpval(q = teststat, Aloc = 1, CDF = pf,
-                       method = twosidedmethod, df1 = param, df2 = param)
+                       method = twosidedmethod, df1 = thedf1, df2 = thedf2)
     }
     fullmethod <- "Goldfeld-Quandt F Test"
   } else if (method == "nonparametric") {
     if (restype == "ols") {
-      absres <- abs(mainlm$residuals)
+      absres <- abs(e)
       newn <- n
     } else if (restype == "blus") {
-      absres <- abs(blus(mainlm, ...))
+      absres <- abs(blus(mainlm = list("e" = e, "X" = X), ...))
       newn <- n - p
     }
 
     if (!is.null(deflator)) absres <- absres[order(X[, deflator])]
 
     teststat <- countpeaks(absres[!is.na(absres)])
-    param <- NULL
+    if (statonly) return(teststat)
+
+    thedf1 <- NULL
     if (is.null(prob)) {
       if (alternative == "greater") {
         pval <- ppeak(k = teststat, n = newn, lower.tail = FALSE, usedata = (newn <= 1000))
@@ -216,7 +195,7 @@ goldfeld_quandt <- function (mainlm, method = "parametric", deflator = NULL,
     fullmethod <- "Goldfeld-Quandt Peaks Test"
   } else stop("Invalid `method` argument")
 
-  rval <- structure(list(statistic = teststat, p.value = pval, parameter = param,
+  rval <- structure(list(statistic = teststat, p.value = pval, parameter = thedf1,
                null.value = "Homoskedasticity", alternative = alternative,
                method = fullmethod), class = "htest")
   broom::tidy(rval)

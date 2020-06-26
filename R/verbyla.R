@@ -16,8 +16,8 @@
 #' \eqn{q} degrees of freedom. The test is right-tailed.
 #' @inheritParams breusch_pagan
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -29,28 +29,17 @@
 #' verbyla(mtcars_lm, auxdesign = "fitted.values")
 #'
 
-verbyla <- function (mainlm, auxdesign = NULL) {
+verbyla <- function (mainlm, auxdesign = NULL, statonly = FALSE) {
 
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
-                                                    is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    mainlm <- stats::lm.fit(X, y)
-  }
+  auxfitvals <- ifelse(is.null(auxdesign), FALSE, auxdesign == "fitted.values")
+  processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
+                needp = FALSE)
 
   if (is.null(auxdesign)) {
     Z <- X
   } else if (is.character(auxdesign)) {
     if (auxdesign == "fitted.values") {
-      Z <- t(t(mainlm$fitted.values))
+      Z <- t(t(yhat))
     } else stop("Invalid character value for `auxdesign`")
   } else {
     Z <- auxdesign
@@ -71,11 +60,12 @@ verbyla <- function (mainlm, auxdesign = NULL) {
   Z <- cbind(1, Z)
 
   M <- fastM(X, n)
-  sigma_hatbar <- sum(mainlm$residuals ^ 2) / (n - p)
-  term1 <- t(t(mainlm$residuals ^ 2 / sigma_hatbar - diag(M)))
+  sigma_hatbar <- sum(e ^ 2) / (n - p)
+  term1 <- t(t(e ^ 2 / sigma_hatbar - diag(M)))
 
   teststat <- as.double(1 / 2 * t(term1) %*% Z %*% solve(t(Z) %*% (M ^ 2) %*% Z)
                         %*% t(Z) %*% term1)
+  if (statonly) return(teststat)
 
   pval <- stats::pchisq(teststat, df = q, lower.tail = FALSE)
   rval <- structure(list(statistic = teststat, parameter = q, p.value = pval,

@@ -1,14 +1,14 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2020.5.18)  4 JUN 2020 12:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2020.6.22)  26 JUN 2020 10:34
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedastic
--vignette.tex
-
-(c:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedastic-
+**C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedastic-
 vignette.tex
+
+(c:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedastic-v
+ignette.tex
 LaTeX2e <2020-02-02> patch level 5
-L3 programming layer <2020-05-15> (c:/Users/tom/AppData/Roaming/TinyTeX/texmf-d
+L3 programming layer <2020-06-03> (c:/Users/tom/AppData/Roaming/TinyTeX/texmf-d
 ist/tex/latex/base/article.cls
 Document Class: article 2019/12/20 v1.4l Standard LaTeX document class
 (c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/base/size10.clo
@@ -181,7 +181,7 @@ cfg
 File: microtype.cfg 2019/11/18 v2.7d microtype main configuration file (RS)
 )) (c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/parskip/parskip.s
 ty
-Package: parskip 2020-05-19 v2.0e non-zero parskip adjustments
+Package: parskip 2020-06-15 v2.0f non-zero parskip adjustments
 
 (c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/kvoptions/kvoptions.
 sty
@@ -228,7 +228,7 @@ Package: hyperref 2020-05-15 v7.00e Hypertext links for LaTeX
 
 (c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/pdftexcmds/pdftexcmd
 s.sty
-Package: pdftexcmds 2019/11/24 v0.31 Utility functions of pdfTeX for LuaTeX (HO
+Package: pdftexcmds 2020-06-04 v0.32 Utility functions of pdfTeX for LuaTeX (HO
 )
 
 (c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/tex/generic/infwarerr/infwarer
@@ -517,7 +517,7 @@ Package csquotes Info: ... none found.
 
 (c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/l3backend/l3backend-
 pdfmode.def
-File: l3backend-pdfmode.def 2020-05-05 L3 backend support: PDF mode
+File: l3backend-pdfmode.def 2020-06-18 L3 backend support: PDF mode
 \l__kernel_color_stack_int=\count291
 \l__pdf_internal_box=\box54
 ) (./skedastic-vignette.aux)
@@ -688,225 +688,252 @@ map}]
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <10> not available
 (Font)              Font shape `T1/lmtt/b/n' tried instead on input line 181.
 [2]
-Overfull \hbox (34.93004pt too wide) in alignment at lines 347--354
+LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
+342.
+(c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmtt.fd
+File: ts1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
+) [3]
+Overfull \hbox (34.93004pt too wide) in alignment at lines 398--405
  [] [] [] [] [] 
  []
 
 
-Overfull \hbox (34.93004pt too wide) in alignment at lines 354--359
+Overfull \hbox (34.93004pt too wide) in alignment at lines 405--410
  [] [] [] [] [] 
  []
 
 
-Overfull \hbox (34.93004pt too wide) in alignment at lines 359--403
+Overfull \hbox (34.93004pt too wide) in alignment at lines 410--455
  [] [] [] [] [] 
  []
 
-[3]
+
+Overfull \hbox (34.93004pt too wide) in alignment at lines 455--460
+ [] [] [] [] [] 
+ []
+
 LaTeX Font Info:    Font shape `T1/lmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 409.
-[4] [5] [6] [7]
-Underfull \hbox (badness 1394) in paragraph at lines 737--755
+(Font)              Font shape `T1/lmtt/b/n' tried instead on input line 466.
+[4] [5] [6] [7] [8]
+Underfull \hbox (badness 1394) in paragraph at lines 797--815
 \T1/lmr/m/n/10 (+20) Carapeto and Holt (2003) pro-pose a het-eroskedas-tic-ity 
 test that is sim-i-lar in its logic to the
  []
 
-[8] [9] [10] [11] [12] [13] [14] [15] [16] [17] [18] [19] [20] [21] [22]
-LaTeX Font Info:    Trying to load font information for TS1+lmtt on input line 
-1833.
-(c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/tex/latex/lm/ts1lmtt.fd
-File: ts1lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
-) [23] [24]
+[9] [10] [11] [12] [13] [14] [15]
+Overfull \hbox (15.66423pt too wide) in paragraph at lines 1289--1299
+\T1/lmr/m/n/10 (-20) Note that steps 3 and 4 above dif-fer when \T1/lmtt/m/n/10
+ hettest \T1/lmr/m/n/10 (-20) is \T1/lmtt/m/n/10 goldfeld_quandt \T1/lmr/m/n/10
+ (-20) ([][]$[]$[][]),
+ []
+
+[16] [17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31]
 
 Package amsmath Warning: Foreign command \atopwithdelims;
 (amsmath)                \frac or \genfrac should be used instead
-(amsmath)                 on input line 2009.
+(amsmath)                 on input line 2512.
 
-[25]
-<C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedastic-
-vignette_files/figure-latex/ex_blus-1.pdf, id=433, 469.755pt x 325.215pt>
-File: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skeda
-stic-vignette_files/figure-latex/ex_blus-1.pdf Graphic file (type pdf)
-<use C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedas
-tic-vignette_files/figure-latex/ex_blus-1.pdf>
-Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a9
-84f877205.dir/skedastic-vignette_files/figure-latex/ex_blus-1.pdf  used on inpu
-t line 2042.
+[32]
+<C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedastic-v
+ignette_files/figure-latex/ex_blus-1.pdf, id=526, 469.755pt x 325.215pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedas
+tic-vignette_files/figure-latex/ex_blus-1.pdf Graphic file (type pdf)
+<use C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/ex_blus-1.pdf>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-289
+07775a37.dir/skedastic-vignette_files/figure-latex/ex_blus-1.pdf  used on input
+ line 2545.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[26 <c:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedas
-tic-vignette_files/figure-latex/ex_blus-1.pdf>]
-Underfull \hbox (badness 1939) in paragraph at lines 2066--2066
+[33 <c:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/ex_blus-1.pdf>]
+Underfull \hbox (badness 1939) in paragraph at lines 2569--2569
 []\T1/lmr/bx/n/12 Computation of Two-Sided $\OML/lmm/m/it/12 p$\T1/lmr/bx/n/12 
 -Values from Asym-met-ric Dis-tri-bu-tions
  []
 
-[27]
-Overfull \hbox (26.09097pt too wide) detected at line 2145
-\OML/lmm/m/it/10 P[]\OT1/lmr/m/n/10 (\OML/lmm/m/it/10 q\OT1/lmr/m/n/10 ) = []
- []
-
-[28] [29]
-<C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedastic-
-vignette_files/figure-latex/ex1_datasets-1.pdf, id=469, 469.755pt x 325.215pt>
-File: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skeda
-stic-vignette_files/figure-latex/ex1_datasets-1.pdf Graphic file (type pdf)
-<use C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedas
-tic-vignette_files/figure-latex/ex1_datasets-1.pdf>
-Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a9
-84f877205.dir/skedastic-vignette_files/figure-latex/ex1_datasets-1.pdf  used on
- input line 2288.
+[34]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <9> on input line 2647.
+[35] [36]
+<C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedastic-v
+ignette_files/figure-latex/ex1_datasets-1.pdf, id=567, 469.755pt x 325.215pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedas
+tic-vignette_files/figure-latex/ex1_datasets-1.pdf Graphic file (type pdf)
+<use C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/ex1_datasets-1.pdf>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-289
+07775a37.dir/skedastic-vignette_files/figure-latex/ex1_datasets-1.pdf  used on 
+input line 2793.
 (pdftex.def)             Requested size: 258.36604pt x 178.86879pt.
-<C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedastic-
-vignette_files/figure-latex/ex2_datasets-1.pdf, id=470, 469.755pt x 325.215pt>
-File: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skeda
-stic-vignette_files/figure-latex/ex2_datasets-1.pdf Graphic file (type pdf)
-<use C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedas
-tic-vignette_files/figure-latex/ex2_datasets-1.pdf>
-Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a9
-84f877205.dir/skedastic-vignette_files/figure-latex/ex2_datasets-1.pdf  used on
- input line 2311.
+<C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedastic-v
+ignette_files/figure-latex/ex2_datasets-1.pdf, id=568, 469.755pt x 325.215pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedas
+tic-vignette_files/figure-latex/ex2_datasets-1.pdf Graphic file (type pdf)
+<use C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/ex2_datasets-1.pdf>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-289
+07775a37.dir/skedastic-vignette_files/figure-latex/ex2_datasets-1.pdf  used on 
+input line 2816.
 (pdftex.def)             Requested size: 352.31538pt x 243.91064pt.
-[30 <c:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedas
-tic-vignette_files/figure-latex/ex1_datasets-1.pdf>] [31 <c:/Users/tom/AppData/
-Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedastic-vignette_files/figure-
-latex/ex2_datasets-1.pdf>] [32]
-<C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_2_2020_0
-6_04_12_50_02.png, id=503, 481.8pt x 481.8pt>
-File: C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_2_2
-020_06_04_12_50_02.png Graphic file (type png)
-<use C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_2_20
-20_06_04_12_50_02.png>
-Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fit
-ted.values2_res_2_2020_06_04_12_50_02.png  used on input line 2474.
+[37 <c:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/ex1_datasets-1.pdf>] [38 <c:/Users/tom/AppData/L
+ocal/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedastic-vignette_files/figure-la
+tex/ex2_datasets-1.pdf>]
+<C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedastic-v
+ignette_files/figure-latex/hetplot1-1.pdf, id=595, 469.755pt x 325.215pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedas
+tic-vignette_files/figure-latex/hetplot1-1.pdf Graphic file (type pdf)
+<use C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/hetplot1-1.pdf>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-289
+07775a37.dir/skedastic-vignette_files/figure-latex/hetplot1-1.pdf  used on inpu
+t line 2960.
+(pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
+[39]
+<C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_2_2020_0
+6_26_10_34_20.png, id=601, 481.8pt x 481.8pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_2_2
+020_06_26_10_34_20.png Graphic file (type png)
+<use C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_2_20
+20_06_26_10_34_20.png>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fit
+ted.values2_res_2_2020_06_26_10_34_20.png  used on input line 2981.
 (pdftex.def)             Requested size: 187.89389pt x 187.89389pt.
-<C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_abs_2020
-_06_04_12_50_02.png, id=504, 481.8pt x 481.8pt>
-File: C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_abs
-_2020_06_04_12_50_02.png Graphic file (type png)
-<use C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_abs_
-2020_06_04_12_50_02.png>
-Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fit
-ted.values2_res_abs_2020_06_04_12_50_02.png  used on input line 2474.
+<C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_abs_2020
+_06_26_10_34_20.png, id=602, 481.8pt x 481.8pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_abs
+_2020_06_26_10_34_20.png Graphic file (type png)
+<use C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_abs_
+2020_06_26_10_34_20.png>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fit
+ted.values2_res_abs_2020_06_26_10_34_20.png  used on input line 2981.
 (pdftex.def)             Requested size: 187.89389pt x 187.89389pt.
-<C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_constvar
-_2_2020_06_04_12_50_03.png, id=505, 481.8pt x 481.8pt>
-File: C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_con
-stvar_2_2020_06_04_12_50_03.png Graphic file (type png)
-<use C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_cons
-tvar_2_2020_06_04_12_50_03.png>
-Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fit
-ted.values2_res_constvar_2_2020_06_04_12_50_03.png  used on input line 2474.
+<C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_constvar
+_2_2020_06_26_10_34_20.png, id=603, 481.8pt x 481.8pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_con
+stvar_2_2020_06_26_10_34_20.png Graphic file (type png)
+<use C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_cons
+tvar_2_2020_06_26_10_34_20.png>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fit
+ted.values2_res_constvar_2_2020_06_26_10_34_20.png  used on input line 2981.
 (pdftex.def)             Requested size: 187.89389pt x 187.89389pt.
-<C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_constvar
-_abs_2020_06_04_12_50_02.png, id=506, 481.8pt x 481.8pt>
-File: C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_con
-stvar_abs_2020_06_04_12_50_02.png Graphic file (type png)
-<use C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_cons
-tvar_abs_2020_06_04_12_50_02.png>
-Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fit
-ted.values2_res_constvar_abs_2020_06_04_12_50_02.png  used on input line 2474.
+<C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_constvar
+_abs_2020_06_26_10_34_20.png, id=604, 481.8pt x 481.8pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_con
+stvar_abs_2020_06_26_10_34_20.png Graphic file (type png)
+<use C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_cons
+tvar_abs_2020_06_26_10_34_20.png>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fit
+ted.values2_res_constvar_abs_2020_06_26_10_34_20.png  used on input line 2981.
 (pdftex.def)             Requested size: 187.89389pt x 187.89389pt.
-[33 <c:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_2_20
-20_06_04_12_50_02.png> <c:/Users/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitt
-ed.values2_res_abs_2020_06_04_12_50_02.png> <c:/Users/tom/AppData/Local/Temp/Rt
-mpK8afZM/hetplot/fitted.values2_res_constvar_2_2020_06_04_12_50_03.png> <c:/Use
-rs/tom/AppData/Local/Temp/RtmpK8afZM/hetplot/fitted.values2_res_constvar_abs_20
-20_06_04_12_50_02.png>]
-<C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedastic-
-vignette_files/figure-latex/countpeaks2-1.pdf, id=516, 469.755pt x 325.215pt>
-File: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skeda
-stic-vignette_files/figure-latex/countpeaks2-1.pdf Graphic file (type pdf)
-<use C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedas
-tic-vignette_files/figure-latex/countpeaks2-1.pdf>
-Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a9
-84f877205.dir/skedastic-vignette_files/figure-latex/countpeaks2-1.pdf  used on 
-input line 2516.
+[40 <c:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/hetplot1-1.pdf>] [41 <c:/Users/tom/AppData/Local
+/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_2_2020_06_26_10_34_20.png> <c:/User
+s/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2_res_abs_2020_06_26_1
+0_34_20.png> <c:/Users/tom/AppData/Local/Temp/RtmpQHi9zQ/hetplot/fitted.values2
+_res_constvar_2_2020_06_26_10_34_20.png> <c:/Users/tom/AppData/Local/Temp/RtmpQ
+Hi9zQ/hetplot/fitted.values2_res_constvar_abs_2020_06_26_10_34_20.png>]
+<C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedastic-v
+ignette_files/figure-latex/countpeaks2-1.pdf, id=623, 469.755pt x 325.215pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedas
+tic-vignette_files/figure-latex/countpeaks2-1.pdf Graphic file (type pdf)
+<use C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/countpeaks2-1.pdf>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-289
+07775a37.dir/skedastic-vignette_files/figure-latex/countpeaks2-1.pdf  used on i
+nput line 3024.
 (pdftex.def)             Requested size: 234.87692pt x 162.6071pt.
-[34 <c:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedas
-tic-vignette_files/figure-latex/countpeaks2-1.pdf>]
-<C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedastic-
-vignette_files/figure-latex/dpeak-1.pdf, id=530, 469.755pt x 325.215pt>
-File: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skeda
-stic-vignette_files/figure-latex/dpeak-1.pdf Graphic file (type pdf)
-<use C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedas
-tic-vignette_files/figure-latex/dpeak-1.pdf>
-Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a9
-84f877205.dir/skedastic-vignette_files/figure-latex/dpeak-1.pdf  used on input 
-line 2592.
+[42 <c:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/countpeaks2-1.pdf>]
+<C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedastic-v
+ignette_files/figure-latex/dpeak-1.pdf, id=637, 469.755pt x 325.215pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedas
+tic-vignette_files/figure-latex/dpeak-1.pdf Graphic file (type pdf)
+<use C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/dpeak-1.pdf>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-289
+07775a37.dir/skedastic-vignette_files/figure-latex/dpeak-1.pdf  used on input l
+ine 3100.
 (pdftex.def)             Requested size: 234.87692pt x 162.6071pt.
-[35 <c:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedas
-tic-vignette_files/figure-latex/dpeak-1.pdf>] [36]
-<C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedastic-
-vignette_files/figure-latex/dDtrend-1.pdf, id=554, 469.755pt x 325.215pt>
-File: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skeda
-stic-vignette_files/figure-latex/dDtrend-1.pdf Graphic file (type pdf)
-<use C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/skedas
-tic-vignette_files/figure-latex/dDtrend-1.pdf>
-Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a9
-84f877205.dir/skedastic-vignette_files/figure-latex/dDtrend-1.pdf  used on inpu
-t line 2765.
+[43 <c:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/dpeak-1.pdf>] [44]
+<C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedastic-v
+ignette_files/figure-latex/dDtrend-1.pdf, id=662, 469.755pt x 325.215pt>
+File: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedas
+tic-vignette_files/figure-latex/dDtrend-1.pdf Graphic file (type pdf)
+<use C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/dDtrend-1.pdf>
+Package pdftex.def Info: C:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-289
+07775a37.dir/skedastic-vignette_files/figure-latex/dDtrend-1.pdf  used on input
+ line 3273.
 (pdftex.def)             Requested size: 234.87692pt x 162.6071pt.
-[37] [38 <c:/Users/tom/AppData/Local/Temp/Rtmp0ix96F/preview-2a984f877205.dir/s
-kedastic-vignette_files/figure-latex/dDtrend-1.pdf>] [39] [40]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3021.
-[41]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 3021.
+[45 <c:/Users/tom/AppData/Local/Temp/RtmpIL4tlM/preview-28907775a37.dir/skedast
+ic-vignette_files/figure-latex/dDtrend-1.pdf>] [46] [47] [48]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3562.
+[49]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 3562.
 (./skedastic-vignette.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3021.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3021.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3562.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3562.
 
 Package rerunfilecheck Info: File `skedastic-vignette.out' has not changed.
-(rerunfilecheck)             Checksum: 7386F8EBCC5C313A1EEFF7BD4D1C88D5;8588.
+(rerunfilecheck)             Checksum: 451E665F818DE6D19495A12D21FA5489;9592.
  ) 
 Here is how much of TeX's memory you used:
- 14772 strings out of 482424
- 227469 string characters out of 5946283
- 526452 words of memory out of 5000000
- 29899 multiletter control sequences out of 15000+600000
- 625931 words of font info for 187 fonts, out of 8000000 for 9000
+ 14851 strings out of 482426
+ 228884 string characters out of 5946687
+ 523683 words of memory out of 5000000
+ 29932 multiletter control sequences out of 15000+600000
+ 637543 words of font info for 204 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 34i,13n,42p,885b,493s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 34i,13n,42p,884b,455s stack positions out of 5000i,500n,10000p,200000b,80000s
 pdfTeX warning (dest): name{carapeto} has been referenced but does not exist,
  replaced by a fixed one
 
-{c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.e
-nc}{c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathi
-t.enc}{c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts
-1.enc}{c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm
-.enc}{c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.
+{c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{
+c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.en
+c}{c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc
+}{c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.
+enc}{c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.
 enc}{c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-math
 ex.enc}<c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/l
 mbx10.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/l
 m/lmbx12.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/publi
-c/lm/lmex10.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/pu
-blic/lm/lmmi10.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1
-/public/lm/lmmi12.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/ty
-pe1/public/lm/lmmi5.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/
-type1/public/lm/lmmi6.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/font
-s/type1/public/lm/lmmi7.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fo
-nts/type1/public/lm/lmmi8.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/
-fonts/type1/public/lm/lmmib10.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-d
-ist/fonts/type1/public/lm/lmmib7.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texm
-f-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/te
-xmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/
-texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/tom/AppData/Roaming/TinyTe
-X/texmf-dist/fonts/type1/public/lm/lmr6.pfb><c:/Users/tom/AppData/Roaming/TinyT
-eX/texmf-dist/fonts/type1/public/lm/lmr7.pfb><c:/Users/tom/AppData/Roaming/Tiny
-TeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/Users/tom/AppData/Roaming/Tin
-yTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/tom/AppData/Roaming/
-TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/tom/AppData/Roami
-ng/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy5.pfb><c:/Users/tom/AppData/Roa
-ming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/Users/tom/AppData/R
-oaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb><c:/Users/tom/AppData
-/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/Users/tom/AppDa
-ta/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb><c:/Users/tom/Ap
-pData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/Users/tom
-/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt8.pfb><c:/Users/t
-om/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on skedastic-vignette.pdf (41 pages, 644764 bytes).
+c/lm/lmbx7.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/pub
+lic/lm/lmex10.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/
+public/lm/lmmi10.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/typ
+e1/public/lm/lmmi12.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/
+type1/public/lm/lmmi5.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/font
+s/type1/public/lm/lmmi6.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fo
+nts/type1/public/lm/lmmi7.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/
+fonts/type1/public/lm/lmmi8.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-dis
+t/fonts/type1/public/lm/lmmi9.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/texmf-d
+ist/fonts/type1/public/lm/lmmib10.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/tex
+mf-dist/fonts/type1/public/lm/lmmib7.pfb><c:/Users/tom/AppData/Roaming/TinyTeX/
+texmf-dist/fonts/type1/public/lm/lmr10.pfb><c:/Users/tom/AppData/Roaming/TinyTe
+X/texmf-dist/fonts/type1/public/lm/lmr12.pfb><c:/Users/tom/AppData/Roaming/Tiny
+TeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users/tom/AppData/Roaming/Ti
+nyTeX/texmf-dist/fonts/type1/public/lm/lmr5.pfb><c:/Users/tom/AppData/Roaming/T
+inyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb><c:/Users/tom/AppData/Roaming/
+TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb><c:/Users/tom/AppData/Roaming
+/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb><c:/Users/tom/AppData/Roamin
+g/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr9.pfb><c:/Users/tom/AppData/Roami
+ng/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb><c:/Users/tom/AppData/Ro
+aming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb><c:/Users/tom/AppData
+/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy5.pfb><c:/Users/tom/AppDa
+ta/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy6.pfb><c:/Users/tom/App
+Data/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb><c:/Users/tom/A
+ppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy8.pfb><c:/Users/tom
+/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy9.pfb><c:/Users/t
+om/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtk10.pfb><c:/User
+s/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb><c:/U
+sers/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt8.pfb><c:
+/Users/tom/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb
+>
+Output written on skedastic-vignette.pdf (49 pages, 751317 bytes).
 PDF statistics:
- 757 PDF objects out of 1000 (max. 8388607)
- 660 compressed objects within 7 object streams
- 165 named destinations out of 1000 (max. 500000)
- 14643 words of extra memory for PDF output out of 17280 (max. 10000000)
+ 893 PDF objects out of 1000 (max. 8388607)
+ 780 compressed objects within 8 object streams
+ 190 named destinations out of 1000 (max. 500000)
+ 18768 words of extra memory for PDF output out of 20736 (max. 10000000)
 

@@ -102,27 +102,12 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
   xlab_passed <- ("xlab" %in% names(plotargs))
   ylab_passed <- ("ylab" %in% names(plotargs))
 
+  processmainlm(m = mainlm, needyhat = TRUE)
 
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
-                                                           is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    mainlm <- stats::lm.fit(X, y)
-  }
-
-  p <- ncol(X)
   n <- nrow(X)
   M <- fastM(X, n)
-  sigma_hat_sq <- sum(mainlm$residuals ^ 2) / n
-  s_sq <- sum(mainlm$residuals ^ 2) / (n - p)
+  sigma_hat_sq <- sum(e ^ 2) / n
+  s_sq <- sum(e ^ 2) / (n - p)
 
   hasintercept <- columnof1s(X)
   if (hasintercept[[1]]) {
@@ -145,8 +130,8 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
                                     else if (regexpr("log", substr(x, 1, 3)) != -1) {
                                       log(X[, substr(x, 4, nchar(x))])
                                     }
-                                    else if (x == "fitted.values") {mainlm$fitted.values}
-                                    else if (x == "fitted.values2") {diag(M) * mainlm$fitted.values}
+                                    else if (x == "fitted.values") {yhat}
+                                    else if (x == "fitted.values2") {diag(M) * yhat}
                                     else if (x == "index") {1:n}))
   names(x_hor) <- horzvar
 
@@ -155,15 +140,15 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
       else {function(y) `^`(y, as.integer(x)) }
     })
 
-  y_ver_nofunc <- lapply(vertvar, function(x) if (x == "res") {mainlm$residuals}
+  y_ver_nofunc <- lapply(vertvar, function(x) if (x == "res") {e}
                                 else if (x == "res_blus") {
                                   if (exists("omitarg")) {
                                     blus(mainlm, omit = omitarg, keepNA = TRUE)
                                   } else { blus(mainlm, keepNA = TRUE)}
                                 }
-              else if (x == "res_stand") {mainlm$residuals / sqrt(sigma_hat_sq)}
-              else if (x == "res_constvar") {mainlm$residuals / sqrt(diag(M))}
-              else if (x == "res_stud") {mainlm$residuals / sqrt(diag(M) * s_sq)})
+              else if (x == "res_stand") {e / sqrt(sigma_hat_sq)}
+              else if (x == "res_constvar") {e / sqrt(diag(M))}
+              else if (x == "res_stud") {e / sqrt(diag(M) * s_sq)})
 
   y_ver <- as.data.frame(unlist(lapply(vertfun_function,
                                 function(x) lapply(y_ver_nofunc, x)),
@@ -238,7 +223,7 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
       }
     }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = FALSE),
            y_ver, names(y_ver), yline_mtext, SIMPLIFY = FALSE)
+    grDevices::graphics.off()
   }
-  grDevices::graphics.off()
   if (values) list("horizontal" = x_hor, "vertical" = y_ver)
 }

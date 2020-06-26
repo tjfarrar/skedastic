@@ -44,10 +44,9 @@
 #'
 #' @inheritParams breusch_pagan
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
-#'    \code{parameter} in the output object is the \eqn{\alpha} value.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
 #' @export
@@ -60,30 +59,22 @@
 #' rackauskas_zuokas(mtcars_lm, pvalmethod = "sim", m = n, sqZ = TRUE)
 #'
 
-rackauskas_zuokas <- function (mainlm, alpha = 0, pvalmethod = c("data", "sim"),
-                               R = 2 ^ 14, m = 2 ^ 17, sqZ = FALSE, seed = 1234) {
+rackauskas_zuokas <- function(mainlm, alpha = 0, pvalmethod = c("data", "sim"),
+                               R = 2 ^ 14, m = 2 ^ 17, sqZ = FALSE, seed = 1234,
+                              statonly = FALSE) {
 
   if (alpha < 0 || alpha >= 1 / 2) stop("Invalid `alpha` argument. `alpha` must be >= 0
               and < 1/2")
-  if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x), is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    mainlm <- stats::lm.fit(X, y)
-  }
 
-  e <- mainlm$residuals
+  processmainlm(m = mainlm, needy = FALSE, needp = FALSE)
+
   n <- length(e)
   Tnalpha <- max(vapply(1:(n - 1), function(ell) max((ell / n) ^ (-alpha) *
                       vapply(0:(n - ell), function(k)
       abs(sum(e[(k + 1):(k + ell)] ^ 2 - 1 / n * sum(e ^ 2))), NA_real_)), NA_real_))
   deltahat <- mean((e ^ 2 - mean(e ^ 2)) ^ 2)
   teststat <- Tnalpha / sqrt(deltahat * n)
+  if (statonly) return(teststat)
 
   pvalmethod <- match.arg(pvalmethod, c("data", "sim"))
   if (pvalmethod  == "data") {

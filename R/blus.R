@@ -49,8 +49,13 @@
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' blus(mtcars_lm)
 #' plot(mtcars_lm$residuals, blus(mtcars_lm))
-#'
-#' # BLUS residuals cannot be computed with `omit = "last"` in this case so
+#' # Same as first example
+#' mtcars_list <- list("y" = mtcars$mpg, "X" = cbind(1, mtcars$wt, mtcars$qsec, mtcars$am))
+#' blus(mtcars_list)
+#' # Again same as first example
+#' mtcars_list2 <- list("e" = mtcars_lm$residuals, "X" = cbind(1, mtcars$wt, mtcars$qsec, mtcars$am))
+#' blus(mtcars_list2)
+#' # BLUS residuals cannot be computed with `omit = "last"` in this example, so
 #' # omitted indices are randomised:
 #' blus(mtcars_lm, omit = "last")
 #'
@@ -58,24 +63,9 @@
 blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
                   exhaust = NULL, seed = 1234) {
 
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x), is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    mainlm <- stats::lm.fit(X, y)
-  }
+  processmainlm(m = mainlm, needy = FALSE)
 
-  e <- mainlm$residuals
   n <- nrow(X)
-  p <- ncol(X)
-
   if (!is.null(seed)) set.seed(seed)
   omitfunc <- do_omit(omit, n, p, seed)
   Xmats <- do_Xmats(X, n, p, omitfunc$omit_ind)
