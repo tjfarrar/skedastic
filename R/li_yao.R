@@ -25,8 +25,8 @@
 #'    This argument is ignored if \code{method} is \code{"alrt"}.
 #' @inheritParams breusch_pagan
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -37,37 +37,28 @@
 #' li_yao(mtcars_lm, method = "alrt")
 #' li_yao(mtcars_lm, method = "cvt")
 #' li_yao(mtcars_lm, method = "cvt", baipanyin = FALSE)
+#' # Same as first example
+#' li_yao(list("e" = mtcars_lm$residuals), method = "alrt")
 #'
 
-li_yao <- function (mainlm, method = c("cvt", "alrt"), baipanyin = TRUE) {
+li_yao <- function(mainlm, method = c("cvt", "alrt"), baipanyin = TRUE,
+                   statonly = FALSE) {
 
-  if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x), is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    mainlm <- stats::lm.fit(X, y)
-  } else if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-  }
+  processmainlm(m = mainlm, needy = FALSE)
 
   method <- match.arg(method, c("cvt", "alrt"))
-  e <- mainlm$residuals
   n <- length(e)
-  p <- ncol(X)
 
   if (method == "alrt") {
     teststat <- log(( 1 / n * sum(e ^ 2)) / (prod(e ^ 2) ^ (1 / n)))
+    if (statonly) return(teststat)
     fullmethod <- "Approximate Likelihood-Ratio Test"
     pval <- stats::pnorm((teststat - (log(2) - digamma(1))) /
                 sqrt((pi ^ 2 / 2 - 2) / n), lower.tail = FALSE)
   } else if (method == "cvt") {
     mbar <- 1 / n * sum(e ^ 2)
     teststat <- (1 / n * sum((e ^ 2 - mbar) ^ 2)) / mbar ^ 2
+    if (statonly) return(teststat)
     if (baipanyin) {
       M <- fastM(X, n)
       MoM <- M * M

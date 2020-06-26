@@ -113,12 +113,7 @@ twosidedpval <- function(q, CDF, continuous, method = c("doubled", "kulinskaya",
       }
     }
   } else if (method == "doubled") {
-    if (continuous) {
-      min(1, 2 * CDF(q, ...) * (q <= Aloc) + 2 * (1 - CDF(q, ...)) * (q > Aloc))
-    } else {
-      min(1, 2 * CDF(q, ...) * (q < Aloc) + (q == Aloc) +
-            2 * (1 - CDF(q, ...)) * (q > Aloc))
-    }
+    min(2 * CDF(q, ...), 2 * (1 - CDF(q, ...)))
   } else if (method == "minlikelihood") {
     if (continuous) {
       stop("Method minlikelihood not implemented for continuous function")

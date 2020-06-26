@@ -30,8 +30,8 @@
 #'
 #' @inheritParams breusch_pagan
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -48,38 +48,15 @@
 
 wilcox_keselman <- function(mainlm, gammapar = 0.2, B = 500L,
                     p.adjust.method = "holm", seed = NULL, rqwarn = FALSE,
-                    matchWRS = FALSE) {
+                    matchWRS = FALSE, statonly = FALSE) {
 
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-    p <- ncol(X)
-    hasintercept <- columnof1s(X)
-    if (hasintercept[[1]]) {
-      nonintercept <- 2:p
-    } else {
-      nonintercept <- 1:p
-    }
-    y <- stats::model.response(stats::model.frame(mainlm))
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
-                                        is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    p <- ncol(X)
-    hasintercept <- columnof1s(X)
-    if (hasintercept[[1]]) {
-      if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
-      colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
-      nonintercept <- 2:p
-    } else {
-      colnames(X) <- paste0("X", 1:p)
-      nonintercept <- 1:p
-    }
+  processmainlm(m = mainlm)
+
+  hasintercept <- columnof1s(X)
+  if (hasintercept[[1]]) {
+    nonintercept <- 2:p
+  } else {
+    nonintercept <- 1:p
   }
 
   n <- nrow(X)
@@ -99,6 +76,7 @@ wilcox_keselman <- function(mainlm, gammapar = 0.2, B = 500L,
 
   warnfunc <- ifelse(rqwarn, identity, suppressWarnings)
 
+  if (is.null(y)) stop("Response vector required but not extractable from `mainlm` argument")
   bootbetahat_gamma <- warnfunc(sapply(bootsamp, function(b) sapply(gammapar,
               function(q) quantreg::rq.fit(x = X[b, ], y = y[b],
               tau = q)$coefficients[nonintercept]), simplify = "array"))
@@ -118,6 +96,7 @@ wilcox_keselman <- function(mainlm, gammapar = 0.2, B = 500L,
   }
 
   teststat <- d / sdstar
+  if (statonly) return(teststat)
   pval <- 2 * stats::pnorm(abs(teststat), lower.tail = FALSE)
   if (!(p.adjust.method == "none")) {
     pval <- stats::p.adjust(p = pval, method = p.adjust.method)

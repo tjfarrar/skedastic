@@ -43,8 +43,8 @@
 #' @inheritParams breusch_pagan
 #' @inheritParams goldfeld_quandt
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -53,32 +53,24 @@
 #' @examples
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' carapeto_holt(mtcars_lm, deflator = "qsec", prop_central = 0.25)
+#' # Same as previous example
+#' mtcars_list <- list("y" = mtcars$mpg, "X" = cbind(1, mtcars$wt, mtcars$qsec, mtcars$am))
+#' carapeto_holt(mtcars_list, deflator = 3, prop_central = 0.25)
 #'
 
 carapeto_holt <- function(mainlm, deflator = NULL, prop_central = 1 / 3,
-                           qfmethod = "imhof", alternative = c("greater",
-                           "less", "two.sided"), twosidedmethod =
-                           c("doubled", "kulinskaya")) {
+                  group1prop = 1 / 2, qfmethod = "imhof",
+                  alternative = c("greater", "less", "two.sided"),
+                  twosidedmethod = c("doubled", "kulinskaya"),
+                  statonly = FALSE) {
 
   alternative <- match.arg(alternative, c("greater", "less", "two.sided"))
   twosidedmethod <- match.arg(twosidedmethod, c("doubled", "kulinskaya"))
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-    p <- ncol(X)
-    hasintercept <- columnof1s(X)
-    y <- stats::model.response(stats::model.frame(mainlm))
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
-                                        is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    p <- ncol(X)
-    hasintercept <- columnof1s(X)
+
+  processmainlm(m = mainlm, needy = FALSE)
+
+  hasintercept <- columnof1s(X)
+  if (class(mainlm) == "list") {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column
                                        of design matrix")
@@ -86,43 +78,30 @@ carapeto_holt <- function(mainlm, deflator = NULL, prop_central = 1 / 3,
     } else {
       colnames(X) <- paste0("X", 1:p)
     }
-    mainlm <- stats::lm.fit(X, y)
   }
 
   n <- nrow(X)
 
-  if (is.numeric(deflator) && deflator == as.integer(deflator)) {
-    if (hasintercept[[1]] && deflator == 1) {
-      stop("deflator cannot be the model intercept")
-    } else if (deflator > p) {
-      stop("`deflator` is not the index of a column of design matrix")
-    }
-  } else if (is.character(deflator)) {
-    if (deflator == "(Intercept)") {
-      stop("deflator cannot be the model intercept")
-    } else if (!deflator %in% colnames(X)) {
-      stop("`deflator` is not the name of a column of design matrix")
-    }
-  } else if (!is.null(deflator)) stop("`deflator` must be integer or character")
+  checkdeflator(deflator, X, p, hasintercept[[1]])
 
-  k <- num_to_remove(n, prop_central)
+  theind <- gqind(n, prop_central, group1prop)
 
   if (!is.null(deflator)) {
-    e <- mainlm$residuals[order(X[, deflator], decreasing = TRUE)]
+    e <- e[order(X[, deflator], decreasing = TRUE)]
     X <- X[order(X[, deflator], decreasing = TRUE), , drop = FALSE]
   }
 
   M <- fastM(X, n)
-  ind_lo <- 1:((n - k) / 2)
-  ind_hi <- ((n + k) / 2 + 1):n
   Istar_hi <- diag(x = 0, nrow = n)
   Istar_lo <- Istar_hi
-  diag(Istar_hi)[ind_hi] <- 1
-  diag(Istar_lo)[ind_lo] <- 1
+  diag(Istar_hi)[theind[[2]]] <- 1
+  diag(Istar_lo)[theind[[1]]] <- 1
 
   if (hasintercept[[1]]) {
     teststat <- as.double((t(e) %*% Istar_hi %*% e) /
                             (t(e) %*% Istar_lo %*% e))
+    if (statonly) return(teststat)
+
     if (alternative == "greater") {
       pval <- pvalRQF(r = teststat, A = M %*% Istar_hi %*% M,
                       B = M %*% Istar_lo %*% M, algorithm = qfmethod,
@@ -140,6 +119,7 @@ carapeto_holt <- function(mainlm, deflator = NULL, prop_central = 1 / 3,
     A <- diag(n) - matrix(data = 1 / n, nrow = n, ncol = n)
     teststat <- as.double((t(A %*% e) %*% Istar_hi %*% A %*% e) /
       (t(A %*% e) %*% Istar_lo %*% A %*% e))
+    if (statonly) return(teststat)
 
     if (alternative == "greater") {
       pval <- pvalRQF(r = teststat, A = M %*% A %*% Istar_hi %*% A %*% M,

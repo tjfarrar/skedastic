@@ -22,8 +22,8 @@
 #'    pure test of heteroskedasticity but also of model specification.
 #' @inheritParams breusch_pagan
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -40,21 +40,9 @@
 #' white_lm(mtcars_lm, interactions = TRUE)
 #'
 
-white_lm <- function (mainlm, interactions = FALSE) {
+white_lm <- function(mainlm, interactions = FALSE, statonly = FALSE) {
 
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x), is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    mainlm <- stats::lm.fit(X, y)
-  }
+  processmainlm(m = mainlm, needy = FALSE)
 
   hasintercept <- columnof1s(X)
   if (!hasintercept[[1]]) {
@@ -64,19 +52,19 @@ white_lm <- function (mainlm, interactions = FALSE) {
   }
 
   n <- nrow(X)
-  k <- ncol(X)
 
   Z <- cbind(1, X, X ^ 2)
   if (interactions) {
     Z <- cbind(Z, generate_interactions(X))
   }
 
-  esq <- mainlm$residuals ^ 2
+  esq <- e ^ 2
   auxlm <- stats::lm.fit(Z, esq)
   iota <- rep(1, n)
   N <- diag(n) - 1 / n * (tcrossprod(iota))
   e_aux <- auxlm$residuals
   teststat <- n * (1 - crossprod(e_aux) / (t(esq) %*% N %*% esq))
+  if (statonly) return(teststat)
 
   df <- ncol(Z) - 1
   pval <- stats::pchisq(teststat, df = df, lower.tail = FALSE)

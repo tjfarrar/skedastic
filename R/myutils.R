@@ -1,3 +1,56 @@
+processmainlm <- function(m, needX = TRUE, needy = TRUE, neede = TRUE,
+                          needyhat = FALSE, needp = TRUE) {
+# process mainlm object passed to function
+
+  y <- NULL
+  X <- NULL
+  yhat <- NULL
+  p <- NULL
+  if (class(m) == "lm") {
+    if (needX) X <- stats::model.matrix(m)
+    if (!exists("e", where = environment(), inherits = FALSE) && neede) {
+      e <- m$residuals
+    }
+    if (needy) y <- stats::model.response(stats::model.frame(m))
+    if (needyhat) yhat <- m$fitted.values
+  } else if (class(m) == "list") {
+    if (is.null(names(m))) {
+      y <- m[[1]]
+      X <- m[[2]]
+      if (length(m) > 2) e <- m[[3]]
+    } else {
+      y <- m$y
+      X <- m$X
+      e <- m$e
+    }
+    if (!is.null(X)) {
+      badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
+                                          is.nan(x), is.infinite(x))))
+      if (length(badrows) > 0) {
+        warning("Rows of data containing NA/NaN/Inf values removed")
+        y <- y[-badrows]
+        X <- X[-badrows, drop = FALSE]
+      }
+    }
+    if ((!exists("e", where = environment(), inherits = FALSE) || is.null(e))) {
+      if (neede) {
+        m <- stats::lm.fit(X, y)
+        e <- m$residuals
+      }
+      if (needyhat) yhat <- m$fitted.values
+    } else {
+      if (needyhat) yhat <- y - e
+    }
+  }
+  if (needp) p <- ncol(X)
+  if (exists("e", where = environment(), inherits = FALSE)) {
+    invisible(list2env(x = list("y" = y, "X" = X, "e" = e,
+                     "yhat" = yhat, "p" = p), envir = parent.frame()))
+  } else {
+    invisible(list2env(x = list("y" = y, "X" = X, "yhat" = yhat,
+                    "p" = p), envir = parent.frame()))
+  }
+}
 
 columnof1s <- function (X) { # check whether a design matrix has a column of 1s
   columnsof1s <- apply(X, 2, function(x) all(x == 1))
@@ -5,6 +58,22 @@ columnof1s <- function (X) { # check whether a design matrix has a column of 1s
   r[[1]] <- any(columnsof1s)
   r[[2]] <- which(columnsof1s)
   return(r)
+}
+
+checkdeflator <- function(d, X, p, has0) {
+  if (is.numeric(d) && d == as.integer(d)) {
+    if (has0 && d == 1) {
+      stop("deflator cannot be the model intercept")
+    } else if (d > p) {
+      stop("`deflator` is not the index of a column of design matrix")
+    }
+  } else if (is.character(d)) {
+    if (d == "(Intercept)") {
+      stop("deflator cannot be the model intercept")
+    } else if (!d %in% colnames(X)) {
+      stop("`deflator` is not the name of a column of design matrix")
+    }
+  } else if (!is.null(d)) stop("`deflator` must be integer or character")
 }
 
 plotdim <- function(x) { # find all positive factors of a positive integer
@@ -253,18 +322,19 @@ rksim <- function(R., m., sqZ., seed., alpha. = alpha) { # generates pseudorando
                       hseq ^ (-alpha.)), NA_real_)
 }
 
-num_to_remove <- function(n, p) {
+gqind <- function(n, p, g) {
  k <- as.integer(round(n * p))
- if ((((n - k) / 2) %% 1) != 0) k <- k - 1
- if ((n - k) / 2 <= p) {
-   stop("`prop_central` must be small enough that
-             (n - k) / 2 > p where n is total no. of observations,
-             k is number of central observations removed, and p is no. of
-             columns in design matrix (no. of parameters to be estimated)")
+ nprime <- n - k
+ n1prime <- as.integer(round(nprime * g))
+ n2prime <- nprime - n1prime
+ if (min(n1prime, n2prime) <= p) {
+   stop("Your choice of `prop_central` and `group1prop` results in a subset
+        containing less than or equal to p observations, where p is the number
+        of coefficients to be estimated. As a result, the models cannot be fit.")
  } else if (k < 0) {
    stop("`prop_central` cannot be negative")
  }
- return(k)
+ return(list(1:n1prime, (n - n2prime + 1):n))
 }
 
 fastM <- function(X, n) {

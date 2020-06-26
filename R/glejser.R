@@ -25,8 +25,8 @@
 #'    Partial matching is used.
 #' @inheritParams breusch_pagan
 #'
-#' @return An object of \code{\link[base]{class}} "htest". If object is not
-#'    assigned, its attributes are displayed in the console as a
+#' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
+#'    not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.
 #' @references{\insertAllCited{}}
 #' @importFrom Rdpack reprompt
@@ -40,29 +40,20 @@
 #' glejser(mtcars_lm)
 #'
 
-glejser <- function (mainlm, auxdesign = NULL,
-                     sigmaest = c("main", "auxiliary")) {
+glejser <- function(mainlm, auxdesign = NULL,
+                     sigmaest = c("main", "auxiliary"), statonly = FALSE) {
 
   sigmaest <- match.arg(sigmaest, c("main", "auxiliary"))
-  if (class(mainlm) == "lm") {
-    X <- stats::model.matrix(mainlm)
-  } else if (class(mainlm) == "list") {
-    y <- mainlm[[1]]
-    X <- mainlm[[2]]
-    badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x), is.nan(x), is.infinite(x))))
-    if (length(badrows) > 0) {
-      warning("Rows of data containing NA/NaN/Inf values removed")
-      y <- y[-badrows]
-      X <- X[-badrows, drop = FALSE]
-    }
-    mainlm <- stats::lm.fit(X, y)
-  }
+
+  auxfitvals <- ifelse(is.null(auxdesign), FALSE, auxdesign == "fitted.values")
+  processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
+                needp = FALSE)
 
   if (is.null(auxdesign)) {
     Z <- X
   } else if (is.character(auxdesign)) {
     if (auxdesign == "fitted.values") {
-      Z <- t(t(mainlm$fitted.values))
+      Z <- t(t(yhat))
     } else stop("Invalid character value for `auxdesign`")
   } else {
     Z <- auxdesign
@@ -79,16 +70,18 @@ glejser <- function (mainlm, auxdesign = NULL,
 
   q <- ncol(Z) - 1
   n <- nrow(Z)
-  auxresponse <- abs(mainlm$residuals)
+  auxresponse <- abs(e)
   auxres <- stats::lm.fit(Z, auxresponse)$residuals
   if (sigmaest == "main") {
-    sigma_hatsq <- sum(mainlm$residuals ^ 2) / n
+    sigma_hatsq <- sum(e ^ 2) / n
   } else if (sigmaest == "auxiliary") {
     sigma_hatsq <- sum(auxres ^ 2) / n
   }
 
   teststat <- (sum(auxresponse ^ 2) - n * mean(auxresponse) ^ 2 -
                  sum(auxres ^ 2)) / (sigma_hatsq * (1 - 2 / pi))
+  if (statonly) return(teststat)
+
   pval <- stats::pchisq(teststat, df = q, lower.tail = FALSE)
 
   rval <- structure(list(statistic = teststat, parameter = q, p.value = pval,
