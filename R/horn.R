@@ -25,7 +25,7 @@
 #'    \eqn{V(D)=\frac{n^2(n+1)^2(n-1)}{36}}; see
 #'    \insertCite{Lehmann75;textual}{skedastic} for \eqn{E(D)} and \eqn{V(D)}
 #'    when ties are present. When ties are absent, a continuity correction
-#'    improves the normal approximation. When
+#'    is used to improve the normal approximation. When
 #'    exact distribution is used, two-sided \eqn{p}-value is computed by
 #'    doubling the one-sided \eqn{p}-value, since the distribution of \eqn{D}
 #'    is symmetric. The function does not support the exact distribution of
@@ -43,9 +43,6 @@
 #' @param exact A logical. Should exact \eqn{p}-values be computed? If
 #'    \code{FALSE}, a normal approximation is used. Defaults to \code{TRUE}
 #'    only if the number of absolute residuals being ranked is \eqn{\le 10}.
-#' @param correct A logical. Should a continuity correction be used when
-#'    computing the \eqn{p}-value? This parameter is ignored if
-#'    \code{exact == TRUE} or if ties are present in the ranks.
 #' @param restype A character specifying which residuals to use: \code{"ols"}
 #'    for OLS residuals (the default) or the \code{"blus"} for
 #'    \link[=blus]{BLUS} residuals. The advantage of using BLUS residuals is
@@ -73,7 +70,7 @@
 
 horn <- function(mainlm, deflator = NULL, restype = c("ols", "blus"),
                   alternative = c("two.sided", "greater", "less"),
-                  exact = (m <= 10), correct = TRUE, statonly = FALSE, ...) {
+                  exact = (m <= 10), statonly = FALSE, ...) {
 
   restype <- match.arg(restype, c("ols", "blus"))
   alternative <- match.arg(alternative, c("two.sided", "greater", "less"))
@@ -130,18 +127,18 @@ horn <- function(mainlm, deflator = NULL, restype = c("ols", "blus"),
   twosided <- function(teststat, m) {
     if (teststat > (m * (m - 1) * (m + 1) / 6)) {
       return(2 * pDtrend(k = teststat, n = m, lower.tail = FALSE,
-                         exact, correct, tiefreq = d))
+                         exact, tiefreq = d))
     } else if (teststat < (m * (m - 1) * (m + 1) / 6)) {
       return(2 * pDtrend(k = teststat, n = m, lower.tail = TRUE,
-                         exact, correct, tiefreq = d))
+                         exact, tiefreq = d))
     } else if (teststat == (m * (m - 1) * (m + 1) / 6)) {
       return(1)
     }
   }
   pval <- switch(alternative, "greater" = pDtrend(k = teststat, n = m,
-                 lower.tail = FALSE, exact, correct, tiefreq = d),
+                 lower.tail = FALSE, exact, tiefreq = d),
                  "less" = pDtrend(k = teststat, n = m,
-                 lower.tail = TRUE, exact, correct, tiefreq = d),
+                 lower.tail = TRUE, exact, tiefreq = d),
                  "two.sided" = twosided(teststat, m))
 
   rval <- structure(list(statistic = teststat, p.value = pval,

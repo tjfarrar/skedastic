@@ -146,7 +146,7 @@ goldfeld_quandt <- function(mainlm, method = "parametric", deflator = NULL,
     } else if (alternative == "less") {
       pval <- stats::pf(teststat, df1 = thedf1, df2 = thedf2, lower.tail = TRUE)
     } else if (alternative == "two.sided") {
-      pval <- twosidedpval(q = teststat, Aloc = 1, CDF = pf,
+      pval <- twosidedpval(q = teststat, Aloc = 1, CDF = stats::pf,
                        method = twosidedmethod, df1 = thedf1, df2 = thedf2)
     }
     fullmethod <- "Goldfeld-Quandt F Test"

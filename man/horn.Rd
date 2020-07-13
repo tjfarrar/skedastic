@@ -10,7 +10,6 @@ horn(
   restype = c("ols", "blus"),
   alternative = c("two.sided", "greater", "less"),
   exact = (m <= 10),
-  correct = TRUE,
   statonly = FALSE,
   ...
 )
@@ -56,10 +55,6 @@ tends to be small when there is a positive trend.)}
 \code{FALSE}, a normal approximation is used. Defaults to \code{TRUE}
 only if the number of absolute residuals being ranked is \eqn{\le 10}.}
 
-\item{correct}{A logical. Should a continuity correction be used when
-computing the \eqn{p}-value? This parameter is ignored if
-\code{exact == TRUE} or if ties are present in the ranks.}
-
 \item{statonly}{A logical. If \code{TRUE}, only the test statistic value
 is returned, instead of an object of \code{\link[base]{class}}
 \code{"htest"}. Defaults to \code{FALSE}.}
@@ -98,7 +93,7 @@ The test entails specifying a 'deflator', an explanatory variable
    \eqn{V(D)=\frac{n^2(n+1)^2(n-1)}{36}}; see
    \insertCite{Lehmann75;textual}{skedastic} for \eqn{E(D)} and \eqn{V(D)}
    when ties are present. When ties are absent, a continuity correction
-   improves the normal approximation. When
+   is used to improve the normal approximation. When
    exact distribution is used, two-sided \eqn{p}-value is computed by
    doubling the one-sided \eqn{p}-value, since the distribution of \eqn{D}
    is symmetric. The function does not support the exact distribution of

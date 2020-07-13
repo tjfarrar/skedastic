@@ -312,7 +312,7 @@ supfunc <- function(B, m..) {  # Function to find supremum of absolute differenc
               B[1:(k + 1)]))))
 }
 
-rksim <- function(R., m., sqZ., seed., alpha. = alpha) { # generates pseudorandom variates from T_alpha distribution
+rksim <- function(R., m., sqZ., seed., alpha.) { # generates pseudorandom variates from T_alpha distribution
                                                     # of Rackauskas-Zuokas Test
   hseq <- (1:(m. - 1)) / m.
   if (!is.null(seed.)) set.seed(seed.)
@@ -339,36 +339,6 @@ gqind <- function(n, p, g) {
 
 fastM <- function(X, n) {
   diag(n) - X %*% solve(crossprod(X)) %*% t(X)
-}
-
-IRfunc <- function(X, e, B, method) {
-  p <- ncol(X)
-  n <- length(e)
-  sigma_hat_sq <- sum(e ^ 2) / n
-  H <- X %*% solve(crossprod(X)) %*% t(X)
-  xi <- replicate(B, stats::rnorm(n))
-  if (method == "Xj") {
-    Hminus <- lapply(1:p, function(j) X[, -j, drop = FALSE] %*%
-                       solve(t(X[, -j, drop = FALSE]) %*% X[, -j, drop = FALSE]) %*%
-                       t(X[, -j, drop = FALSE]))
-    w <- sapply(1:p, function(j) diag(H) - diag(Hminus[[j]]))
-    IR <- vapply(1:p, function(j) sum(w[, j] * e ^ 2) / sigma_hat_sq, NA_real_)
-    W <- sqrt(n) * (IR - 1)
-    Wstar <- sapply(1:B, function(b) vapply(1:p, function(j) sqrt(n) *
-            sum(xi[, b] * ((w[, j] - 1 / n * IR[j]) * (e ^ 2 / sigma_hat_sq - 1) -
-            1 / n * (IR[j] - 1))), NA_real_))
-    Px <- vapply(1:3, function(j) sum(Wstar[j, ] >= W[j]) / B, NA_real_)
-    return(list(W, Px))
-  } else if (method == "pool") {
-    wpool <- diag(H) / p
-    IRpool <- sum(e ^ 2 * wpool) / sigma_hat_sq
-    Wstarpool <- vapply(1:B, function(b) sqrt(n) *
-                          sum(xi[, b] * ((wpool - 1 / n * IRpool) *
-                                           (e ^ 2 / sigma_hat_sq - 1) - 1 / n * (IRpool - 1))), NA_real_)
-    Wpool <- sqrt(n) * (IRpool - 1)
-    P <- sum(Wstarpool >= Wpool) / B
-    return(list(Wpool, P))
-  }
 }
 
 SKH <- function(i) {

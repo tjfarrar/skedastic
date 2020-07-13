@@ -12,7 +12,7 @@
 #'    replications of the test statistic, \eqn{T_1,T_2,\ldots,T_R}, are
 #'    computed from the generated error vectors. (4) The empirical
 #'    \code{p}-value is computed as \eqn{\frac{\hat{G}_R(T_0)+1}{R+1}}, where
-#'    \eqn{\hat{G}_R(x)=\sum_{j=1}^{R} 1_{T_j \ge x}}, 1_{\bullet}
+#'    \eqn{\hat{G}_R(x)=\sum_{j=1}^{R} 1_{T_j \ge x}}, \eqn{1_{\bullet}}
 #'    being the indicator function. The test is right-tailed, regardless of the
 #'    tailedness of \code{hettest}. Note that the heteroskedasticity
 #'    test implemented by \code{hettest} must have a test statistic that is
@@ -32,6 +32,9 @@
 #'    that implements a heteroskedasticity test on a linear regression model.
 #'    The function is called with the \code{statonly} argument set to
 #'    \code{TRUE} to improve computational efficiency.
+#' @param alternative The tailedness of the test whose statistic is computed by
+#'    \code{hettest}; one of \code{"greater"} (the default), \code{"less"}, or
+#'    \code{"two.sided"}.
 #' @param errorgen A function, or a character specifying the name of a
 #'    function, from which the random errors are to be generated. The function
 #'    should correspond to a continuous probability distribution that has (or
@@ -43,8 +46,13 @@
 #'    \code{hettest} is assumed to be scale invariant. If \code{errorgen} is
 #'    not \code{rnorm}, \code{errorparam} should be chosen in such a way that
 #'    the error distribution has a mean of 0.
+#' @param seed An integer specifying a seed to pass to
+#'    \code{\link[base]{set.seed}} for random number generation. This allows
+#'    reproducibility of Monte Carlo results. A value of \code{NULL}
+#'    results in not setting a seed.
 #' @param ... Additional arguments to pass to \code{hettest}
 #'
+#' @inheritParams breusch_pagan
 #' @return An object of \code{\link[base]{class}} \code{"htest"}. If object
 #'    is not assigned, its attributes are displayed in the console as a
 #'    \code{\link[tibble]{tibble}} using \code{\link[broom]{tidy}}.

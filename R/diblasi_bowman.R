@@ -124,7 +124,7 @@ diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
 
       Sigma <- matrix(data = unlist(lapply(1:n, function(i) lapply(1:n,
       function(j) ifelse(j <= i, NA_real_, cubature::adaptIntegrate(
-        normexpect_integrand(x, sigma1 = sqrt(sigma_hat_sq * M[i, i]),
+        normexpect_integrand(xx, sigma1 = sqrt(sigma_hat_sq * M[i, i]),
         sigma2 = sqrt(sigma_hat_sq * M[j, j]), rho =  M[i, j] /
           sqrt(M[i, i] * M[j, j])),
       lowerLimit = c(-Inf, -Inf), upperLimit = c(Inf, Inf))$integral -
@@ -155,9 +155,9 @@ diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
     Tstar <- rep(NA_real_, B)
     if (!is.null(seed)) set.seed(seed)
     for (b in 1:B) {
-      ystar <- rnorm(n, mean = yhat,
+      ystar <- stats::rnorm(n, mean = yhat,
                      sd = sqrt(sigma_hat_sq))
-      lmstar <- lm.fit(X, ystar)
+      lmstar <- stats::lm.fit(X, ystar)
       estar <- lmstar$residuals
       sigma_hat_sqstar <- sum(estar ^ 2) / (n - p)
       E0star <- 2 ^ (1 / 4) * gamma(3 / 4) *

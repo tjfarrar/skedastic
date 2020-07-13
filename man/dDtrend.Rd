@@ -37,7 +37,7 @@ the support.
 }
 \examples{
 prob <- dDtrend(k = "all", n = 9)
-values <- as.integer(names(dvar))
+values <- as.integer(names(prob))
 plot(c(values[1], values[1]), c(0, prob[1]), type = "l",
   axes = FALSE, xlab = expression(k), ylab = expression(Pr(D == k)),
   xlim = c(0, 250), yaxs = "i", ylim = c(0, 1.05 * max(prob)))

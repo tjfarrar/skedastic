@@ -31,7 +31,7 @@
 #'
 #' @examples
 #' prob <- dDtrend(k = "all", n = 9)
-#' values <- as.integer(names(dvar))
+#' values <- as.integer(names(prob))
 #' plot(c(values[1], values[1]), c(0, prob[1]), type = "l",
 #'   axes = FALSE, xlab = expression(k), ylab = expression(Pr(D == k)),
 #'   xlim = c(0, 250), yaxs = "i", ylim = c(0, 1.05 * max(prob)))
@@ -74,8 +74,8 @@ dDtrend <- function(k = "all", n) {
 #' used to compute one-sided \eqn{p}-values for the nonparametric test for
 #' heteroskedasticity of \insertCite{Horn81;textual}{skedastic}. Computation
 #' time is extremely slow for \eqn{n > 10} if \code{usedata} is set to
-#' \code{FALSE}; thus \code{\link{horn}} uses a normal approximation in that
-#' case.
+#' \code{FALSE}; thus a normal approximation is implemented, including a
+#' continuity correction.
 #'
 #' @param n A positive integer representing the number of observations in the
 #'    series.
@@ -88,13 +88,6 @@ dDtrend <- function(k = "all", n) {
 #'    calling \code{\link{dDtrend}}? If \code{FALSE}, a normal approximation
 #'    is used. If \code{tiefreq} is not \code{NULL} (ties are present),
 #'    normal approximation is used regardless of the value of \code{exact}.
-#' @param correct A logical. Should continuity correction be used in normal
-#'    approximation? Defaults to \code{TRUE}. Since the support of \eqn{D}
-#'    consists always of even integers beginning from 0, the continuity
-#'    correction consists of adding 1 to \eqn{D} when approximating the
-#'    lower-tail probability \eqn{\Pr(D \le k)} and subtracting 1 from
-#'    \eqn{D} when approximating the upper-tail probability
-#'    \eqn{\Pr(D \ge k)}.
 #' @param tiefreq A double vector corresponding to the value of \eqn{d_i}
 #'    in \insertCite{Lehmann75;textual}{skedastic}. These are the frequencies
 #'    of the various tied ranks. If ties are absent, \code{NULL} (the default).
@@ -112,56 +105,38 @@ dDtrend <- function(k = "all", n) {
 #' pDtrend(k = 50, n = 9)
 #' # Normal approximation of the above with continuity correction is
 #' # 0.05193808
-#' pDtrend(k = 50, n = 9, exact = FALSE, correct = TRUE)
+#' pDtrend(k = 50, n = 9, exact = FALSE)
 #' # For an independent sample of size 50, the probability that D is >= 20000 is
 #' # is 0.6093583
 #' pDtrend(k = 2e4, n = 50, lower.tail = FALSE)
 #'
 
 pDtrend <- function(k, n, lower.tail = TRUE,
-                    exact = (n <= 10), correct = TRUE, tiefreq = NULL) {
+                    exact = (n <= 10), tiefreq = NULL) {
 
   if (exact && is.null(tiefreq)) {
-    exact_upper <- function(j, m = n) {
-      dvar <- dDtrend(n = m)
-      values <- as.integer(names(dvar))
-      return(sum(prob[values >= k]))
+    exactCDF <- function(j, m = n, LT = lower.tail) {
+      prob <- dDtrend(n = m)
+      values <- as.integer(names(prob))
+      if (LT) {
+        return(sum(prob[values <= k]))
+      } else {
+        return(sum(prob[values >= k]))
+      }
     }
-    exact_lower <- function(j, m = n) {
-      dvar <- dDtrend(n = m)
-      values <- as.integer(names(dvar))
-      return(sum(prob[values <= k]))
-    }
-    if (lower.tail) {
-      vapply(k, exact_lower, FUN.VALUE = NA_real_)
-    } else {
-      vapply(k, exact_upper, FUN.VALUE = NA_real_)
-    }
+    vapply(k, exactCDF, NA_real_)
   } else {
     if (is.null(tiefreq)) {
       ED <- (n ^ 3 - n) / 6
       VD <- (n ^ 2 * (n + 1) ^ 2 * (n - 1)) / 36
-      normapprox_upper <- function(j, contcorrect = correct) {
-        return(stats::pnorm((j - contcorrect - ED) / sqrt(VD), lower.tail = FALSE))
-      }
-      normapprox_lower <- function(j, contcorrect = correct) {
-        return(stats::pnorm((j + contcorrect - ED) / sqrt(VD), lower.tail = TRUE))
-      }
+      vapply(k, function(j) stats::pnorm((j - 1 - ED) / sqrt(VD),
+                  lower.tail = lower.tail), NA_real_)
     } else {
       ED <- (n ^ 3 - n) / 6 - sum(tiefreq ^ 3 - tiefreq) / 12
       VD <- (n ^ 2 * (n + 1) ^ 2 * (n - 1)) / 36 *
                (1 - sum(tiefreq ^ 3 - tiefreq) / (n ^ 3 - n))
-      normapprox_upper <- function(j) {
-        return(stats::pnorm((j - ED) / sqrt(VD), lower.tail = FALSE))
-      }
-      normapprox_lower <- function(j) {
-        return(stats::pnorm((j - ED) / sqrt(VD), lower.tail = TRUE))
-      }
-    }
-    if (lower.tail) {
-      vapply(k, normapprox_lower, FUN.VALUE = NA_real_)
-    } else {
-      vapply(k, normapprox_upper, FUN.VALUE = NA_real_)
+      vapply(k, function(j) stats::pnorm((j - ED) / sqrt(VD),
+                  lower.tail = lower.tail), NA_real_)
     }
   }
 }

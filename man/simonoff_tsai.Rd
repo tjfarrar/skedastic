@@ -93,7 +93,7 @@ This function implements the modified profile likelihood ratio test and
 The Simonoff-Tsai Likelihood Ratio Test involves a modification of the
 profile likelihood function so that the nuisance parameter will be
 orthogonal to the parameter of interest. The maximum likelihood estimate
-of \code{\lambda} (called \code{\delta} in
+of \eqn{\lambda} (called \eqn{\delta} in
 \insertCite{Simonoff94;textual}{skedastic}) is computed from the modified
 profile log-likelihood function using the Nelder-Mead algorithm in
 \code{\link[maxLik]{maxLik}}. Under the null hypothesis of homoskedasticity,
@@ -114,7 +114,7 @@ The assumption of underlying both tests is that
 \eqn{\mathrm{Cov}(\epsilon)=\sigma^2 W}, where \eqn{W} is
 an \eqn{n\times n} diagonal matrix with \eqn{i}th diagonal element
 \eqn{w_i=w(Z_i, \lambda)}. Here, \eqn{Z_i} is the \eqn{i}th row of an
-\eqn{n \times q} nonstochastic auxiliary design matrix \bm{Z}. Note:
+\eqn{n \times q} nonstochastic auxiliary design matrix \eqn{Z}. Note:
 \eqn{Z} as defined here does not have a column of ones, but is concatenated
 to a column of ones when used in an auxiliary regression.
 \eqn{\lambda} is a \eqn{q}-vector of unknown parameters, and \eqn{w(\cdot)}

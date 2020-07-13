@@ -4,14 +4,7 @@
 \alias{pDtrend}
 \title{Cumulative distribution function of nonparametric trend statistic \eqn{D}}
 \usage{
-pDtrend(
-  k,
-  n,
-  lower.tail = TRUE,
-  exact = (n <= 10),
-  correct = TRUE,
-  tiefreq = NULL
-)
+pDtrend(k, n, lower.tail = TRUE, exact = (n <= 10), tiefreq = NULL)
 }
 \arguments{
 \item{k}{An integer of \code{length} 1; the value must be between 0 and
@@ -28,14 +21,6 @@ tailed cumulative probabilities are computed inclusive of \code{k}.}
 calling \code{\link{dDtrend}}? If \code{FALSE}, a normal approximation
 is used. If \code{tiefreq} is not \code{NULL} (ties are present),
 normal approximation is used regardless of the value of \code{exact}.}
-
-\item{correct}{A logical. Should continuity correction be used in normal
-approximation? Defaults to \code{TRUE}. Since the support of \eqn{D}
-consists always of even integers beginning from 0, the continuity
-correction consists of adding 1 to \eqn{D} when approximating the
-lower-tail probability \eqn{\Pr(D \le k)} and subtracting 1 from
-\eqn{D} when approximating the upper-tail probability
-\eqn{\Pr(D \ge k)}.}
 
 \item{tiefreq}{A double vector corresponding to the value of \eqn{d_i}
 in \insertCite{Lehmann75;textual}{skedastic}. These are the frequencies
@@ -55,8 +40,8 @@ identically distributed random variables with no ties. The function may be
 used to compute one-sided \eqn{p}-values for the nonparametric test for
 heteroskedasticity of \insertCite{Horn81;textual}{skedastic}. Computation
 time is extremely slow for \eqn{n > 10} if \code{usedata} is set to
-\code{FALSE}; thus \code{\link{horn}} uses a normal approximation in that
-case.
+\code{FALSE}; thus a normal approximation is implemented, including a
+continuity correction.
 }
 \examples{
 # For an independent sample of size 9, the probability that D is <= 50 is
@@ -64,7 +49,7 @@ case.
 pDtrend(k = 50, n = 9)
 # Normal approximation of the above with continuity correction is
 # 0.05193808
-pDtrend(k = 50, n = 9, exact = FALSE, correct = TRUE)
+pDtrend(k = 50, n = 9, exact = FALSE)
 # For an independent sample of size 50, the probability that D is >= 20000 is
 # is 0.6093583
 pDtrend(k = 2e4, n = 50, lower.tail = FALSE)

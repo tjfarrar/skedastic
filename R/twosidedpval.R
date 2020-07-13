@@ -79,11 +79,11 @@
 #' # 'Conventional' two-sided p-value obtained by doubling one-sided p-value:
 #' stats::var.test(x1, x2, alternative = "two.sided")$p.value
 #' # This is replicated in `twosidedpval` by setting `method` argument to `"doubled"`
-#' twosidedpval(q = var(x1) / var(x2), CDF = stats::pf, method = "doubled",
-#'  Aloc = 1, df1 = n1 - 1, df2 = n2 - 1)
+#' twosidedpval(q = var(x1) / var(x2), CDF = stats::pf, continuous = TRUE,
+#'  method = "doubled", Aloc = 1, df1 = n1 - 1, df2 = n2 - 1)
 #' # Conditional two-sided p-value centered at df (mean of chi-squared r.v.):
-#' twosidedpval(q = var(x1) / var(x2), CDF = stats::pf, method = "kulinskaya",
-#'  Aloc = 1, df1 = n1 - 1, df2 = n2 - 1)
+#' twosidedpval(q = var(x1) / var(x2), CDF = stats::pf, continuous = TRUE,
+#'  method = "kulinskaya", Aloc = 1, df1 = n1 - 1, df2 = n2 - 1)
 
 twosidedpval <- function(q, CDF, continuous, method = c("doubled", "kulinskaya",
                          "minlikelihood"), Aloc, supportlim, ...) {
