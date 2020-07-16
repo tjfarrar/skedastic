@@ -81,4 +81,3 @@ LazyData: true
 RoxygenNote: 7.1.0
 URL: http://github.com/tjfarrar/skedastic
 BugReports: http://github.com/tjfarrar/skedastic/issues
-VignetteBuilder: knitr
