@@ -161,7 +161,8 @@ dufour_etal <- function(mainlm, hettest, R = 1000L, alternative = c("greater",
                     sum(statgen <= statobs))
   }
 
-  pval <- (teststat + 1) / (R + 1) * ifelse(alternative == "two.sided", 2, 1)
+  pval <- (teststat + 1) / (R + 1) *
+    ifelse(alternative == "two.sided", 2, 1)
 
   rval <- structure(list(statistic = teststat, parameter = R, p.value = pval,
                null.value = "Homoskedasticity",

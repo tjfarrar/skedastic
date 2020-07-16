@@ -76,7 +76,8 @@ bickel <- function(mainlm, fitmethod = c("lm", "rlm"),
   b <- match.arg(b, c("hubersq", "tanhsq"))
   if (b == "hubersq") {
     bfunc <- function(x) {
-      vapply(x, function(y) ifelse(abs(y) <= k, y ^ 2, k ^ 2), NA_real_)
+      vapply(x, function(y) ifelse(abs(y) <= k, y ^ 2, k ^ 2),
+             NA_real_)
     }
   } else if (b == "tanhsq") {
     bfunc <- function(x) tanh(x) ^ 2

@@ -54,7 +54,8 @@ zhou_etal <- function(mainlm, auxdesign = NULL,
 
   method <- match.arg(method, c("pooled", "covariate-specific", "hybrid"))
 
-  auxfitvals <- ifelse(is.null(auxdesign), FALSE, auxdesign == "fitted.values")
+  auxfitvals <- ifelse(is.null(auxdesign), FALSE,
+                                    auxdesign == "fitted.values")
   processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
                 needp = FALSE)
 

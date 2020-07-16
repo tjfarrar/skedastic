@@ -57,7 +57,8 @@ cook_weisberg <- function(mainlm, auxdesign = NULL,
 
   hetfun <- match.arg(hetfun, c("mult", "add", "logmult"))
 
-  auxfitvals <- ifelse(is.null(auxdesign), FALSE, auxdesign == "fitted.values")
+  auxfitvals <- ifelse(is.null(auxdesign), FALSE,
+                                    auxdesign == "fitted.values")
   processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
                 needp = FALSE)
 

@@ -188,10 +188,12 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
       do.call(graphics::plot, plotargs)
       if (!xlab_passed) graphics::mtext(parselabels(xnames, theaxis = "x"),
                               side = 1, line = 2.5, las = 1,
-                              cex = ifelse(cex_passed, parargs$cex, 0.8))
+                              cex = ifelse(cex_passed,
+                                                      parargs$cex, 0.8))
       if (!ylab_passed) graphics::mtext(parselabels(ynames, theaxis = "y"),
                               side = 2, line = yline, las = 1,
-                              cex = ifelse(cex_passed, parargs$cex, 0.8))
+                              cex = ifelse(cex_passed,
+                                                        parargs$cex, 0.8))
     }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = FALSE),
     y_ver, names(y_ver), yline_mtext, SIMPLIFY = FALSE)
   } else {
@@ -215,9 +217,11 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
       plotargs$y <- y
       do.call(graphics::plot, plotargs)
       if (!xlab_passed) graphics::mtext(parselabels(xnames, theaxis = "x"),
-          side = 1, line = 2.5, las = 1, cex = ifelse(cex_passed, parargs$cex, 1.2))
+          side = 1, line = 2.5, las = 1,
+          cex = ifelse(cex_passed, parargs$cex, 1.2))
       if (!ylab_passed) graphics::mtext(parselabels(ynames, theaxis = "y"),
-          side = 2, line = yline, las = 1, cex = ifelse(cex_passed, parargs$cex, 1.2))
+          side = 2, line = yline, las = 1,
+          cex = ifelse(cex_passed, parargs$cex, 1.2))
       if (length(grDevices::dev.list()) > 59) {
         grDevices::graphics.off()
       }

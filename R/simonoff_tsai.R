@@ -98,7 +98,8 @@ simonoff_tsai <- function(mainlm, auxdesign = NULL, method = c("mlr", "score"),
   method <- match.arg(method, c("mlr", "score"))
   hetfun <- match.arg(hetfun, c("mult", "add", "logmult"))
 
-  auxfitvals <- ifelse(is.null(auxdesign), FALSE, auxdesign == "fitted.values")
+  auxfitvals <- ifelse(is.null(auxdesign), FALSE,
+                                    auxdesign == "fitted.values")
   processmainlm(m = mainlm, needy = (method == "mlr"), needyhat = auxfitvals,
                 needp = TRUE)
 
@@ -182,8 +183,13 @@ simonoff_tsai <- function(mainlm, auxdesign = NULL, method = c("mlr", "score"),
     } else {
       lambda_start <- rep(mlestart, q)
     }
-    MLE <- maxLik::maxLik(logLik = ellp, start = lambda_start,
-                method = "NM")
+    if (p > 2) {
+      maxLikargs <- list("logLik" = ellp,
+                         "start" = lambda_start, "method" = "NM")
+    } else {
+      maxLikargs <- list("logLik" = ellp, "start" = lambda_start)
+    }
+    MLE <- do.call(what = maxLik::maxLik, args = maxLikargs)
     # constraints = list("ineqA" = diag(q), "ineqB" = rep(0, q))
     L <- -2 * (ellp(lambda0) - MLE$maximum)
     w_at_MLE <- vapply(1:n, function(i) w(Z[i, ], MLE$estimate), NA_real_)

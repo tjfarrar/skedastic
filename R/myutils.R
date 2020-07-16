@@ -24,17 +24,18 @@ processmainlm <- function(m, needX = TRUE, needy = TRUE, neede = TRUE,
       e <- m$e
     }
     if (!is.null(X)) {
+      if (is.vector(X) && !is.matrix(X)) X <- as.matrix(X)
       badrows <- which(apply(cbind(y, X), 1, function(x) any(is.na(x),
                                           is.nan(x), is.infinite(x))))
       if (length(badrows) > 0) {
-        warning("Rows of data containing NA/NaN/Inf values removed")
+        message("Rows of data containing NA/NaN/Inf values removed")
         y <- y[-badrows]
-        X <- X[-badrows, drop = FALSE]
+        X <- X[-badrows, , drop = FALSE]
       }
     }
     if ((!exists("e", where = environment(), inherits = FALSE) || is.null(e))) {
       if (neede) {
-        m <- stats::lm.fit(X, y)
+        m <- stats::lm.fit(x = X, y = y)
         e <- m$residuals
       }
       if (needyhat) yhat <- m$fitted.values

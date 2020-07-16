@@ -64,7 +64,8 @@
 breusch_pagan <- function(mainlm, auxdesign = NULL, koenker = TRUE,
                            statonly = FALSE) {
 
-  auxfitvals <- ifelse(is.null(auxdesign), FALSE, auxdesign == "fitted.values")
+  auxfitvals <- ifelse(is.null(auxdesign), FALSE,
+                                    auxdesign == "fitted.values")
   processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
                 needp = FALSE)
 

@@ -81,7 +81,14 @@ evans_king <- function(mainlm, method = c("GLS", "LM"), deflator = NULL,
     tau <- ((1:n) - 1) / (n - 1)
     w <- (1 + lambda_star * tau) ^ (1 / 2)
     R <- diag(1 / w)
-    Xstar <- t(sapply(1:n, function(i) X[i, ] / w[i], USE.NAMES = FALSE))
+    Xstar <- sapply(1:n, function(i) X[i, ] / w[i],
+                    USE.NAMES = FALSE)
+    if (is.matrix(Xstar)) {
+      Xstar <- t(Xstar)
+    } else {
+      Xstar <- as.matrix(Xstar)
+    }
+
     Mstar <- fastM(Xstar, n)
     teststat <- as.double((t(e) %*% R %*% Mstar %*% R %*% e) / crossprod(e))
     if (statonly) teststat <- FALSE

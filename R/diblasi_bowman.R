@@ -123,10 +123,11 @@ diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
       #   E0[i] * E0[j])))), nrow = n, ncol = n)
 
       Sigma <- matrix(data = unlist(lapply(1:n, function(i) lapply(1:n,
-      function(j) ifelse(j <= i, NA_real_, cubature::adaptIntegrate(
-        normexpect_integrand(xx, sigma1 = sqrt(sigma_hat_sq * M[i, i]),
-        sigma2 = sqrt(sigma_hat_sq * M[j, j]), rho =  M[i, j] /
-          sqrt(M[i, i] * M[j, j])),
+      function(j) ifelse(j <= i, NA_real_,
+        cubature::adaptIntegrate(normexpect_integrand(xx,
+        sigma1 = sqrt(sigma_hat_sq * M[i, i]),
+        sigma2 = sqrt(sigma_hat_sq * M[j, j]),
+        rho =  M[i, j] / sqrt(M[i, i] * M[j, j])),
       lowerLimit = c(-Inf, -Inf), upperLimit = c(Inf, Inf))$integral -
       E0[i] * E0[j])))), nrow = n, ncol = n)
 

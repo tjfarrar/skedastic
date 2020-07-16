@@ -136,8 +136,10 @@ goldfeld_quandt <- function(mainlm, method = "parametric", deflator = NULL,
     }
     thedf2 <- (length(theind[[2]]) - p)
     thedf1 <- (length(theind[[1]]) - p)
-    S2sq <- sum(stats::lm.fit(X[theind[[2]], ], y[theind[[2]]])$residuals ^ 2) / thedf2
-    S1sq <- sum(stats::lm.fit(X[theind[[1]], ], y[theind[[1]]])$residuals ^ 2) / thedf1
+    S2sq <- sum(stats::lm.fit(X[theind[[2]], , drop = FALSE],
+                              y[theind[[2]]])$residuals ^ 2) / thedf2
+    S1sq <- sum(stats::lm.fit(X[theind[[1]], , drop = FALSE],
+                              y[theind[[1]]])$residuals ^ 2) / thedf1
     teststat <- S2sq / S1sq
     if (statonly) return(teststat)
     names(thedf1) <- "df1"

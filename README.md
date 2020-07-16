@@ -1,5 +1,7 @@
 # skedastic
 
+[![Build Status](https://travis-ci.org/tjfarrar/skedastic.svg?branch=master)](https://travis-ci.org/tjfarrar/skedastic)
+
 The purpose of the `skedastic` package is to make diagnostic methods 
 for detecting heteroskedasticity in linear regression models accessible to R 
 users.
@@ -28,13 +30,11 @@ observations.
 Most of the functions in the package implement particular hypothesis testing 
 methods for detecting heteroskedasticity that have been published in a journal 
 article or book. Other functions implement graphical methods for detecting 
-heteroskedasticity or compute transformations of the Ordinary Least Squares 
-(OLS) residuals that are useful in heteroskedasticity detection.
+heteroskedasticity or perform supporting tasks for the tests such as computing transformations of the Ordinary Least Squares (OLS) residuals that are useful in heteroskedasticity detection, or computing probabilities from the null distribution of a test statistic.
 
 Nearly all of the exported functions in the package require as an argument an  
 `lm` object (or, for advanced users desiring faster computation, a list 
-containing the response vector and the design matrix in the exact form 
-required by `lm.fit`). Thus, to use this package a user must first be familiar 
+containing the response vector, the design matrix, and optionally the vector of OLS residuals). Thus, to use this package a user must first be familiar 
 with how to fit linear regression models using the `lm` function from package 
 `stats`. Note that the package currently supports only linear regression models 
 fit using OLS.

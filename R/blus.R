@@ -96,7 +96,8 @@ blus <- function(mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
       all_possible_omit <- all_possible_omit[-whichrow, , drop = FALSE]
     }
 
-    maxrow <- ifelse(is.null(exhaust), nrow(all_possible_omit), exhaust)
+    maxrow <- ifelse(is.null(exhaust), nrow(all_possible_omit),
+                                  exhaust)
 
     rowstodo <- sample(1:nrow(all_possible_omit), maxrow, replace = FALSE)
 
