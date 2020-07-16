@@ -5,3 +5,5 @@ r:
 os:
   - linux
 dist: xenial
+before_install:
+  - sudo apt-get install libmpfr-dev
