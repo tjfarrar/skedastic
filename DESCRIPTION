@@ -60,7 +60,7 @@ Imports:
     cubature (>= 2.0.4),
     quantreg (>= 5.55),
     CompQuadForm (>= 1.4.3),
-    MASS (>= 7.3.51.6),
+    MASS (>= 7.3.47),
     qpdf (>= 1.1),
     data.table (>= 1.12.8),
     expm (>= 0.999.4),
