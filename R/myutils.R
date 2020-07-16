@@ -206,8 +206,8 @@ do_omit <- function(omit, n, p, seed.) {
 
 do_Xmats <- function(X, n, p, omit_ind) {
   keep_ind <- setdiff(1:n, omit_ind)
-  X0 <- X[omit_ind, ]
-  X1 <- X[keep_ind, ]
+  X0 <- X[omit_ind, , drop = FALSE]
+  X1 <- X[keep_ind, , drop = FALSE]
   if (identical(omit_ind, 1:p)) {
     X_ord <- X
   } else {

@@ -60,7 +60,7 @@
 #' blus(mtcars_lm, omit = "last")
 #'
 
-blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
+blus <- function(mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
                   exhaust = NULL, seed = 1234) {
 
   processmainlm(m = mainlm, needy = FALSE)
@@ -85,14 +85,15 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
     }
     all_possible_omit <- t(utils::combn(n, p))
     if (omitfunc$omit_passed == "first") {
-      all_possible_omit <- all_possible_omit[-1, ]
+      all_possible_omit <- all_possible_omit[-1, , drop = FALSE]
     } else if (omitfunc$omit_passed == "last") {
-      all_possible_omit <- all_possible_omit[-nrow(all_possible_omit), ]
+      all_possible_omit <- all_possible_omit[-nrow(all_possible_omit),
+                                             , drop = FALSE]
     } else if (omitfunc$omit_passed == "intvector" ||
                omitfunc$omit_passed == "random") {
       whichrow <- which(apply(all_possible_omit, 1,
                         function(x) all(x == omitfunc$omit_ind)))
-      all_possible_omit <- all_possible_omit[-whichrow, ]
+      all_possible_omit <- all_possible_omit[-whichrow, , drop = FALSE]
     }
 
     maxrow <- ifelse(is.null(exhaust), nrow(all_possible_omit), exhaust)
@@ -100,7 +101,7 @@ blus <- function (mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
     rowstodo <- sample(1:nrow(all_possible_omit), maxrow, replace = FALSE)
 
     for (r in 1:maxrow) {
-      omitfunc <- do_omit(all_possible_omit[rowstodo[r], ], n, p)
+      omitfunc <- do_omit(all_possible_omit[rowstodo[r], , drop = FALSE], n, p)
       Xmats <- do_Xmats(X, n, p, omitfunc$omit_ind)
       if (!matrixcalc::is.singular.matrix(Xmats$X_ord_sq,
                                           tol = .Machine$double.eps) &&

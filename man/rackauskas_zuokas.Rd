@@ -89,8 +89,10 @@ Rackauskas and Zuokas propose a class of tests that entails determining the
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 rackauskas_zuokas(mtcars_lm)
 rackauskas_zuokas(mtcars_lm, alpha = 7 / 16)
+\donttest{
 n <- length(mtcars_lm$residuals)
 rackauskas_zuokas(mtcars_lm, pvalmethod = "sim", m = n, sqZ = TRUE)
+}
 
 }
 \references{

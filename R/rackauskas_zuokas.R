@@ -55,8 +55,10 @@
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' rackauskas_zuokas(mtcars_lm)
 #' rackauskas_zuokas(mtcars_lm, alpha = 7 / 16)
+#' \donttest{
 #' n <- length(mtcars_lm$residuals)
 #' rackauskas_zuokas(mtcars_lm, pvalmethod = "sim", m = n, sqZ = TRUE)
+#' }
 #'
 
 rackauskas_zuokas <- function(mainlm, alpha = 0, pvalmethod = c("data", "sim"),

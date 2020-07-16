@@ -126,10 +126,10 @@ hypothesis of homoskedasticity may be expressed as
 
 In the score test, the added term in the test statistic is of the
 form
-\deqn{\sum_{j=1}^{q} \left(\sum_{i=1}^{n} h_{ii} t_{ij}\right) \tau_j \text{,}}
+\deqn{\sum_{j=1}^{q} \left(\sum_{i=1}^{n} h_{ii} t_{ij}\right) \tau_j},
 where \eqn{t_{ij}} is the \eqn{(i,j)}th element of the Jacobian matrix
 \eqn{J} evaluated at \eqn{\lambda=\lambda_0}:
-\deqn{t_{ij}=\left.\frac{\partial w(Z_i, \lambda)}{\partial \lambda_j}\right|_{\lambda=\lambda_0}\text{,}}
+\deqn{t_{ij}=\left.\frac{\partial w(Z_i, \lambda)}{\partial \lambda_j}\right|_{\lambda=\lambda_0}},
 and \eqn{\tau=(\bar{J}'\bar{J})^{-1}\bar{J}'d}, where \eqn{d} is the
 \eqn{n}-vector whose \eqn{i}th element is \eqn{e_i^2\bar{\sigma}^{-2}},
 \eqn{\bar{\sigma}^2=n^{-1}e'e}, and \eqn{\bar{J}=(I_n-1_n 1_n'/n)J}.
@@ -140,8 +140,8 @@ simonoff_tsai(mtcars_lm, method = "score")
 simonoff_tsai(mtcars_lm, method = "score", basetest = "cook_weisberg")
 simonoff_tsai(mtcars_lm, method = "mlr")
 simonoff_tsai(mtcars_lm, method = "mlr", bartlett = FALSE)
-simonoff_tsai(mtcars_lm, auxdesign = data.frame(mtcars$wt, mtcars$qsec),
- method = "mlr", hetfun = "logmult")
+\dontrun{simonoff_tsai(mtcars_lm, auxdesign = data.frame(mtcars$wt, mtcars$qsec),
+ method = "mlr", hetfun = "logmult")}
 
 }
 \references{

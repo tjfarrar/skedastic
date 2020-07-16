@@ -48,7 +48,7 @@
 #' @examples
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' diblasi_bowman(mtcars_lm)
-#' diblasi_bowman(mtcars_lm, ignorecov = FALSE)
+#' \donttest{diblasi_bowman(mtcars_lm, ignorecov = FALSE)}
 #' diblasi_bowman(mtcars_lm, distmethod = "bootstrap")
 #'
 #' # Example discussed in Diblasi and Bowman (1997)

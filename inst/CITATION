@@ -5,10 +5,10 @@ citEntry(entry = "manual",
     author = "Thomas J. Farrar",
     institution = "University of the Western  Cape",
     address = "Bellville, South Africa",
-    year = "2019",
-    note = "R Package Version 0.1.0",
+    year = "2020",
+    note = "R Package Version 1.0.0",
     url = "https://github.com/tjfarrar/skedastic",
-    textVersion  = paste0("Farrar, Thomas J. (2019). ",
+    textVersion  = paste0("Farrar, Thomas J. (2020). ",
         "skedastic: Heteroskedasticity Diagnostics for Linear Regression Models. ",
-        "R Package version 0.1.0. ","University of the Western Cape. Bellville, South Africa. ", "https://github.com/tjfarrar/skedastic")
+        "R Package version 1.0.0. ","University of the Western Cape. Bellville, South Africa. ", "https://github.com/tjfarrar/skedastic")
 )
