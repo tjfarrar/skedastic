@@ -1,14 +1,17 @@
 language: r
-r:
-  - release
-  - devel
-warnings_are_errors: true
-os:
-  - linux
-  - osx
-osx_image: xcode9.4
-dist: xenial
-addons:
-  apt:
-    packages:
-      - libmpfr-dev
+matrix:
+  include:
+  - r:
+      - release
+      - devel
+    os: linux
+    dist: xenial
+    addons:
+      apt:
+        packages:
+          - libmpfr-dev
+    warnings_are_errors: true
+  - r: release
+    os: osx
+    osx_image: xcode9.4
+    warnings_are_errors: true
