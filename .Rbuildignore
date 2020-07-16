@@ -3,4 +3,3 @@
 cran-comments.md
 ## Ignore travis config file
 ^\.travis\.yml$
-^vignettes$
