@@ -7,13 +7,15 @@ jobs:
       os: linux
       dist: xenial
       r: release
+      before_install:
+        - sudo apt-get install libmpfr-dev
     - name: "Linux Xenial R-Devel"
       os: linux
       dist: xenial
       r: devel
+      before_install:
+        - sudo apt-get install libmpfr-dev
     - name: "Mac OSX 9.4 R-Release"
       os: osx
       osx_image: xcode9.4
       r: release
-before_install:
-  - sudo apt-get install libmpfr-dev
