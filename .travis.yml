@@ -1,9 +1,19 @@
 language: r
 warnings_are_errors: true
-r:
-  - release
-os:
-  - linux
-dist: xenial
+
+jobs:
+  include:
+    - name: "Linux Xenial R-Release"
+      os: linux
+      dist: xenial
+      r: release
+    - name: "Linux Xenial R-Devel"
+      os: linux
+      dist: xenial
+      r: devel
+    - name: "Mac OSX 9.4 R-Release"
+      os: osx
+      osx_image: xcode9.4
+      r: release
 before_install:
   - sudo apt-get install libmpfr-dev
