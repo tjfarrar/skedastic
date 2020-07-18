@@ -19,3 +19,4 @@ jobs:
       os: osx
       osx_image: xcode9.4
       r: release
+      r_github_packages: tidymodels/broom, RcppCore/RcppArmadillo, r-lib/vctrs
