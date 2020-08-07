@@ -179,7 +179,7 @@ goldfeld_quandt <- function(mainlm, method = c("parametric", "nonparametric"),
     if (statonly) return(teststat)
 
     thedf1 <- NULL
-    if (is.na(prob) || is.null(prob)) {
+    if (is.na(prob[1]) || is.null(prob)) {
       if (alternative == "greater") {
         pval <- ppeak(k = teststat, n = newn, lower.tail = FALSE, usedata = (newn <= 1000))
       } else if (alternative == "less") {

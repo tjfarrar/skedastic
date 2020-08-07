@@ -46,7 +46,7 @@
 dDtrend <- function(k = "all", n, override = FALSE) {
 
   kall <- FALSE
-  if (is.na(k) || is.null(k)) {
+  if (is.na(k[1]) || is.null(k)) {
     stop("Argument k cannot be NA or NULL")
   } else if (is.character(k)) {
     if (length(k) == 1 && k == "all") {
@@ -58,7 +58,7 @@ dDtrend <- function(k = "all", n, override = FALSE) {
     stop("Invalid value(s) in k; try an integer or \"all\"")
   }
 
-  if (is.na(n) || is.null(n)) {
+  if (is.na(n[1]) || is.null(n)) {
     stop("Argument n cannot be NA or NULL")
   } else if (!is.numeric(n)) {
     stop("Argument n must be numeric")
