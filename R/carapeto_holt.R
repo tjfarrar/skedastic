@@ -15,14 +15,14 @@
 #'    observations. The test statistic is then computed as a ratio of quadratic
 #'    forms corresponding to the sums of squared residuals of the upper and
 #'    lower observations respectively. \eqn{p}-values are computed by the
-#'    Imhof algorithm in \code{\link{pvalRQF}}.
+#'    Imhof algorithm in \code{\link{pRQF}}.
 #'
 #' @param deflator Either a character specifying a column name from the
 #'    design matrix of \code{mainlm} or an integer giving the index of a
 #'    column of the design matrix. This variable is suspected to be
 #'    related to the error variance under the alternative hypothesis.
 #'    \code{deflator} may not correspond to a column of 1's (intercept).
-#'    Default \code{NULL} means the data will be left in its current order
+#'    Default \code{NA} means the data will be left in its current order
 #'    (e.g. in case the existing index is believed to be associated with
 #'    error variance).
 #' @param prop_central A double specifying the proportion of central
@@ -31,7 +31,7 @@
 #'    observations is an integer. Defaults to \eqn{\frac{1}{3}}.
 #' @param qfmethod A character, either \code{"imhof"}, \code{"davies"}, or
 #'    \code{"integrate"}, corresponding to the \code{algorithm} argument
-#'    of \code{\link[skedastic]{pvalRQF}}. The default is \code{"imhof"}.
+#'    of \code{\link[skedastic]{pRQF}}. The default is \code{"imhof"}.
 #' @param alternative A character specifying the form of alternative
 #'    hypothesis. If it is suspected that the error variance is positively
 #'    associated with the deflator variable, \code{"greater"}. If it is
@@ -58,7 +58,7 @@
 #' carapeto_holt(mtcars_list, deflator = 3, prop_central = 0.25)
 #'
 
-carapeto_holt <- function(mainlm, deflator = NULL, prop_central = 1 / 3,
+carapeto_holt <- function(mainlm, deflator = NA, prop_central = 1 / 3,
                   group1prop = 1 / 2, qfmethod = "imhof",
                   alternative = c("greater", "less", "two.sided"),
                   twosidedmethod = c("doubled", "kulinskaya"),
@@ -84,9 +84,12 @@ carapeto_holt <- function(mainlm, deflator = NULL, prop_central = 1 / 3,
 
   checkdeflator(deflator, X, p, hasintercept[[1]])
 
-  theind <- gqind(n, prop_central, group1prop)
+  theind <- gqind(n, p, prop_central, group1prop)
 
-  if (!is.null(deflator)) {
+  if (!is.na(deflator) && !is.null(deflator)) {
+    if (!is.na(suppressWarnings(as.integer(deflator)))) {
+      deflator <- as.integer(deflator)
+    }
     e <- e[order(X[, deflator], decreasing = TRUE)]
     X <- X[order(X[, deflator], decreasing = TRUE), , drop = FALSE]
   }
@@ -103,17 +106,18 @@ carapeto_holt <- function(mainlm, deflator = NULL, prop_central = 1 / 3,
     if (statonly) return(teststat)
 
     if (alternative == "greater") {
-      pval <- pvalRQF(r = teststat, A = M %*% Istar_hi %*% M,
+      pval <- pRQF(r = teststat, A = M %*% Istar_hi %*% M,
                       B = M %*% Istar_lo %*% M, algorithm = qfmethod,
                       lower.tail = FALSE)
     } else if (alternative == "less") {
-      pval <- pvalRQF(r = teststat, A = M %*% Istar_hi %*% M,
+      pval <- pRQF(r = teststat, A = M %*% Istar_hi %*% M,
                       B = M %*% Istar_lo %*% M, algorithm = qfmethod,
                       lower.tail = TRUE)
     } else if (alternative == "two.sided") {
-      pval <- twosidedpval(q = teststat, CDF = pvalRQF, method = twosidedmethod,
+      pval <- twosidedpval(q = teststat, CDF = pRQF, method = twosidedmethod,
               continuous = TRUE, Aloc = 1, A = M %*% Istar_hi %*% M,
-              B = M %*% Istar_lo %*% M, algorithm = qfmethod, lower.tail = TRUE)
+              B = M %*% Istar_lo %*% M, algorithm = qfmethod,
+              lower.tail = TRUE)
     }
   } else {
     A <- diag(n) - matrix(data = 1 / n, nrow = n, ncol = n)
@@ -122,15 +126,15 @@ carapeto_holt <- function(mainlm, deflator = NULL, prop_central = 1 / 3,
     if (statonly) return(teststat)
 
     if (alternative == "greater") {
-      pval <- pvalRQF(r = teststat, A = M %*% A %*% Istar_hi %*% A %*% M,
+      pval <- pRQF(r = teststat, A = M %*% A %*% Istar_hi %*% A %*% M,
                       B = M %*% A %*% Istar_lo %*% A %*% M, algorithm = qfmethod,
                       lower.tail = FALSE)
     } else if (alternative == "less") {
-      pval <- pvalRQF(r = teststat, A = M %*% A %*% Istar_hi %*% A %*% M,
+      pval <- pRQF(r = teststat, A = M %*% A %*% Istar_hi %*% A %*% M,
                       B = M %*% A %*% Istar_lo %*% A %*% M, algorithm = qfmethod,
                       lower.tail = TRUE)
     } else if (alternative == "two.sided") {
-      pval <- twosidedpval(q = teststat, CDF = pvalRQF,
+      pval <- twosidedpval(q = teststat, CDF = pRQF,
                       method = twosidedmethod, Aloc = 1, continuous = TRUE,
                        A = M %*% A %*% Istar_hi %*% A %*% M,
                        B = M %*% A %*% Istar_lo %*% A %*% M,

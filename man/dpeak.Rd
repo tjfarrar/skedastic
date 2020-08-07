@@ -42,6 +42,10 @@ dpeak(0:9, 10)
 plot(0:9, dpeak(0:9, 10), type = "p", pch = 20, xlab = "Number of Peaks",
          ylab = "Probability")
 
+# This would be extremely slow if usedata were set to FALSE:
+prob <- dpeak(0:199, 200, usedata = TRUE)
+plot(0:199, prob, type = "l", xlab = "Number of Peaks", ylab = "Probability")
+
 # `dpeakdat` is a dataset containing probabilities generated from `dpeak`
 utils::data(dpeakdat)
 expval <- unlist(lapply(dpeakdat,

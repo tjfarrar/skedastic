@@ -17,7 +17,7 @@ An integer value between \code{0} and \code{length(x) - 1}
 This function computes the number of peaks in a double vector, with
 peak defined as per \insertCite{Goldfeld65;textual}{skedastic}. The function
 is used in the Goldfeld-Quandt nonparametric test for heteroskedasticity in
-a linear model.
+a linear model. \code{NA} and \code{NaN} values in the sequence are ignored.
 }
 \examples{
 set.seed(9586)

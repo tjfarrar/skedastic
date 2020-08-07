@@ -7,10 +7,10 @@
 bamset(
   mainlm,
   k = 3,
-  deflator = NULL,
+  deflator = NA,
   correct = TRUE,
   omitatmargins = TRUE,
-  omit = NULL,
+  omit = NA,
   statonly = FALSE
 )
 }
@@ -21,9 +21,11 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{k}{An integer. The number of subsets (>= 2) into which the BLUS residuals are
 to be partitioned. Defaults to 3, the value suggested in
@@ -34,7 +36,7 @@ design matrix of \code{mainlm} or an integer giving the index of a
 column of the design matrix. This variable is suspected to be
 related to the error variance under the alternative hypothesis.
 \code{deflator} may not correspond to a column of 1's (intercept).
-Default \code{NULL} means the data will be left in its current order
+Default \code{NA} means the data will be left in its current order
 (e.g. in case the existing index is believed to be associated with
 error variance).}
 
@@ -46,7 +48,7 @@ constant to improve the chi-squared approximation? Defaults to
 margins of the \code{k} subsets be passed to \code{\link{blus}} as the
 \code{omit} argument? If \code{TRUE} (the default), this overrides any
 \code{omit} argument passed directly. If \code{FALSE}, the \code{omit}
-argument must be specified and cannot be left as \code{NULL}.}
+argument must be specified and cannot be left as \code{NA}.}
 
 \item{omit}{A numeric vector of length \eqn{p} (the number of columns in the
 linear model design matrix) giving the indices of \eqn{p} observations to omit in

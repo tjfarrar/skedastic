@@ -8,7 +8,7 @@ blus(
   mainlm,
   omit = c("first", "last", "random"),
   keepNA = TRUE,
-  exhaust = NULL,
+  exhaust = NA,
   seed = 1234
 )
 }
@@ -19,9 +19,11 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{omit}{A numeric vector of length \eqn{p} (the number of columns in the
 linear model design matrix) giving the indices of \eqn{p} observations to omit in
@@ -36,12 +38,15 @@ returned as \code{NA_real_} to preserve the length of the residual vector?}
 \item{exhaust}{An integer. If singular matrices are encountered
 using the passed value of \code{omit}, how many random combinations
 of \eqn{p} indices should be attempted before an error is thrown? If
-\code{NULL} (the default), all possible combinations are attempted
-(which could result in very slow execution if \eqn{n} is large).}
+\code{NA} (the default), all possible combinations are attempted
+provided that \eqn{{n \choose p} \le 10^4}; otherwise up to
+\eqn{10^4} random samples of size \code{p} from \code{1:n} are
+attempted (with replacement). Integer values of \code{exhaust}
+greater than \code{1e4L} are treated as \code{NA}.}
 
 \item{seed}{An integer specifying a seed to pass to
 \code{\link[base]{set.seed}} for random number generation. This allows
-reproducibility of bootstrap results. The default value, \code{NULL},
+reproducibility of bootstrap results. The default value, \code{NA},
 results in not setting a seed.}
 }
 \value{

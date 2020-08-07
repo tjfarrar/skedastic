@@ -40,17 +40,17 @@
 #' glejser(mtcars_lm)
 #'
 
-glejser <- function(mainlm, auxdesign = NULL,
+glejser <- function(mainlm, auxdesign = NA,
                      sigmaest = c("main", "auxiliary"), statonly = FALSE) {
 
   sigmaest <- match.arg(sigmaest, c("main", "auxiliary"))
 
-  auxfitvals <- ifelse(is.null(auxdesign), FALSE,
+  auxfitvals <- ifelse(all(is.na(auxdesign)) | is.null(auxdesign), FALSE,
                                     auxdesign == "fitted.values")
   processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
                 needp = FALSE)
 
-  if (is.null(auxdesign)) {
+  if (all(is.na(auxdesign)) || is.null(auxdesign)) {
     Z <- X
   } else if (is.character(auxdesign)) {
     if (auxdesign == "fitted.values") {

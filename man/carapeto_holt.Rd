@@ -6,7 +6,7 @@
 \usage{
 carapeto_holt(
   mainlm,
-  deflator = NULL,
+  deflator = NA,
   prop_central = 1/3,
   group1prop = 1/2,
   qfmethod = "imhof",
@@ -22,16 +22,18 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{deflator}{Either a character specifying a column name from the
 design matrix of \code{mainlm} or an integer giving the index of a
 column of the design matrix. This variable is suspected to be
 related to the error variance under the alternative hypothesis.
 \code{deflator} may not correspond to a column of 1's (intercept).
-Default \code{NULL} means the data will be left in its current order
+Default \code{NA} means the data will be left in its current order
 (e.g. in case the existing index is believed to be associated with
 error variance).}
 
@@ -47,7 +49,7 @@ equal number of observations is assigned to the first and second groups.}
 
 \item{qfmethod}{A character, either \code{"imhof"}, \code{"davies"}, or
 \code{"integrate"}, corresponding to the \code{algorithm} argument
-of \code{\link[skedastic]{pvalRQF}}. The default is \code{"imhof"}.}
+of \code{\link[skedastic]{pRQF}}. The default is \code{"imhof"}.}
 
 \item{alternative}{A character specifying the form of alternative
 hypothesis. If it is suspected that the error variance is positively
@@ -88,7 +90,7 @@ The test is based on the methodology of
    observations. The test statistic is then computed as a ratio of quadratic
    forms corresponding to the sums of squared residuals of the upper and
    lower observations respectively. \eqn{p}-values are computed by the
-   Imhof algorithm in \code{\link{pvalRQF}}.
+   Imhof algorithm in \code{\link{pRQF}}.
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)

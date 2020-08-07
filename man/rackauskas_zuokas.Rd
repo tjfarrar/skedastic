@@ -22,9 +22,11 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{alpha}{A double such that \eqn{0 \le \alpha < 1/2}; a hyperparameter
 of the test. Defaults to 0.}
@@ -62,7 +64,7 @@ observations is small. Ignored if \code{pvalmethod == "data"}.}
 number generation when simulating values from the asymptotic null
 distribution. This is to provide reproducibility of test results.
 Ignored if \code{pvalmethod == "data"}. If user does not wish to set
-the seed, pass \code{NULL}.}
+the seed, pass \code{NA}.}
 
 \item{statonly}{A logical. If \code{TRUE}, only the test statistic value
 is returned, instead of an object of \code{\link[base]{class}}

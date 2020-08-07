@@ -21,11 +21,13 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
-\item{hettest}{A function, or a character specifying the name of a function,
+\item{hettest}{A character specifying the name of a function
 that implements a heteroskedasticity test on a linear regression model.
 The function is called with the \code{statonly} argument set to
 \code{TRUE} to improve computational efficiency.}
@@ -34,15 +36,15 @@ The function is called with the \code{statonly} argument set to
 to generate. Defaults to \code{1000L}.}
 
 \item{alternative}{The tailedness of the test whose statistic is computed by
-\code{hettest}; one of \code{"greater"} (the default), \code{"less"}, or
-\code{"two.sided"}.}
+\code{hettest} function; one of \code{"greater"} (the default),
+\code{"less"}, or \code{"two.sided"}.}
 
 \item{seed}{An integer specifying a seed to pass to
 \code{\link[base]{set.seed}} for random number generation. This allows
-reproducibility of bootstrap results. A value of \code{NULL}
+reproducibility of bootstrap results. A value of \code{NA}
 results in not setting a seed.}
 
-\item{...}{Additional arguments to pass to \code{hettest}}
+\item{...}{Additional arguments to pass to function with name \code{hettest}}
 }
 \value{
 An object of \code{\link[base]{class}} \code{"htest"}. If object
@@ -57,10 +59,11 @@ This function implements the method of
 }
 \details{
 The procedure runs as follows. (1) The observed
-   value of the test statistic \eqn{T_0} is computed using \code{hettest}.
-   (2) A sample \eqn{e_1^\star,e_2^\star,\ldots,e_n^\star} is drawn with
-   replacement from the OLS residuals. (3) Bootstrapped response values are
-   computed as \eqn{y_i^{\star}=x_i' \hat{\beta}+e_i^\star,i=1,2,\ldots,n}.
+   value of the test statistic \eqn{T_0} is computed using function with
+   name \code{hettest}. (2) A sample
+   \eqn{e_1^\star,e_2^\star,\ldots,e_n^\star} is drawn with replacement from
+   the OLS residuals. (3) Bootstrapped response values are computed as
+   \eqn{y_i^{\star}=x_i' \hat{\beta}+e_i^\star,i=1,2,\ldots,n}.
    (4) Bootstrapped test statistic value \eqn{T^\star} is computed from the
    regression of \eqn{y^\star} on \eqn{X} using function \code{hettest}.
    (5) Steps (2)-(4) are repeated until \eqn{B} bootstrapped test statistic
@@ -72,7 +75,7 @@ The procedure runs as follows. (1) The observed
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
-godfrey_orme(mtcars_lm, hettest = breusch_pagan)
+godfrey_orme(mtcars_lm, hettest = "breusch_pagan")
 
 }
 \references{

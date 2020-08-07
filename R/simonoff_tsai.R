@@ -59,16 +59,24 @@
 #'    \code{"cook_weisberg"} corresponds to the test statistic produced by
 #'    \code{\link{cook_weisberg}}. Partial matching is used. This argument is
 #'    only used if \code{method} is \code{"score"}.
-#' @param mlestart The numerical value of the \code{start} argument of
-#'    \code{\link[maxLik]{maxLik}}. If it is of \code{length} 1, the value will
-#'    be replicated \eqn{q} times using \code{\link[base]{rep}}. Default is 0.1.
-#'    This argument is used only if \code{method} is \code{"mlr"}.
 #' @param bartlett A logical specifying whether a Bartlett correction should be
 #'    made, as per \insertCite{Ferrari04;textual}{skedastic}, to improve the
 #'    fit of the test statistic to the asymptotic null distribution. This
 #'    argument is only applicable where \code{method} is \code{"mlr"}, and is
 #'    implemented only where \code{hetfun} is \code{"mult"} or
 #'    \code{"logmult"}.
+#' @param optmethod A character specifying the optimisation method to use with
+#'    \code{\link[stats]{optim}}, if \code{method} is \code{"mlr"}. The
+#'    default, \code{"Nelder-Mead"}, corresponds to the default \code{method}
+#'    value in \code{\link[stats]{optim}}. Warnings about Nelder-Mead algorithm
+#'    being unreliable for one-dimensional optimization have been suppressed,
+#'    since the algorithm does appear to work for the three implemented choices
+#'    of \code{hetfun}.
+#' @param ... Optional arguments to pass to \code{\link[stats]{optim}}, such as
+#'    \code{par} (initial value of \eqn{\lambda}) and \code{maxit} (maximum
+#'    number of iterations to use in optimisation algorithm), and \code{trace}
+#'    (to provide detailed output on optimisation algorithm). Default initial
+#'    value of \eqn{\lambda} is \code{rep(1e-3, q)}.
 #' @inheritParams breusch_pagan
 #' @inheritParams cook_weisberg
 #'
@@ -89,21 +97,22 @@
 #'  method = "mlr", hetfun = "logmult")}
 #'
 
-simonoff_tsai <- function(mainlm, auxdesign = NULL, method = c("mlr", "score"),
+simonoff_tsai <- function(mainlm, auxdesign = NA, method = c("mlr", "score"),
                   hetfun = c("mult", "add", "logmult"),
-                  basetest = c("koenker", "cook_weisberg"), mlestart = 0.1,
-                  bartlett = TRUE, statonly = FALSE) {
+                  basetest = c("koenker", "cook_weisberg"), bartlett = TRUE,
+                  optmethod = "Nelder-Mead", statonly = FALSE,
+                  ...) {
 
   basetest <- match.arg(basetest, c("koenker", "cook_weisberg"))
   method <- match.arg(method, c("mlr", "score"))
   hetfun <- match.arg(hetfun, c("mult", "add", "logmult"))
 
-  auxfitvals <- ifelse(is.null(auxdesign), FALSE,
+  auxfitvals <- ifelse(all(is.na(auxdesign)) | is.null(auxdesign), FALSE,
                                     auxdesign == "fitted.values")
   processmainlm(m = mainlm, needy = (method == "mlr"), needyhat = auxfitvals,
                 needp = TRUE)
 
-  if (is.null(auxdesign)) {
+  if (all(is.na(auxdesign)) || is.null(auxdesign)) {
     Z <- X
   } else if (is.character(auxdesign)) {
     if (auxdesign == "fitted.values") {
@@ -130,6 +139,7 @@ simonoff_tsai <- function(mainlm, auxdesign = NULL, method = c("mlr", "score"),
     if (hetfun == "mult") {
       J <- Z
     } else if (hetfun == "logmult") {
+      if (any(Z <= 0)) stop("When `hetfun` is `\"logmult\"`, auxiliary design matrix elements must be strictly positive")
       J <- log(Z)
     } else if (hetfun == "add") {
       J <- 2 * Z
@@ -155,6 +165,7 @@ simonoff_tsai <- function(mainlm, auxdesign = NULL, method = c("mlr", "score"),
     teststat <- basestat + addterm
     if (statonly) return(teststat)
   } else if (method == "mlr") {
+
     if (hetfun == "mult") {
       w <- function(Zi, lambda) {
         force(exp(sum(lambda * Zi)))
@@ -171,28 +182,39 @@ simonoff_tsai <- function(mainlm, auxdesign = NULL, method = c("mlr", "score"),
     } else stop("Invalid hetfun argument")
     ellp <- function(lambda) {
       W <- diag(vapply(1:n, function(i) w(Z[i, ], lambda), NA_real_))
-      beta <- solve(t(X) %*% solve(W) %*% X) %*% t(X) %*% solve(W) %*% y
-      sigmasq <- t(y - X %*% beta) %*% solve(W) %*% (y - X %*% beta) / n
+      Winv <- solve(W)
+      beta <- solve(t(X) %*% Winv %*% X) %*% t(X) %*% Winv %*% y
+      sigmasq <- t(y - X %*% beta) %*% Winv %*% (y - X %*% beta) / n
       (- n / 2 * log(sigmasq) - 1 / 2 * sum(vapply(1:n, function(i)
         log(w(Z[i, ], lambda)), NA_real_)) - (2 * sigmasq) ^ (-1) *
-        t(y - X %*% beta) %*% solve(W) %*% (y - X %*% beta))
+        t(y - X %*% beta) %*% Winv %*% (y - X %*% beta))
     }
     lambda0 <- rep(0, q)
-    if (length(mlestart) == q) {
-      lambda_start <- mlestart
-    } else {
-      lambda_start <- rep(mlestart, q)
+    lambda_start <- rep(1e-3, q)
+
+    arguments <- list(...)
+    invisible(list2env(arguments, envir = environment()))
+
+    if (exists("par", where = environment(), inherits = FALSE)) {
+      if (length(par) == 1) {
+        lambda_start <- rep(par, q)
+      } else {
+        lambda_start <- par
+      }
+      arguments$par <- NULL
     }
-    if (p > 2) {
-      maxLikargs <- list("logLik" = ellp,
-                         "start" = lambda_start, "method" = "NM")
-    } else {
-      maxLikargs <- list("logLik" = ellp, "start" = lambda_start)
-    }
-    MLE <- do.call(what = maxLik::maxLik, args = maxLikargs)
+
+    controllist <- append(list("fnscale" = -1, "warn.1d.NelderMead" = FALSE),
+                          arguments)
+
+    MLE <- stats::optim(par = lambda_start, fn = ellp, method = optmethod,
+                        control = controllist, hessian = TRUE)
+
+    if (MLE$convergence != 0) warning("Algorithm for likelihood maximisation did not converge; consider trying a larger maxit value")
+
     # constraints = list("ineqA" = diag(q), "ineqB" = rep(0, q))
-    L <- -2 * (ellp(lambda0) - MLE$maximum)
-    w_at_MLE <- vapply(1:n, function(i) w(Z[i, ], MLE$estimate), NA_real_)
+    L <- -2 * (ellp(lambda0) - MLE$value)
+    w_at_MLE <- vapply(1:n, function(i) w(Z[i, ], MLE$par), NA_real_)
     Ghat <- diag(w_at_MLE / (prod(w_at_MLE ^ (1 / n))))
     Xmhat <- expm::sqrtm(solve(Ghat)) %*% X
     teststat <- as.double((n - p - 2) / n * L +

@@ -22,7 +22,7 @@
 #'    column of the design matrix. This variable is suspected to be
 #'    related to the error variance under the alternative hypothesis.
 #'    \code{deflator} may not correspond to a column of 1's (intercept).
-#'    Default \code{NULL} means the data will be left in its current order
+#'    Default \code{NA} means the data will be left in its current order
 #'    (e.g. in case the existing index is believed to be associated with
 #'    error variance).
 #' @param lambda_star A double; coefficient representing the degree of
@@ -51,7 +51,7 @@
 #' evans_king(mtcars_lm, deflator = "qsec", method = "LM")
 #'
 
-evans_king <- function(mainlm, method = c("GLS", "LM"), deflator = NULL,
+evans_king <- function(mainlm, method = c("GLS", "LM"), deflator = NA,
                       lambda_star = 5, qfmethod = "imhof", statonly = FALSE) {
 
   method <- match.arg(toupper(method), c("GLS", "LM"))
@@ -71,7 +71,10 @@ evans_king <- function(mainlm, method = c("GLS", "LM"), deflator = NULL,
 
   checkdeflator(deflator, X, p, hasintercept[[1]])
 
-  if (!is.null(deflator)) {
+  if (!is.na(deflator) && !is.null(deflator)) {
+    if (!is.na(suppressWarnings(as.integer(deflator)))) {
+      deflator <- as.integer(deflator)
+    }
     e <- e[order(X[, deflator])]
     X <- X[order(X[, deflator]), , drop = FALSE]
   }
@@ -91,16 +94,23 @@ evans_king <- function(mainlm, method = c("GLS", "LM"), deflator = NULL,
 
     Mstar <- fastM(Xstar, n)
     teststat <- as.double((t(e) %*% R %*% Mstar %*% R %*% e) / crossprod(e))
-    if (statonly) teststat <- FALSE
-    pval <- pvalRQF(r = teststat, A = M %*% R %*% Mstar %*% R %*% M,
+    if (statonly) return(teststat)
+    pval <- pRQF(r = teststat, A = M %*% R %*% Mstar %*% R %*% M,
                     B = M, algorithm = qfmethod, lower.tail = TRUE)
   } else if (method == "LM") {
     lambda_star <- NULL
     N <- diag((n - 1:n) / (n - 1))
     teststat <- as.double((t(e) %*% N %*% e) / crossprod(e))
-    if (statonly) teststat <- FALSE
-    pval <- pvalRQF(r = teststat, A = M %*% N %*% M,
+    if (statonly) return(teststat)
+    pval <- pRQF(r = teststat, A = M %*% N %*% M,
                     B = M, algorithm = qfmethod, lower.tail = TRUE)
+    if (pval < 0 && berryFunctions::almost.equal(pval, 0)) {
+      message("p-value returned by algorithm in pRQF slightly < 0 and thus changed to 0")
+      pval <- 0
+    } else if (pval > 1 && berryFunctions::almost.equal(pval, 1)) {
+      message("p-value returned by algorithm in pRQF slightly > 1 and thus changed to 1")
+      pval <- 0
+    }
   } else stop("Invalid `method` argument")
 
   rval <- structure(list(statistic = teststat, p.value = pval,

@@ -18,22 +18,26 @@
 #'    \code{"fitted.values"} for the OLS predicted values \eqn{\hat{y}_i},
 #'    \code{"fitted.values2"} for transformed OLS predicted values
 #'    \eqn{m_{ii}\hat{y}_i}, and/or \code{names} of explanatory variable columns).
-#'    \code{"explanatory"} passes all explanatory variable columns. \code{"log"}
+#'    \code{"explanatory"} passes all explanatory variable columns. \code{"log_"}
 #'    concatenated with \code{names} of explanatory variable columns passes logs
 #'    of those explanatory variables. \code{"log_explanatory"} passes logs of
 #'    all explanatory variables. If more than one variable is specified,
 #'    a separate plot is created for each.
 #' @param vertvar A character vector describing the variable to plot on the
-#'    vertical axis ("res" for OLS residuals [the default], "res_blus" for
-#'    \code{\link[=blus]{BLUS}} residuals, "res_stand" for standardised OLS
-#'    residuals: \eqn{e_i/\hat{\sigma}}, "res_constvar" for OLS
-#'    residuals transformed to have constant variance: \eqn{e_i/\sqrt{m_{ii}}},
-#'    "res_stud" for studentised OLS residuals: \eqn{e_i/(s\sqrt{m_{ii}})}.
-#'    If more than one value is specified, a separate plot is created for each.
-#' @param vertfun A character vector giving the names of functions to apply to
-#'    the \code{vertvar} variable. Numerals such as "2" are taken to be powers
-#'    to which \code{vertvar} should be set. If multiple values are specified,
-#'    they are all applied to each element of \code{vertvar}.
+#'    vertical axis (\code{"res"} for OLS residuals [the default],
+#'    \code{"res_blus"} for \code{\link[=blus]{BLUS}} residuals,
+#'    \code{"res_stand"} for standardised OLS residuals:
+#'    \eqn{e_i/\hat{\sigma}}, \code{"res_constvar"} for OLS residuals
+#'    transformed to have constant variance: \eqn{e_i/\sqrt{m_{ii}}},
+#'    \code{"res_stud"} for studentised OLS residuals:
+#'    \eqn{e_i/(s\sqrt{m_{ii}})}. If more than one value is specified,
+#'    a separate plot is created for each.
+#' @param vertfun A character vector giving the name of a function to apply to
+#'    the \code{vertvar} variable. Values that can be coerced to numeric such
+#'    as \code{"2"} are taken to be powers to which \code{vertvar} should be
+#'    set. If multiple values are specified, they are all applied to each
+#'    element of \code{vertvar}. Common choices might be \code{"identity"} (the
+#'    default), \code{"abs"} (absolute value), and \code{"2"} (squaring).
 #' @param filetype A character giving the type of image file to which the
 #'    plot(s) should be written. Values can be \code{"png"},
 #'    \code{"bmp"}, \code{"jpeg"}, or \code{"tiff"}. Image files are written
@@ -41,7 +45,7 @@
 #'    directory, which can be located using \code{tempdir()}. The files should
 #'    be moved or copied to another location if they are needed after the R
 #'    session is ended. Default filenames contain timestamps for uniqueness.
-#'    If \code{NULL} (the default), no image files are written, and in this
+#'    If \code{NA} (the default), no image files are written, and in this
 #'    case, if there are multiple plots, they are plotted on a single device
 #'    using the \code{"mfrow"} graphical parameter. If many plots are requested
 #'    at once, it is advisable to write them to image files.
@@ -68,17 +72,16 @@
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' # Generates 2 x 2 matrix of plots in console
 #' hetplot(mtcars_lm, horzvar = c("index", "fitted.values"),
-#' vertvar = c("res_blus"), vertfun = c("2", "abs"), filetype = NULL)
+#' vertvar = c("res_blus"), vertfun = c("2", "abs"), filetype = NA)
 #'
 #' # Generates 84 png files in tempdir() folder
-#' ## Not run
-#' # hetplot(mainlm = mtcars_lm, horzvar = c("explanatory", "log_explanatory",
-#' #  "fitted.values2"), vertvar = c("res", "res_stand", "res_stud",
-#' #  "res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")
+#' \dontrun{hetplot(mainlm = mtcars_lm, horzvar = c("explanatory", "log_explanatory",
+#' "fitted.values2"), vertvar = c("res", "res_stand", "res_stud",
+#' "res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")}
 #'
 
-hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity",
-                     filetype = NULL, values = FALSE, ...) {
+hetplot <- function (mainlm, horzvar = "index", vertvar = "res", vertfun = "identity",
+                     filetype = NA, values = FALSE, ...) {
 
   args <- list(...)
   grdevargnames <- c("filename", "width", "height", "units", "pointsize", "bg",
@@ -109,26 +112,26 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
   sigma_hat_sq <- sum(e ^ 2) / n
   s_sq <- sum(e ^ 2) / (n - p)
 
-  hasintercept <- columnof1s(X)
-  if (hasintercept[[1]]) {
-    if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
-    colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
-  } else {
-    colnames(X) <- paste0("X", 1:p)
-  }
+  # hasintercept <- columnof1s(X)
+  # if (hasintercept[[1]]) {
+  #   if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
+  #   colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
+  # } else {
+  #   colnames(X) <- paste0("X", 1:p)
+  # }
 
   if ("explanatory" %in% horzvar) {
     horzvar <- c(horzvar[-which(horzvar == "explanatory")], colnames(X))
     if ("(Intercept)" %in% horzvar) horzvar <- horzvar[-which(horzvar == "(Intercept)")]
   }
   if ("log_explanatory" %in% horzvar) {
-    horzvar <- c(horzvar[-which(horzvar == "log_explanatory")], paste0("log", colnames(X)))
-    if ("log(Intercept)" %in% horzvar) horzvar <- horzvar[-which(horzvar == "log(Intercept)")]
+    horzvar <- c(horzvar[-which(horzvar == "log_explanatory")], paste0("log_", colnames(X)))
+    if ("log_(Intercept)" %in% horzvar) horzvar <- horzvar[-which(horzvar == "log_(Intercept)")]
   }
 
   x_hor <- as.data.frame(lapply(horzvar, function(x) if (x %in% colnames(X)) {X[, x]}
-                                    else if (regexpr("log", substr(x, 1, 3)) != -1) {
-                                      log(X[, substr(x, 4, nchar(x))])
+                                    else if (regexpr("log_", substr(x, 1, 4)) != -1) {
+                                      log(X[, substr(x, 5, nchar(x))])
                                     }
                                     else if (x == "fitted.values") {yhat}
                                     else if (x == "fitted.values2") {diag(M) * yhat}
@@ -157,7 +160,7 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
                                                            sep = "_")))
 
   yline_mtext <- unlist(lapply(names(y_ver), function(l) {
-    ylinebase <- ifelse(is.null(filetype), 3, 4.25)
+    ylinebase <- ifelse(is.na(filetype) | is.null(filetype), 3, 4.25)
     if (regexpr("stud", l) != -1) {
       ylinebase <- ylinebase - 0.5
     } else if (regexpr("const", l) != -1) {
@@ -170,9 +173,9 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
   }))
 
   opar <- graphics::par(no.readonly = TRUE)
-  on.exit(graphics::par(opar))
+  on.exit(suppressWarnings(graphics::par(opar)))
   numplots <- length(horzvar) * length(vertvar) * length(vertfun)
-  if (is.null(filetype)) {
+  if (is.na(filetype) || is.null(filetype)) {
     mfrow_dim <- plotdim(numplots)
     if (max(mfrow_dim) >= 5) warning("Large number of plots in one dimension")
     graphics::par(mfrow = mfrow_dim)
@@ -196,6 +199,7 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
                                                         parargs$cex, 0.8))
     }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = FALSE),
     y_ver, names(y_ver), yline_mtext, SIMPLIFY = FALSE)
+    graphics::par(new = FALSE)
   } else {
     if (!dir.exists(paste0(tempdir(),"/hetplot"))) {
       dir.create(paste0(tempdir(),"/hetplot"))
@@ -205,6 +209,9 @@ hetplot <- function (mainlm, horzvar = 1:n, vertvar = "res", vertfun = "identity
         grdevargs$filename <- paste0(tempdir(),"/hetplot/",xnames, "_",
                           ynames, "_", gsub("[[:space:]]|[[:punct:]]",
                                   "_", Sys.time()), ".", filetype)
+        if (file.exists(grdevargs$filename))
+          grdevargs$filename <- paste0(substr(grdevargs$filename, start = 1,
+           stop = regexpr(filetype, grdevargs$filename) - 2), "(1).", filetype)
       }
       do.call(get(filetype), grdevargs)
       if (!las_passed) parargs$las <- 1

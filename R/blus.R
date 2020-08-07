@@ -27,8 +27,11 @@
 #' @param exhaust An integer. If singular matrices are encountered
 #'    using the passed value of \code{omit}, how many random combinations
 #'    of \eqn{p} indices should be attempted before an error is thrown? If
-#'    \code{NULL} (the default), all possible combinations are attempted
-#'    (which could result in very slow execution if \eqn{n} is large).
+#'    \code{NA} (the default), all possible combinations are attempted
+#'    provided that \eqn{{n \choose p} \le 10^4}; otherwise up to
+#'    \eqn{10^4} random samples of size \code{p} from \code{1:n} are
+#'    attempted (with replacement). Integer values of \code{exhaust}
+#'    greater than \code{1e4L} are treated as \code{NA}.
 #' @inheritParams breusch_pagan
 #' @inheritParams wilcox_keselman
 #'
@@ -61,56 +64,51 @@
 #'
 
 blus <- function(mainlm, omit = c("first", "last", "random"), keepNA = TRUE,
-                  exhaust = NULL, seed = 1234) {
+                  exhaust = NA, seed = 1234) {
 
   processmainlm(m = mainlm, needy = FALSE)
 
   n <- nrow(X)
-  if (!is.null(seed)) set.seed(seed)
+  if (!is.na(seed)) set.seed(seed)
   omitfunc <- do_omit(omit, n, p, seed)
   Xmats <- do_Xmats(X, n, p, omitfunc$omit_ind)
   singular_matrix <- FALSE
 
-  if (matrixcalc::is.singular.matrix(Xmats$X_ord_sq,
-                  tol = .Machine$double.eps) ||
-      matrixcalc::is.singular.matrix(Xmats$X0,
-                  tol = .Machine$double.eps)) {
+  if (is.singular.mat(Xmats$X_ord_sq) ||
+      is.singular.mat(Xmats$X0)) {
 
     singular_matrix <- TRUE
     message("Passed `omit` argument resulted in singular matrix; BLUS residuals
           could not be computed. Randomly chosen combinations of indices to
           omit will be attempted according to `exhaust` argument passed.")
-    if (!is.null(exhaust) && exhaust == 0) {
-      stop("`exhaust` set to 0; no attempts made to find subset to omit")
-    }
-    all_possible_omit <- t(utils::combn(n, p))
-    if (omitfunc$omit_passed == "first") {
-      all_possible_omit <- all_possible_omit[-1, , drop = FALSE]
-    } else if (omitfunc$omit_passed == "last") {
-      all_possible_omit <- all_possible_omit[-nrow(all_possible_omit),
-                                             , drop = FALSE]
-    } else if (omitfunc$omit_passed == "intvector" ||
-               omitfunc$omit_passed == "random") {
-      whichrow <- which(apply(all_possible_omit, 1,
-                        function(x) all(x == omitfunc$omit_ind)))
-      all_possible_omit <- all_possible_omit[-whichrow, , drop = FALSE]
+    ncombn <- choose(n, p)
+    if ((is.na(exhaust) || is.null(exhaust))) {
+      dosample <- (ncombn > 1e4)
+      numsample <- 1e4
+    } else if (exhaust <= 0) {
+      stop("`exhaust` is not positive; no attempts will be made to find subset to omit")
+    } else {
+      dosample <- (ncombn > exhaust)
+      numsample <- min(ncombn, exhaust)
     }
 
-    maxrow <- ifelse(is.null(exhaust), nrow(all_possible_omit),
-                                  exhaust)
+    if (dosample) {
+      subsetstotry <- unique(t(replicate(numsample, sort(sample(x = n, size = p)))))
+      rowstodo <- 1:nrow(subsetstotry)
+    } else {
+      subsetstotry <- t(utils::combn(n, p))
+      maxrow <- min(exhaust, nrow(subsetstotry), na.rm = TRUE)
+      rowstodo <- sample(1:nrow(subsetstotry), maxrow, replace = FALSE)
+    }
 
-    rowstodo <- sample(1:nrow(all_possible_omit), maxrow, replace = FALSE)
-
-    for (r in 1:maxrow) {
-      omitfunc <- do_omit(all_possible_omit[rowstodo[r], , drop = FALSE], n, p)
+    for (r in rowstodo) {
+      omitfunc <- do_omit(subsetstotry[rowstodo[r], , drop = FALSE], n, p)
       Xmats <- do_Xmats(X, n, p, omitfunc$omit_ind)
-      if (!matrixcalc::is.singular.matrix(Xmats$X_ord_sq,
-                                          tol = .Machine$double.eps) &&
-          !matrixcalc::is.singular.matrix(Xmats$X0,
-                                          tol = .Machine$double.eps)) {
+      if (!is.singular.mat(Xmats$X_ord_sq) &&
+          !is.singular.mat(Xmats$X0)) {
         singular_matrix <- FALSE
         message(paste0("Success! Subset of indices found that does not yield singular
-                     matrix: ", paste(omitfunc$omit_ind, collapse = ",")))
+                   matrix: ", paste(omitfunc$omit_ind, collapse = ",")))
         break
       }
     }

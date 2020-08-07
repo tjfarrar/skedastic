@@ -63,7 +63,7 @@ white_lm <- function(mainlm, interactions = FALSE, statonly = FALSE) {
   iota <- rep(1, n)
   N <- diag(n) - 1 / n * (tcrossprod(iota))
   e_aux <- auxlm$residuals
-  teststat <- n * (1 - crossprod(e_aux) / (t(esq) %*% N %*% esq))
+  teststat <- as.double(n * (1 - crossprod(e_aux) / (t(esq) %*% N %*% esq)))
   if (statonly) return(teststat)
 
   df <- ncol(Z) - 1

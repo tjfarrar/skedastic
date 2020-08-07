@@ -22,7 +22,7 @@
 #'    column of the design matrix. This variable is suspected to be
 #'    related to the error variance under the alternative hypothesis.
 #'    \code{deflator} may not correspond to a column of 1's (intercept).
-#'    Default \code{NULL} means the data will be left in its current order
+#'    Default \code{NA} means the data will be left in its current order
 #'    (e.g. in case the existing index is believed to be associated with
 #'    error variance).
 #'
@@ -41,7 +41,7 @@
 #' honda(mtcars_lm, deflator = "qsec")
 #'
 
-honda <- function(mainlm, deflator = NULL, alternative = c("two.sided",
+honda <- function(mainlm, deflator = NA, alternative = c("two.sided",
                     "greater", "less"), twosidedmethod =
                      c("doubled", "kulinskaya"), qfmethod = "imhof",
                      statonly = FALSE) {
@@ -65,22 +65,25 @@ honda <- function(mainlm, deflator = NULL, alternative = c("two.sided",
   checkdeflator(deflator, X, p, hasintercept[[1]])
 
   M <- fastM(X, n)
-  if (is.null(deflator)) {
+  if (is.na(deflator) || is.null(deflator)) {
     A0 <- diag(1:n)
   } else {
+    if (!is.na(suppressWarnings(as.integer(deflator)))) {
+      deflator <- as.integer(deflator)
+    }
     A0 <- diag(X[, deflator])
   }
 
   teststat <- as.double((t(e) %*% A0 %*% e) / crossprod(e))
   if (statonly) return(teststat)
   if (alternative == "greater") {
-    pval <- pvalRQF(r = teststat, A = M %*% A0 %*% M,
+    pval <- pRQF(r = teststat, A = M %*% A0 %*% M,
                     B = M, algorithm = qfmethod, lower.tail = FALSE)
   } else if (alternative == "less") {
-    pval <- pvalRQF(r = teststat, A = M %*% A0 %*% M,
+    pval <- pRQF(r = teststat, A = M %*% A0 %*% M,
                     B = M, algorithm = qfmethod, lower.tail = TRUE)
   } else if (alternative == "two.sided") {
-    pval <- twosidedpval(q = teststat, CDF = pvalRQF,
+    pval <- twosidedpval(q = teststat, CDF = pRQF,
                          method = twosidedmethod, Aloc = 1, continuous = TRUE,
                          A = M %*% A0 %*% M, B = M, algorithm = qfmethod,
                          lower.tail = TRUE)

@@ -36,7 +36,7 @@
 #'    column of the design matrix. This variable is suspected to be
 #'    related to the error variance under the alternative hypothesis.
 #'    \code{deflator} may not correspond to a column of 1's (intercept).
-#'    Default \code{NULL} means the data will be left in its current order
+#'    Default \code{NA} means the data will be left in its current order
 #'    (e.g. in case the existing index is believed to be associated with
 #'    error variance).
 #' @param prop_central A double specifying the proportion of central
@@ -59,11 +59,13 @@
 #' @param prob A vector of probabilities corresponding to values of the test
 #'    statistic (number of peaks) from 0 to \eqn{n-1} inclusive (used
 #'    only when \code{method} is \code{"nonparametric"}). If
-#'    \code{NULL} (the default), probabilities are calculated within the
+#'    \code{NA} (the default), probabilities are calculated within the
 #'    function by calling \code{ppeak}. The user can improve computational
 #'    performance of the test (for instance, when the test is being used
 #'    repeatedly in a simulation) by pre-specifying the exact probability
-#'    distribution of the number of peaks using this argument.
+#'    distribution of the number of peaks using this argument, e.g. by
+#'    calling the \eqn{n}th element of \code{\link{dpeakdat}} (or \eqn{(n-p)}th
+#'    element, if BLUS residuals are used).
 #' @param twosidedmethod A character indicating the method to be used to compute
 #'    two-sided \eqn{p}-values for the parametric test when \code{alternative}
 #'    is \code{"two.sided"}. The argument is passed to
@@ -99,10 +101,10 @@
 #' goldfeld_quandt(mtcars_lm, deflator = "qsec", method = "nonparametric",
 #'  restype = "blus", alternative = "two.sided")
 
-goldfeld_quandt <- function(mainlm, method = "parametric", deflator = NULL,
-                    prop_central = 1 / 3, group1prop = 1 / 2,
+goldfeld_quandt <- function(mainlm, method = c("parametric", "nonparametric"),
+                    deflator = NA, prop_central = 1 / 3, group1prop = 1 / 2,
                     alternative = c("greater", "less", "two.sided"),
-                    prob = NULL, twosidedmethod = c("doubled", "kulinskaya"),
+                    prob = NA, twosidedmethod = c("doubled", "kulinskaya"),
                     restype = c("ols", "blus"), statonly = FALSE, ...) {
 
   twosidedmethod <- match.arg(twosidedmethod, c("doubled", "kulinskaya"))
@@ -128,9 +130,12 @@ goldfeld_quandt <- function(mainlm, method = "parametric", deflator = NULL,
 
   if (method == "parametric") {
 
-    theind <- gqind(n, prop_central, group1prop)
+    theind <- gqind(n, p, prop_central, group1prop)
 
-    if (!is.null(deflator)) {
+    if (!is.na(deflator) && !is.null(deflator)) {
+      if (!is.na(suppressWarnings(as.integer(deflator)))) {
+        deflator <- as.integer(deflator)
+      }
       y <- y[order(X[, deflator])]
       X <- X[order(X[, deflator]), , drop = FALSE]
     }
@@ -149,7 +154,9 @@ goldfeld_quandt <- function(mainlm, method = "parametric", deflator = NULL,
       pval <- stats::pf(teststat, df1 = thedf1, df2 = thedf2, lower.tail = TRUE)
     } else if (alternative == "two.sided") {
       pval <- twosidedpval(q = teststat, Aloc = 1, CDF = stats::pf,
-                       method = twosidedmethod, df1 = thedf1, df2 = thedf2)
+                       method = twosidedmethod, continuous = TRUE,
+                       df1 = thedf1, df2 = thedf2,
+                       lower.tail = TRUE)
     }
     fullmethod <- "Goldfeld-Quandt F Test"
   } else if (method == "nonparametric") {
@@ -161,13 +168,18 @@ goldfeld_quandt <- function(mainlm, method = "parametric", deflator = NULL,
       newn <- n - p
     }
 
-    if (!is.null(deflator)) absres <- absres[order(X[, deflator])]
+    if (!is.na(deflator) && !is.null(deflator)) {
+      if (!is.na(suppressWarnings(as.integer(deflator)))) {
+        deflator <- as.integer(deflator)
+      }
+      absres <- absres[order(X[, deflator])]
+    }
 
     teststat <- countpeaks(absres[!is.na(absres)])
     if (statonly) return(teststat)
 
     thedf1 <- NULL
-    if (is.null(prob)) {
+    if (is.na(prob) || is.null(prob)) {
       if (alternative == "greater") {
         pval <- ppeak(k = teststat, n = newn, lower.tail = FALSE, usedata = (newn <= 1000))
       } else if (alternative == "less") {

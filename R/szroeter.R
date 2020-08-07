@@ -19,7 +19,7 @@
 #'    column of the design matrix. This variable is suspected to be
 #'    related to the error variance under the alternative hypothesis.
 #'    \code{deflator} may not correspond to a column of 1's (intercept).
-#'    Default \code{NULL} means the data will be left in its current order
+#'    Default \code{NA} means the data will be left in its current order
 #'    (e.g. in case the existing index is believed to be associated with
 #'    error variance).
 #'
@@ -38,7 +38,7 @@
 #' szroeter(mtcars_lm, deflator = "qsec")
 #'
 
-szroeter <- function (mainlm, deflator = NULL, h = SKH,
+szroeter <- function (mainlm, deflator = NA, h = SKH,
                         qfmethod = "imhof", statonly = FALSE) {
 
   processmainlm(m = mainlm, needy = FALSE)
@@ -56,7 +56,10 @@ szroeter <- function (mainlm, deflator = NULL, h = SKH,
 
   checkdeflator(deflator, X, p, hasintercept[[1]])
 
-  if (!is.null(deflator)) {
+  if (!is.na(deflator) && !is.null(deflator)) {
+    if (!is.na(suppressWarnings(as.integer(deflator)))) {
+      deflator <- as.integer(deflator)
+    }
     e <- e[order(X[, deflator])]
     X <- X[order(X[, deflator]), , drop = FALSE]
   }
@@ -65,7 +68,7 @@ szroeter <- function (mainlm, deflator = NULL, h = SKH,
 
   teststat <- as.double((t(e) %*% Delta %*% e) / crossprod(e))
   if (statonly) return(teststat)
-  pval <- pvalRQF(r = teststat, A = M %*% Delta %*% M,
+  pval <- pRQF(r = teststat, A = M %*% Delta %*% M,
                   B = M, algorithm = qfmethod, lower.tail = FALSE)
 
   rval <- structure(list(statistic = teststat, p.value = pval,

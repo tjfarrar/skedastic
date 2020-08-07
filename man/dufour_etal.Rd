@@ -23,11 +23,13 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
-\item{hettest}{A function, or a character specifying the name of a function,
+\item{hettest}{A character specifying the name of a function
 that implements a heteroskedasticity test on a linear regression model.
 The function is called with the \code{statonly} argument set to
 \code{TRUE} to improve computational efficiency.}
@@ -36,8 +38,8 @@ The function is called with the \code{statonly} argument set to
 generate. Defaults to \code{1000}.}
 
 \item{alternative}{The tailedness of the test whose statistic is computed by
-\code{hettest}; one of \code{"greater"} (the default), \code{"less"}, or
-\code{"two.sided"}.}
+\code{hettest} function; one of \code{"greater"} (the default),
+\code{"less"}, or \code{"two.sided"}.}
 
 \item{errorgen}{A function, or a character specifying the name of a
 function, from which the random errors are to be generated. The function
@@ -48,16 +50,16 @@ at least can have) a mean of 0. Defaults to \code{\link[stats]{rnorm}}.}
 This argument is ignored if \code{errorgen} is
 \code{\link[stats]{rnorm}}, since \code{mean} must be set to 0, and
 \code{sd} is set to 1 because the heteroskedasticity test implemented by
-\code{hettest} is assumed to be scale invariant. If \code{errorgen} is
-not \code{rnorm}, \code{errorparam} should be chosen in such a way that
-the error distribution has a mean of 0.}
+\code{hettest} function is assumed to be scale invariant. If
+\code{errorgen} is not \code{rnorm}, \code{errorparam} should be chosen
+in such a way that the error distribution has a mean of 0.}
 
 \item{seed}{An integer specifying a seed to pass to
 \code{\link[base]{set.seed}} for random number generation. This allows
-reproducibility of Monte Carlo results. A value of \code{NULL}
+reproducibility of Monte Carlo results. A value of \code{NA}
 results in not setting a seed.}
 
-\item{...}{Additional arguments to pass to \code{hettest}}
+\item{...}{Additional arguments to pass to function with name \code{hettest}}
 }
 \value{
 An object of \code{\link[base]{class}} \code{"htest"}. If object
@@ -71,12 +73,13 @@ This function implements the method of
 }
 \details{
 The test implements a Monte Carlo procedure as follows. (1) The observed
-   value of the test statistic \eqn{T_0} is computed using \code{hettest}.
-   (2) \code{R} replications of the random error vector are generated from
-   the distribution specified using \code{errorgen}. (3) \code{R}
-   replications of the test statistic, \eqn{T_1,T_2,\ldots,T_R}, are
-   computed from the generated error vectors. (4) The empirical
-   \code{p}-value is computed as \eqn{\frac{\hat{G}_R(T_0)+1}{R+1}}, where
+   value of the test statistic \eqn{T_0} is computed using function
+   with name \code{hettest}. (2) \code{R} replications of the random error
+   vector are generated from the distribution specified using
+   \code{errorgen}. (3) \code{R} replications of the test statistic,
+   \eqn{T_1,T_2,\ldots,T_R}, are computed from the generated error vectors.
+   (4) The empirical \code{p}-value is computed as
+   \eqn{\frac{\hat{G}_R(T_0)+1}{R+1}}, where
    \eqn{\hat{G}_R(x)=\sum_{j=1}^{R} 1_{T_j \ge x}}, \eqn{1_{\bullet}}
    being the indicator function. The test is right-tailed, regardless of the
    tailedness of \code{hettest}. Note that the heteroskedasticity
@@ -93,7 +96,7 @@ The test implements a Monte Carlo procedure as follows. (1) The observed
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
-dufour_etal(mtcars_lm, hettest = breusch_pagan)
+dufour_etal(mtcars_lm, hettest = "breusch_pagan")
 
 }
 \references{

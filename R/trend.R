@@ -1,29 +1,31 @@
 #' Probability mass function of nonparametric trend statistic \eqn{D}
 #'
 #' This function computes \eqn{\Pr(D = k)}, i.e. the probability mass
-#' function for \eqn{D=\sum_{i=1}^{n} (R_i - i)^2}, the nonparametric trend
-#' statistic proposed by \insertCite{Lehmann75;textual}{skedastic}, under the
-#' assumption that the ranks \eqn{R_i} are computed on a series of \eqn{n}
-#' independent and identically distributed random variables with no ties. The
-#' function is used within \code{\link{horn}} in computing \eqn{p}-values for
-#' Horn's nonparametric test for heteroskedasticity in a linear regression
-#' model \insertCite{Horn81}{skedastic}. The support of \eqn{D}
-#' consists of consecutive even numbers from 0 to \eqn{\frac{n(n-1)(n+1)}{3}},
-#' with the exception of the case \eqn{n=3}, when the value 4 is excluded from
-#' the support.
+#'   function for \eqn{D=\sum_{i=1}^{n} (R_i - i)^2}, the nonparametric trend
+#'   statistic proposed by \insertCite{Lehmann75;textual}{skedastic}, under the
+#'   assumption that the ranks \eqn{R_i} are computed on a series of \eqn{n}
+#'   independent and identically distributed random variables with no ties. The
+#'   function is used within \code{\link{horn}} in computing \eqn{p}-values for
+#'   Horn's nonparametric test for heteroskedasticity in a linear regression
+#'   model \insertCite{Horn81}{skedastic}. The support of \eqn{D}
+#'   consists of consecutive even numbers from 0 to \eqn{\frac{n(n-1)(n+1)}{3}},
+#'   with the exception of the case \eqn{n=3}, when the value 4 is excluded from
+#'   the support. Note that computation speed for \code{k = "all"} is about the
+#'   same as when \code{k} is set to an individual integer value, because the
+#'   entire distribution is still computed in the latter case.
 #'
 #' @param n A positive integer representing the number of observations in the
-#' series. Note that computation time increases rapidly with \eqn{n} and is
-#' infeasible for \eqn{n>11}.
-#' @param k An integer of \code{length} 1
-#' or a character \code{"all"} indicating that the probability mass function
-#' should be computed across the entire support of \eqn{D}.
+#'   series. Note that computation time increases rapidly with \eqn{n} and is
+#'   infeasible for \eqn{n>11}.
+#' @param k An integer of \code{length} \eqn{\ge 1}
+#'   or a character \code{"all"} (the default) indicating that the probability
+#'   mass function should be applied to the entire support of \eqn{D}.
+#' @param override A logical. By default, the function aborts if \eqn{n > 11}
+#'   due to the prohibitively slow computation (which may cause some systems
+#'   to crash). Setting this argument to \code{TRUE} overrides the abort.
 #'
-#' @return A \code{data.frame} containing two objects: \code{"value"}, an
-#'   integer vector containing values specified in \code{k} (or the support of
-#'   \eqn{D}, if \code{k == "all"}); and \code{"prob"}, a double vector
-#'   representing the probability that \eqn{D} takes on each corresponding
-#'   value in the \code{"value"} object
+#' @return A double vector containing the probabilities corresponding to the
+#'   integers in its \code{names} attribute.
 #'
 #' @references{\insertAllCited{}}
 #' @export
@@ -41,25 +43,41 @@
 #' }
 #'
 
-dDtrend <- function(k = "all", n) {
+dDtrend <- function(k = "all", n, override = FALSE) {
 
-  if (n > 10) warning("Computation of dDtrend is very slow for n > 10 and
-                       computation time is of order n!")
+  kall <- FALSE
+  if (is.na(k) || is.null(k)) {
+    stop("Argument k cannot be NA or NULL")
+  } else if (is.character(k)) {
+    if (length(k) == 1 && k == "all") {
+      kall <- TRUE
+    } else {
+      stop("Invalid character value for k")
+    }
+  } else if (any(k %% 1 != 0)) {
+    stop("Invalid value(s) in k; try an integer or \"all\"")
+  }
+
+  if (is.na(n) || is.null(n)) {
+    stop("Argument n cannot be NA or NULL")
+  } else if (!is.numeric(n)) {
+    stop("Argument n must be numeric")
+  } else if (n %% 1 != 0) {
+    stop("Invalid value for n; try an integer")
+  } else if (n > 11 && !override) {
+    stop("Computation of dDtrend is prohibitively slow for n > 11. Operation aborted. If user insists on proceeding, call function again with `override` set to `TRUE`.")
+  }
+
   perms <- arrangements::permutations(n, n)
   valtab <- table(apply(perms, 1, function(x) sum((x - 1:n) ^ 2)))
-  # value <- as.integer(names(valtab))
   prob <- as.double(valtab / factorial(n))
   names(prob) <- names(valtab)
-
-  if (is.character(k)) {
-    if (k != "all") stop("Invalid character value for k")
+  support <- as.integer(names(prob))
+  if (kall) {
     return(prob)
-  } else if (length(k) == 1) {
-    if (k %% 1 != 0) stop("Invalid integer value for k")
-    return(prob[as.integer(names(prob)) == k])
-    # return(list("value" = k, "prob" = prob[value == k]))
-  } else if (length(k) > 1) {
-    stop("Argument `k` must be an integer of length 1 or a character, \"all\"")
+  } else {
+    if (any(!(k %in% support))) warning("One or more values in k not part of support of distribution")
+    return(prob[support %in% k])
   }
 }
 
@@ -79,21 +97,31 @@ dDtrend <- function(k = "all", n) {
 #'
 #' @param n A positive integer representing the number of observations in the
 #'    series.
-#' @param k An integer of \code{length} 1; the value must be between 0 and
-#'    \eqn{\frac{n(n-1)(n+1)}{3}} inclusive.
+#' @param k An integer of \code{length} \eqn{\ge 1}
+#'   or a character \code{"all"} indicating that the cumulative
+#'   distribution function should be applied to the entire support of \eqn{D}.
+#'   The latter is only acceptable when \code{exact} is \code{TRUE}, since
+#'   the distribution is otherwise continuous.
 #' @param lower.tail A logical. Should lower tailed cumulative probability be
 #'    calculated? Defaults to \code{TRUE}. Note that both lower- and upper-
 #'    tailed cumulative probabilities are computed inclusive of \code{k}.
 #' @param exact A logical. Should exact distribution of \eqn{D} be used by
 #'    calling \code{\link{dDtrend}}? If \code{FALSE}, a normal approximation
-#'    is used. If \code{tiefreq} is not \code{NULL} (ties are present),
+#'    is used. If \code{tiefreq} is not \code{NA} (ties are present),
 #'    normal approximation is used regardless of the value of \code{exact}.
+#'    By default, \code{exact} is set to \code{TRUE} provided that
+#'    \code{n <= 10}. Setting \code{exact} to \code{TRUE} for \code{n > 11}
+#'    results in an error unless \code{override} is set to \code{TRUE}.
 #' @param tiefreq A double vector corresponding to the value of \eqn{d_i}
 #'    in \insertCite{Lehmann75;textual}{skedastic}. These are the frequencies
-#'    of the various tied ranks. If ties are absent, \code{NULL} (the default).
+#'    of the various tied ranks. If ties are absent, \code{NA} (the default).
+#' @param override A logical. By default, the \code{dDtrend} function aborts if
+#'   \eqn{n > 11} due to the prohibitively slow computation (which may cause
+#'   some systems to crash). Setting this argument to \code{TRUE} overrides
+#'   the abort. Ignored unless \code{exact} is \code{TRUE}.
 #'
 #' @return A double between 0 and 1 representing the probability/ies of \eqn{D}
-#'    taking on at least (or at most) a value of \eqn{k}.
+#'    taking on at least (at most) the value(s) in the \code{names} attribute.
 #'
 #' @references{\insertAllCited{}}
 #' @export
@@ -111,32 +139,53 @@ dDtrend <- function(k = "all", n) {
 #' pDtrend(k = 2e4, n = 50, lower.tail = FALSE)
 #'
 
-pDtrend <- function(k, n, lower.tail = TRUE,
-                    exact = (n <= 10), tiefreq = NULL) {
+pDtrend <- function(k, n, lower.tail = TRUE, exact = (n <= 10), tiefreq = NA,
+                    override = FALSE) {
 
-  if (exact && is.null(tiefreq)) {
-    exactCDF <- function(j, m = n, LT = lower.tail) {
-      prob <- dDtrend(n = m)
-      values <- as.integer(names(prob))
-      if (LT) {
-        return(sum(prob[values <= k]))
-      } else {
-        return(sum(prob[values >= k]))
-      }
+  kall <- FALSE
+  if (any(is.na(k)) || is.null(k)) {
+    stop("Invalid k value(s)")
+  } else if (is.character(k)) {
+    if (length(k) == 1 && k == "all") {
+      kall <- TRUE
+    } else {
+      stop("Invalid k value(s)")
     }
-    vapply(k, exactCDF, NA_real_)
+  } else if (any(!is.numeric(k))) stop("Invalid k value(s)")
+
+  if (exact && (is.na(tiefreq) || is.null(tiefreq))) {
+
+    prob <- dDtrend(k = "all", n = n, override = override)
+    values <- as.integer(names(prob))
+    ineqfunc <- ifelse(lower.tail, `<=`, `>=`)
+    if (kall) {
+      cumprob <- vapply(values, function(j) sum(prob[ineqfunc(values, j)]),
+                        NA_real_)
+    } else {
+      cumprob <- vapply(k, function(j) sum(prob[ineqfunc(values, j)]),
+                        NA_real_)
+    }
+
   } else {
-    if (is.null(tiefreq)) {
+
+    if (kall) stop("k = \"all\" is only valid when the exact, discrete distribution is used")
+    if (is.na(tiefreq) || is.null(tiefreq)) {
       ED <- (n ^ 3 - n) / 6
       VD <- (n ^ 2 * (n + 1) ^ 2 * (n - 1)) / 36
-      vapply(k, function(j) stats::pnorm((j - 1 - ED) / sqrt(VD),
+      cumprob <- vapply(k, function(j) stats::pnorm((j - 1 - ED) / sqrt(VD),
                   lower.tail = lower.tail), NA_real_)
     } else {
       ED <- (n ^ 3 - n) / 6 - sum(tiefreq ^ 3 - tiefreq) / 12
       VD <- (n ^ 2 * (n + 1) ^ 2 * (n - 1)) / 36 *
                (1 - sum(tiefreq ^ 3 - tiefreq) / (n ^ 3 - n))
-      vapply(k, function(j) stats::pnorm((j - ED) / sqrt(VD),
+      cumprob <- vapply(k, function(j) stats::pnorm((j - ED) / sqrt(VD),
                   lower.tail = lower.tail), NA_real_)
     }
   }
+  if (kall) {
+    names(cumprob) <- names(prob)
+  } else {
+    names(cumprob) <- as.character(k)
+  }
+  cumprob
 }

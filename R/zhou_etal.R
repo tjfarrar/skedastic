@@ -30,7 +30,7 @@
 #'    to generate when estimating the \eqn{p}-value. Defaults to \code{500L}.
 #' @param seed An integer specifying a seed to pass to
 #'    \code{\link[base]{set.seed}} for random number generation. This allows
-#'    for reproducibility of perturbation sampling. A value of \code{NULL}
+#'    for reproducibility of perturbation sampling. A value of \code{NA}
 #'    results in not setting a seed.
 #'
 #' @inheritParams breusch_pagan
@@ -48,18 +48,18 @@
 #' zhou_etal(mtcars_lm, method = "hybrid")
 #'
 
-zhou_etal <- function(mainlm, auxdesign = NULL,
+zhou_etal <- function(mainlm, auxdesign = NA,
                       method = c("pooled", "covariate-specific", "hybrid"),
                       Bperturbed = 500L, seed = 1234, statonly = FALSE) {
 
   method <- match.arg(method, c("pooled", "covariate-specific", "hybrid"))
 
-  auxfitvals <- ifelse(is.null(auxdesign), FALSE,
+  auxfitvals <- ifelse(all(is.na(auxdesign)) | is.null(auxdesign), FALSE,
                                     auxdesign == "fitted.values")
   processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
                 needp = FALSE)
 
-  if (is.null(auxdesign)) {
+  if (all(is.na(auxdesign)) || is.null(auxdesign)) {
     Z <- X
   } else if (is.character(auxdesign)) {
     if (auxdesign == "fitted.values") {
@@ -78,6 +78,10 @@ zhou_etal <- function(mainlm, auxdesign = NULL,
   }
 
   q <- ncol(Z)
+  if (q == 1 && method %in% c("covariate-specific", "hybrid")) {
+    message("Auxiliary design matrix consists of only one column; method changed to `pooled`")
+    method <- "pooled"
+  }
   n <- nrow(X)
 
   # y <- y - mean(y)
@@ -85,7 +89,7 @@ zhou_etal <- function(mainlm, auxdesign = NULL,
   # newlm <- stats::lm.fit(X, y)
   # e <- newlm$residuals
 
-  if (!is.null(seed)) set.seed(seed)
+  if (!is.na(seed)) set.seed(seed)
   Xi <- replicate(Bperturbed, stats::rnorm(n), simplify = FALSE)
   sigmahatsq <- sum(e ^ 2) / n
   H <- Z %*% solve(crossprod(Z)) %*% t(Z)

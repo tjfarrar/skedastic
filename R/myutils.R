@@ -62,7 +62,8 @@ columnof1s <- function (X) { # check whether a design matrix has a column of 1s
 }
 
 checkdeflator <- function(d, X, p, has0) {
-  if (is.numeric(d) && d == as.integer(d)) {
+  if (is.na(d) || is.null(d)) {
+  } else if (is.numeric(d) && d == as.integer(d)) {
     if (has0 && d == 1) {
       stop("deflator cannot be the model intercept")
     } else if (d > p) {
@@ -71,10 +72,11 @@ checkdeflator <- function(d, X, p, has0) {
   } else if (is.character(d)) {
     if (d == "(Intercept)") {
       stop("deflator cannot be the model intercept")
-    } else if (!d %in% colnames(X)) {
+    } else if (!(d %in% colnames(X)) &&
+               suppressWarnings(is.na(as.integer(d)))) {
       stop("`deflator` is not the name of a column of design matrix")
     }
-  } else if (!is.null(d)) stop("`deflator` must be integer or character")
+  } else stop("`deflator` must be integer or character")
 }
 
 plotdim <- function(x) { # find all positive factors of a positive integer
@@ -118,7 +120,7 @@ parselabels <- function(labname, theaxis) {
                        paste0(f, "("))
       suffix <- switch(f, "sqrt" = ")", "identity" = "", "log" = ")",
                        "abs" = "*phantom(i))",
-                       paste0(f, "("))
+                       ")")
       parse(text = paste0(prefix, innerexpr, suffix))
     }
   } else if (theaxis == "x") {
@@ -137,10 +139,14 @@ parselabels <- function(labname, theaxis) {
   }
 }
 
-generate_interactions <- function (X) { # generate all two-way interactions
+generate_interactions <- function(X) { # generate all two-way interactions
   k <- ncol(X)
-  mycombn <- t(utils::combn(k, 2))
-  apply(mycombn, 1, function(i, X) X[, i[1]] * X[, i[2]], X)
+  if (k >= 2) {
+    mycombn <- t(utils::combn(k, 2))
+    apply(mycombn, 1, function(i, X) X[, i[1]] * X[, i[2]], X)
+  } else {
+    NULL
+  }
 }
 
 checklm <- function(mylm) { # Check validity of lm object
@@ -188,7 +194,7 @@ do_omit <- function(omit, n, p, seed.) {
     } else if (omit == "last") {
       omit_ind <- (n - p + 1):n
     } else if (omit == "random") {
-      if (!is.null(seed.)) set.seed(seed.)
+      if (!is.na(seed.)) set.seed(seed.)
       omit_ind <- sort(sample(1:n, p))
     } else stop("Invalid character for `omit` argument")
   } else if (is.numeric(omit)) {
@@ -316,24 +322,31 @@ supfunc <- function(B, m..) {  # Function to find supremum of absolute differenc
 rksim <- function(R., m., sqZ., seed., alpha.) { # generates pseudorandom variates from T_alpha distribution
                                                     # of Rackauskas-Zuokas Test
   hseq <- (1:(m. - 1)) / m.
-  if (!is.null(seed.)) set.seed(seed.)
+  if (!is.na(seed.)) set.seed(seed.)
   Z <- replicate(R., stats::rnorm(m.), simplify = FALSE)
   B <- lapply(X = Z, FUN = do_brownbridge_me, sq = sqZ.)
   vapply(X = B, FUN = function(b) max(supfunc(B = b, m.. = m.) *
                       hseq ^ (-alpha.)), NA_real_)
 }
 
-gqind <- function(n, p, g) {
- k <- as.integer(round(n * p))
- nprime <- n - k
- n1prime <- as.integer(round(nprime * g))
+gqind <- function(n, p, propremove, propgroup1) {
+ nremove <- as.integer(round(n * propremove))
+ k <- nremove / n
+ nprime <- n - nremove
+ n1prime <- as.integer(round(nprime * propgroup1))
+ w <- n1prime / nprime
  n2prime <- nprime - n1prime
+
  if (min(n1prime, n2prime) <= p) {
-   stop("Your choice of `prop_central` and `group1prop` results in a subset
-        containing less than or equal to p observations, where p is the number
-        of coefficients to be estimated. As a result, the models cannot be fit.")
- } else if (k < 0) {
-   stop("`prop_central` cannot be negative")
+   maxw <- ifelse(n %% 2 == 0, 0.5, (n - 1) / (2 * n))
+   n1prime <- n * maxw
+   n2prime <- n - n1prime
+
+   if (min(n1prime, n2prime) <= p) {
+     stop("Your choice of `prop_central` and `group1prop` results in a subset containing less than or equal to p observations, where p is the number of coefficients to be estimated. As a result, the models cannot be fit. Even if `prop_central` were set to 0 and `propgroup1` to 0.5, the number of observations in at least one of the groups would be <= p. Thus, the Goldfeld-Quandt Test cannot be implemented.")
+   } else {
+     message(paste0("Your choice of `prop_central` and `group1prop` results in a subset containing less than or equal to p observations, where p is the number of coefficients to be estimated. As a result, the models cannot be fit. The test has instead been implemented with prop_central set to 0 and group1prop to ", maxw))
+   }
  }
  return(list(1:n1prime, (n - n2prime + 1):n))
 }
@@ -344,4 +357,59 @@ fastM <- function(X, n) {
 
 SKH <- function(i) {
   2 * (1 - cos((pi * i) / (length(i) + 1)))
+}
+
+is.btwn01 <- function(x) {
+  if (is.finite(x)) {
+    (x >= 0 && x <= 1)
+  } else {
+    FALSE
+  }
+}
+
+is.square.mat <- function(a) {
+  if (!is.matrix(a))
+    stop("argument a is not a matrix")
+  return(nrow(a) == ncol(a))
+}
+
+is.symmetric.mat <- function(a) {
+  if (!is.matrix(a)) {
+    stop("argument a is not a matrix")
+  }
+  if (!is.numeric(a)) {
+    stop("argument a is not a numeric matrix")
+  }
+  if (!is.square.mat(a))
+    stop("argument a is not a square numeric matrix")
+
+  all(berryFunctions::almost.equal(a[upper.tri(a)], t(a)[upper.tri(t(a))]))
+}
+
+is.pos.semidef.mat <- function(a) {
+  if (!is.square.mat(a))
+    stop("argument a is not a square matrix")
+  if (!is.symmetric.mat(a))
+    stop("argument a is not a symmetric matrix")
+  if (!is.numeric(a))
+    stop("argument a is not a numeric matrix")
+  myeigen <- eigen(a, only.values = TRUE)$values
+  cplxeigen <- which(Im(myeigen) != 0)
+
+  if (length(cplxeigen) == 0 || all(berryFunctions::almost.equal(Im(myeigen[cplxeigen]), 0))) {
+    myeigen[cplxeigen] <- Re(myeigen[cplxeigen])
+    myeigen <- as.numeric(myeigen)
+  } else stop("matrix a has complex eigenvalues")
+
+  negeigen <- which(myeigen < 0)
+  (length(negeigen) == 0 | all(berryFunctions::almost.equal(myeigen[negeigen],
+                                                            0)))
+}
+
+is.singular.mat <- function(a) {
+  if (!is.square.mat(a))
+    stop("argument a is not a square matrix")
+  if (!is.numeric(a))
+    stop("argument a is not a numeric matrix")
+  berryFunctions::almost.equal(det(a), 0)
 }

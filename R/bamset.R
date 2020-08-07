@@ -24,7 +24,7 @@
 #'    margins of the \code{k} subsets be passed to \code{\link{blus}} as the
 #'    \code{omit} argument? If \code{TRUE} (the default), this overrides any
 #'    \code{omit} argument passed directly. If \code{FALSE}, the \code{omit}
-#'    argument must be specified and cannot be left as \code{NULL}.
+#'    argument must be specified and cannot be left as \code{NA}.
 #'
 #' @inheritParams breusch_pagan
 #' @inheritParams goldfeld_quandt
@@ -46,8 +46,8 @@
 #' bamset(mtcars_lm, deflator = "qsec", k = 4, omitatmargins = FALSE, omit = "last")
 #'
 
-bamset <- function(mainlm, k = 3, deflator = NULL, correct = TRUE,
-                   omitatmargins = TRUE, omit = NULL, statonly = FALSE) {
+bamset <- function(mainlm, k = 3, deflator = NA, correct = TRUE,
+                   omitatmargins = TRUE, omit = NA, statonly = FALSE) {
 
   processmainlm(m = mainlm, needy = FALSE)
 
@@ -64,7 +64,10 @@ bamset <- function(mainlm, k = 3, deflator = NULL, correct = TRUE,
 
   checkdeflator(deflator, X, p, hasintercept[[1]])
 
-  if (!is.null(deflator)) {
+  if (!is.na(deflator) && !is.null(deflator)) {
+    if (!is.na(suppressWarnings(as.integer(deflator)))) {
+      deflator <- as.integer(deflator)
+    }
     e <- e[order(X[, deflator])]
     X <- X[order(X[, deflator]), , drop = FALSE]
   }

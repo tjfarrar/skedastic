@@ -4,36 +4,39 @@
 \alias{dDtrend}
 \title{Probability mass function of nonparametric trend statistic \eqn{D}}
 \usage{
-dDtrend(k = "all", n)
+dDtrend(k = "all", n, override = FALSE)
 }
 \arguments{
-\item{k}{An integer of \code{length} 1
-or a character \code{"all"} indicating that the probability mass function
-should be computed across the entire support of \eqn{D}.}
+\item{k}{An integer of \code{length} \eqn{\ge 1}
+or a character \code{"all"} (the default) indicating that the probability
+mass function should be applied to the entire support of \eqn{D}.}
 
 \item{n}{A positive integer representing the number of observations in the
 series. Note that computation time increases rapidly with \eqn{n} and is
 infeasible for \eqn{n>11}.}
+
+\item{override}{A logical. By default, the function aborts if \eqn{n > 11}
+due to the prohibitively slow computation (which may cause some systems
+to crash). Setting this argument to \code{TRUE} overrides the abort.}
 }
 \value{
-A \code{data.frame} containing two objects: \code{"value"}, an
-  integer vector containing values specified in \code{k} (or the support of
-  \eqn{D}, if \code{k == "all"}); and \code{"prob"}, a double vector
-  representing the probability that \eqn{D} takes on each corresponding
-  value in the \code{"value"} object
+A double vector containing the probabilities corresponding to the
+  integers in its \code{names} attribute.
 }
 \description{
 This function computes \eqn{\Pr(D = k)}, i.e. the probability mass
-function for \eqn{D=\sum_{i=1}^{n} (R_i - i)^2}, the nonparametric trend
-statistic proposed by \insertCite{Lehmann75;textual}{skedastic}, under the
-assumption that the ranks \eqn{R_i} are computed on a series of \eqn{n}
-independent and identically distributed random variables with no ties. The
-function is used within \code{\link{horn}} in computing \eqn{p}-values for
-Horn's nonparametric test for heteroskedasticity in a linear regression
-model \insertCite{Horn81}{skedastic}. The support of \eqn{D}
-consists of consecutive even numbers from 0 to \eqn{\frac{n(n-1)(n+1)}{3}},
-with the exception of the case \eqn{n=3}, when the value 4 is excluded from
-the support.
+  function for \eqn{D=\sum_{i=1}^{n} (R_i - i)^2}, the nonparametric trend
+  statistic proposed by \insertCite{Lehmann75;textual}{skedastic}, under the
+  assumption that the ranks \eqn{R_i} are computed on a series of \eqn{n}
+  independent and identically distributed random variables with no ties. The
+  function is used within \code{\link{horn}} in computing \eqn{p}-values for
+  Horn's nonparametric test for heteroskedasticity in a linear regression
+  model \insertCite{Horn81}{skedastic}. The support of \eqn{D}
+  consists of consecutive even numbers from 0 to \eqn{\frac{n(n-1)(n+1)}{3}},
+  with the exception of the case \eqn{n=3}, when the value 4 is excluded from
+  the support. Note that computation speed for \code{k = "all"} is about the
+  same as when \code{k} is set to an individual integer value, because the
+  entire distribution is still computed in the latter case.
 }
 \examples{
 prob <- dDtrend(k = "all", n = 9)

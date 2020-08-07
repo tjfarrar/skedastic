@@ -73,7 +73,7 @@ plot(mylm$residuals, myblusres)
 To create customised residual plots for the same model:
 
 ```R
-hetplot(mylm, horzvar = c("explanatory", "log_explanatory"), vertvar = c("res", "res_stud"), vertfun = "2", filetype = NULL)
+hetplot(mylm, horzvar = c("explanatory", "log_explanatory"), vertvar = c("res", "res_stud"), vertfun = "2", filetype = NA)
 ```
 
 ## Learn More

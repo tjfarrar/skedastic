@@ -6,10 +6,10 @@
 \usage{
 horn(
   mainlm,
-  deflator = NULL,
+  deflator = NA,
   restype = c("ols", "blus"),
   alternative = c("two.sided", "greater", "less"),
-  exact = (m <= 10),
+  exact = (nres <= 10),
   statonly = FALSE,
   ...
 )
@@ -21,16 +21,18 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{deflator}{Either a character specifying a column name from the
 design matrix of \code{mainlm} or an integer giving the index of a
 column of the design matrix. This variable is suspected to be
 related to the error variance under the alternative hypothesis.
 \code{deflator} may not correspond to a column of 1's (intercept).
-Default \code{NULL} means the data will be left in its current order
+Default \code{NA} means the data will be left in its current order
 (e.g. in case the existing index is believed to be associated with
 error variance).}
 

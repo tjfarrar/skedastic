@@ -40,7 +40,7 @@
 #'    number generation when simulating values from the asymptotic null
 #'    distribution. This is to provide reproducibility of test results.
 #'    Ignored if \code{pvalmethod == "data"}. If user does not wish to set
-#'    the seed, pass \code{NULL}.
+#'    the seed, pass \code{NA}.
 #'
 #' @inheritParams breusch_pagan
 #'

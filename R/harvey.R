@@ -34,14 +34,14 @@
 #' harvey(mtcars_lm, auxdesign = "fitted.values")
 #'
 
-harvey <- function(mainlm, auxdesign = NULL, statonly = FALSE) {
+harvey <- function(mainlm, auxdesign = NA, statonly = FALSE) {
 
-  auxfitvals <- ifelse(is.null(auxdesign), FALSE,
+  auxfitvals <- ifelse(all(is.na(auxdesign)) | is.null(auxdesign), FALSE,
                                     auxdesign == "fitted.values")
   processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
                 needp = FALSE)
 
-  if (is.null(auxdesign)) {
+  if (all(is.na(auxdesign)) || is.null(auxdesign)) {
     Z <- X
   } else if (is.character(auxdesign)) {
     if (auxdesign == "fitted.values") {

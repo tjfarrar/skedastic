@@ -7,7 +7,7 @@
 evans_king(
   mainlm,
   method = c("GLS", "LM"),
-  deflator = NULL,
+  deflator = NA,
   lambda_star = 5,
   qfmethod = "imhof",
   statonly = FALSE
@@ -20,9 +20,11 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{method}{A character indicating which of the two tests derived in
 \insertCite{Evans88;textual}{skedastic} should be implemented.
@@ -34,7 +36,7 @@ design matrix of \code{mainlm} or an integer giving the index of a
 column of the design matrix. This variable is suspected to be
 related to the error variance under the alternative hypothesis.
 \code{deflator} may not correspond to a column of 1's (intercept).
-Default \code{NULL} means the data will be left in its current order
+Default \code{NA} means the data will be left in its current order
 (e.g. in case the existing index is believed to be associated with
 error variance).}
 
@@ -48,7 +50,7 @@ case as \eqn{\lambda^\star \to 0}. Defaults to \code{5}.}
 
 \item{qfmethod}{A character, either \code{"imhof"}, \code{"davies"}, or
 \code{"integrate"}, corresponding to the \code{algorithm} argument
-of \code{\link[skedastic]{pvalRQF}}. The default is \code{"imhof"}.}
+of \code{\link[skedastic]{pRQF}}. The default is \code{"imhof"}.}
 
 \item{statonly}{A logical. If \code{TRUE}, only the test statistic value
 is returned, instead of an object of \code{\link[base]{class}}

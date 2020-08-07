@@ -89,6 +89,7 @@ twosidedpval <- function(q, CDF, continuous, method = c("doubled", "kulinskaya",
                          "minlikelihood"), Aloc, supportlim, ...) {
 
   method <- match.arg(method, c("doubled", "kulinskaya", "minlikelihood"))
+  names(q) <- NULL
 
   if (missing(Aloc) && method != "minlikelihood") {
     Aloc <- meanfromCDF(theCDF = CDF, cont = continuous, suplim = supportlim,
@@ -97,8 +98,11 @@ twosidedpval <- function(q, CDF, continuous, method = c("doubled", "kulinskaya",
 
   if (method == "kulinskaya") {
     if (continuous) {
-      CDF(q, ...) / CDF(Aloc, ...) * (q <= Aloc) + (1 - CDF(q, ...)) /
-        (1 - CDF(Aloc, ...)) * (q >= Aloc)
+      if (q <= Aloc) {
+        CDF(q, ...) / CDF(Aloc, ...)
+      } else {
+        (1 - CDF(q, ...)) / (1 - CDF(Aloc, ...))
+      }
     } else {
       if (!(value_possible(x = Aloc, myCDF = CDF, ...))) {
         wL <- CDF(Aloc, ...)
@@ -121,6 +125,8 @@ twosidedpval <- function(q, CDF, continuous, method = c("doubled", "kulinskaya",
       if (missing(supportlim)) {
         support <- -1e6:1e6
       } else {
+        if (supportlim[1] == -Inf) supportlim[1] <- -1e6
+        if (supportlim[2] == Inf) supportlim[2] <- 1e6
         support <- supportlim[1]:supportlim[2]
       }
       allPMF <- vapply(support, function(j) CDF(j, ...) -

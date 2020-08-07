@@ -21,9 +21,11 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{distmethod}{A character specifying the method by which to estimate
 the \eqn{p}-values, either \code{"moment.match"} or \code{"bootstrap"}.}
@@ -41,16 +43,16 @@ Any other dimensionality of \code{H} results in an error.}
 
 \item{ignorecov}{A logical. If \code{TRUE} (the default), the
 variance-covariance matrix of \eqn{s} is assumed to be diagonal. (This
-assumption is, strictly speaking, invalid, but improves computational
-efficiency considerably for what should be a small loss of
-statistical precision).}
+assumption is, strictly speaking, invalid, but usually yields a reasonable
+approximation. Computation time is
+prohibitive for large sample sizes if set to \code{FALSE}).}
 
 \item{B}{An integer specifying the number of nonparametric bootstrap
 replications to be used, if \code{distmethod="bootstrap"}.}
 
 \item{seed}{An integer specifying a seed to pass to
 \code{\link[base]{set.seed}} for random number generation. This allows
-reproducibility of bootstrap results. The default value, \code{NULL},
+reproducibility of bootstrap results. The default value, \code{NA},
 results in not setting a seed.}
 
 \item{statonly}{A logical. If \code{TRUE}, only the test statistic value

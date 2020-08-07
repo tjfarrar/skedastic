@@ -6,54 +6,93 @@ htest <- c("anscombe", "bamset", "bickel",
            "li_yao", "rackauskas_zuokas", "simonoff_tsai",
            "szroeter", "verbyla", "white_lm", "wilcox_keselman", "zhou_etal")
 
-test_that("simple lm works with default arguments", {
-
+test_that("simple linear regression works with default arguments and
+          gives same p-value for lm or list mainlm argument", {
   carslm <- lm(dist ~ speed, data = cars)
-  lapply(htest, function(h) expect_true(is.finite(do.call(what = h,
-                          args = list("mainlm" = carslm))$p.value)))
-})
-
-test_that("simple lm thru origin works with default arguments", {
-  carslm0 <- lm(dist ~ 0 + speed, data = cars)
-  lapply(htest, function(h) expect_true(is.finite(do.call(what = h,
-        args = list("mainlm" = carslm0))$p.value)))
-})
-
-test_that("simple lm (list) works with default arguments", {
   carslist <- list("y" = cars$dist, "X" = cbind(1, cars$speed))
-  lapply(htest, function(h) expect_true(is.finite(do.call(what = h,
-              args = list("mainlm" = carslist))$p.value)))
+  carslmpvals <- unlist(lapply(htest, function(h) do.call(what = h,
+                  args = list("mainlm" = carslm))$p.value))
+  carslistpvals <- unlist(lapply(htest, function(h) do.call(what = h,
+                    args = list("mainlm" = carslist))$p.value))
+  lapply(carslmpvals, function(x) expect_true(is.btwn01(x)))
+  expect_equal(carslmpvals, carslistpvals)
 })
 
-test_that("simple lm (list) thru origin works with default arguments", {
-  carslist0 <- list("y" = cars$dist, "X" = as.matrix(cars$speed))
-  lapply(htest, function(h) expect_true(is.finite(do.call(what = h,
-              args = list("mainlm" = carslist0))$p.value)))
+test_that("simple linear regression through origin works with default
+          arguments and gives same p-value for lm or list mainlm
+          argument", {
+            carslm0 <- lm(dist ~ 0 + speed, data = cars)
+            carslist0 <- list("y" = cars$dist, "X" = as.matrix(cars$speed))
+            carslm0pvals <- unlist(lapply(htest, function(h) do.call(what = h,
+              args = list("mainlm" = carslm0))$p.value))
+            carslist0pvals <- unlist(lapply(htest, function(h) do.call(what = h,
+              args = list("mainlm" = carslist0))$p.value))
+            lapply(carslm0pvals, function(x) expect_true(is.btwn01(x)))
+            expect_equal(carslm0pvals, carslist0pvals)
 })
 
-# May need to move to separate file and skip_on_cran() because time-consuming
-# test_that("lm (list) with NA's works with default arguments", {
-#   ChickWeight2 <- rbind(ChickWeight, NA)
-#   chicklistNA <- list("y" = ChickWeight2$weight, "X" = cbind(1,
-#                                     ChickWeight2$Time))
-#   lapply(htest, function(h) expect_true(is.finite(do.call(what = h,
-#         args = list("mainlm" = chicklistNA))$p.value)))
-# })
+test_that("lm (list) with NA's works with default arguments", {
+  skip_on_cran()
+  ChickWeight2 <- rbind(ChickWeight, NA)
+  chicklistNA <- list("y" = ChickWeight2$weight, "X" = cbind(1,
+                      ChickWeight2$Time))
+  lapply(htest, function(h) expect_true(is.btwn01(do.call(what = h,
+                      args = list("mainlm" = chicklistNA))$p.value)))
+})
 
-# ChickWeight2 <- rbind(ChickWeight, NA)
-# themainlm <- vector("list", 8)
-# theresults <- vector("list", 8)
-# themainlm[[1]] <- lm(weight ~ Time, data = ChickWeight)
-# themainlm[[2]] <- list("y" = ChickWeight$weight, "X" = cbind(1, ChickWeight$Time))
-# themainlm[[3]] <- list("y" = ChickWeight$weight, "X" = cbind(1, ChickWeight$Time),
-#                        "e" = themainlm[[1]]$residuals)
-# themainlm[[4]] <- lm(weight ~ Time + Diet, data = ChickWeight)
-# themainlm[[5]] <- lm(weight ~ 0 + Time, data = ChickWeight)
-# myn <- 10
-# myp <- 4
-# myX <- cbind(1, matrix(data = runif(myn * myp), nrow = myn, ncol = myp))
-# myy <- rnorm(myn, mean = rowMeans(myX), sd = rowMeans(myX))
-# themainlm[[6]] <- lm(myy ~ myX)
-# themainlm[[7]] <- list("y" = myy, "X" = myX)
-# themainlm[[8]] <- lm(weight ~ Time, data = ChickWeight2)
-#
+test_that("multiple linear regression works with default arguments and
+          gives same p-value for lm or list mainlm argument", {
+            skip_on_cran()
+            chicklm <- lm(weight ~ Time + Diet, data = ChickWeight)
+            chicklist <- list("y" = ChickWeight$weight,
+                              "X" = stats::model.matrix(chicklm))
+            chicklmpvals <- unlist(lapply(htest, function(h) do.call(what = h,
+                      args = list("mainlm" = chicklm))$p.value))
+            chicklistpvals <- unlist(lapply(htest, function(h) do.call(what = h,
+                      args = list("mainlm" = chicklist))$p.value))
+            lapply(chicklmpvals, function(x) expect_true(is.btwn01(x)))
+            expect_equal(chicklmpvals, chicklistpvals)
+})
+
+htest_nosimonoff <- setdiff(htest, "simonoff_tsai")
+test_that("large multiple linear regression (BostonHousing) works with default arguments", {
+          skip_on_cran()
+            bostonlm <- lm(medv ~ crim + zn + indus + chas + nox + rm +
+                          age + dis + rad + tax + ptratio + b + lstat, data = BostonHousing)
+            bostonlmpvals <- unlist(lapply(htest_nosimonoff, function(h) do.call(what = h,
+                                args = list("mainlm" = bostonlm))$p.value))
+            lapply(bostonlmpvals, function(x) expect_true(is.btwn01(x)))
+          })
+
+test_that("multiple linear regression through origin works with default
+          arguments and gives same p-value for lm or list mainlm
+          argument", {
+            skip_on_cran()
+            chicklm0 <- lm(weight ~ 0 + Time + Diet, data = ChickWeight)
+            chicklist0 <- list("y" = ChickWeight$weight,
+                        "X" = stats::model.matrix(chicklm0))
+            chicklm0pvals <- unlist(lapply(htest, function(h) do.call(what = h,
+                      args = list("mainlm" = chicklm0))$p.value))
+            chicklist0pvals <- unlist(lapply(htest, function(h) do.call(what = h,
+                      args = list("mainlm" = chicklist0))$p.value))
+            lapply(chicklm0pvals, function(x) expect_true(is.btwn01(x)))
+            expect_equal(chicklm0pvals, chicklist0pvals)
+})
+
+test_that("multiple linear regression with random data in vectors rather than
+           data frames works with default arguments and
+           gives same p-value for lm or list mainlm argument", {
+          myn <- 10
+          myp <- 3
+          myX <- matrix(data = runif(myn * myp),
+                                 nrow = myn, ncol = myp)
+          myy <- rnorm(myn, mean = rowMeans(myX), sd = rowMeans(myX))
+          mylm <- lm(myy ~ myX)
+          mylist <- list("y" = myy, "X" = cbind(1, myX))
+          mylmpvals <- unlist(lapply(htest_nosimonoff, function(h) do.call(what = h,
+                      args = list("mainlm" = mylm))$p.value))
+          mylistpvals <- unlist(lapply(htest_nosimonoff, function(h) do.call(what = h,
+                      args = list("mainlm" = mylist))$p.value))
+          lapply(mylmpvals, function(x) expect_true(is.btwn01(x)))
+          expect_equal(mylmpvals, mylistpvals)
+})

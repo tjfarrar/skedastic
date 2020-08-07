@@ -6,10 +6,10 @@
 \usage{
 hetplot(
   mainlm,
-  horzvar = 1:n,
+  horzvar = "index",
   vertvar = "res",
   vertfun = "identity",
-  filetype = NULL,
+  filetype = NA,
   values = FALSE,
   ...
 )
@@ -21,33 +21,39 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{horzvar}{A character vector describing the variable(s) to plot on
 horizontal axes (\code{"index"} for the data index \eqn{i},
 \code{"fitted.values"} for the OLS predicted values \eqn{\hat{y}_i},
 \code{"fitted.values2"} for transformed OLS predicted values
 \eqn{m_{ii}\hat{y}_i}, and/or \code{names} of explanatory variable columns).
-\code{"explanatory"} passes all explanatory variable columns. \code{"log"}
+\code{"explanatory"} passes all explanatory variable columns. \code{"log_"}
 concatenated with \code{names} of explanatory variable columns passes logs
 of those explanatory variables. \code{"log_explanatory"} passes logs of
 all explanatory variables. If more than one variable is specified,
 a separate plot is created for each.}
 
 \item{vertvar}{A character vector describing the variable to plot on the
-vertical axis ("res" for OLS residuals [the default], "res_blus" for
-\code{\link[=blus]{BLUS}} residuals, "res_stand" for standardised OLS
-residuals: \eqn{e_i/\hat{\sigma}}, "res_constvar" for OLS
-residuals transformed to have constant variance: \eqn{e_i/\sqrt{m_{ii}}},
-"res_stud" for studentised OLS residuals: \eqn{e_i/(s\sqrt{m_{ii}})}.
-If more than one value is specified, a separate plot is created for each.}
+vertical axis (\code{"res"} for OLS residuals [the default],
+\code{"res_blus"} for \code{\link[=blus]{BLUS}} residuals,
+\code{"res_stand"} for standardised OLS residuals:
+\eqn{e_i/\hat{\sigma}}, \code{"res_constvar"} for OLS residuals
+transformed to have constant variance: \eqn{e_i/\sqrt{m_{ii}}},
+\code{"res_stud"} for studentised OLS residuals:
+\eqn{e_i/(s\sqrt{m_{ii}})}. If more than one value is specified,
+a separate plot is created for each.}
 
-\item{vertfun}{A character vector giving the names of functions to apply to
-the \code{vertvar} variable. Numerals such as "2" are taken to be powers
-to which \code{vertvar} should be set. If multiple values are specified,
-they are all applied to each element of \code{vertvar}.}
+\item{vertfun}{A character vector giving the name of a function to apply to
+the \code{vertvar} variable. Values that can be coerced to numeric such
+as \code{"2"} are taken to be powers to which \code{vertvar} should be
+set. If multiple values are specified, they are all applied to each
+element of \code{vertvar}. Common choices might be \code{"identity"} (the
+default), \code{"abs"} (absolute value), and \code{"2"} (squaring).}
 
 \item{filetype}{A character giving the type of image file to which the
 plot(s) should be written. Values can be \code{"png"},
@@ -56,7 +62,7 @@ to a subdirectory called "hetplot" within the R session's temporary
 directory, which can be located using \code{tempdir()}. The files should
 be moved or copied to another location if they are needed after the R
 session is ended. Default filenames contain timestamps for uniqueness.
-If \code{NULL} (the default), no image files are written, and in this
+If \code{NA} (the default), no image files are written, and in this
 case, if there are multiple plots, they are plotted on a single device
 using the \code{"mfrow"} graphical parameter. If many plots are requested
 at once, it is advisable to write them to image files.}
@@ -96,13 +102,12 @@ combination.
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 # Generates 2 x 2 matrix of plots in console
 hetplot(mtcars_lm, horzvar = c("index", "fitted.values"),
-vertvar = c("res_blus"), vertfun = c("2", "abs"), filetype = NULL)
+vertvar = c("res_blus"), vertfun = c("2", "abs"), filetype = NA)
 
 # Generates 84 png files in tempdir() folder
-## Not run
-# hetplot(mainlm = mtcars_lm, horzvar = c("explanatory", "log_explanatory",
-#  "fitted.values2"), vertvar = c("res", "res_stand", "res_stud",
-#  "res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")
+\dontrun{hetplot(mainlm = mtcars_lm, horzvar = c("explanatory", "log_explanatory",
+"fitted.values2"), vertvar = c("res", "res_stand", "res_stud",
+"res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")}
 
 }
 \references{

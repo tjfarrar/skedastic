@@ -52,17 +52,17 @@
 #' cook_weisberg(mtcars_lm, auxdesign = "fitted.values", hetfun = "logmult")
 #'
 
-cook_weisberg <- function(mainlm, auxdesign = NULL,
+cook_weisberg <- function(mainlm, auxdesign = NA,
                   hetfun = c("mult", "add", "logmult"), statonly = FALSE) {
 
   hetfun <- match.arg(hetfun, c("mult", "add", "logmult"))
 
-  auxfitvals <- ifelse(is.null(auxdesign), FALSE,
+  auxfitvals <- ifelse(all(is.na(auxdesign)) | is.null(auxdesign), FALSE,
                                     auxdesign == "fitted.values")
   processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
                 needp = FALSE)
 
-  if (is.null(auxdesign)) {
+  if (all(is.na(auxdesign)) || is.null(auxdesign)) {
     Z <- X
   } else if (is.character(auxdesign)) {
     if (auxdesign == "fitted.values") {

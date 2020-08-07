@@ -29,14 +29,14 @@
 #' verbyla(mtcars_lm, auxdesign = "fitted.values")
 #'
 
-verbyla <- function (mainlm, auxdesign = NULL, statonly = FALSE) {
+verbyla <- function(mainlm, auxdesign = NA, statonly = FALSE) {
 
-  auxfitvals <- ifelse(is.null(auxdesign), FALSE,
+  auxfitvals <- ifelse(all(is.na(auxdesign)) | is.null(auxdesign), FALSE,
                                     auxdesign == "fitted.values")
   processmainlm(m = mainlm, needy = auxfitvals, needyhat = auxfitvals,
                 needp = FALSE)
 
-  if (is.null(auxdesign)) {
+  if (all(is.na(auxdesign)) || is.null(auxdesign)) {
     Z <- X
   } else if (is.character(auxdesign)) {
     if (auxdesign == "fitted.values") {
@@ -64,7 +64,19 @@ verbyla <- function (mainlm, auxdesign = NULL, statonly = FALSE) {
   sigma_hatbar <- sum(e ^ 2) / (n - p)
   term1 <- t(t(e ^ 2 / sigma_hatbar - diag(M)))
 
-  teststat <- as.double(1 / 2 * t(term1) %*% Z %*% solve(t(Z) %*% (M ^ 2) %*% Z)
+  mat_to_invert <- t(Z) %*% (M ^ 2) %*% Z
+  quiet <- function(x) {
+    sink(tempfile())
+    on.exit(sink())
+    invisible(force(x))
+  }
+  if (!is.null(quiet(plm::detect.lindep(mat_to_invert)))) {
+    message("Intercept not included in auxiliary design in order to avoid linear dependency")
+    Z <- Z[, -1, drop = FALSE]
+    mat_to_invert <- t(Z) %*% (M ^ 2) %*% Z
+  }
+
+  teststat <- as.double(1 / 2 * t(term1) %*% Z %*% solve(mat_to_invert)
                         %*% t(Z) %*% term1)
   if (statonly) return(teststat)
 

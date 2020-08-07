@@ -4,7 +4,7 @@
 \alias{harvey}
 \title{Harvey Test for Heteroskedasticity in a Linear Regression Model}
 \usage{
-harvey(mainlm, auxdesign = NULL, statonly = FALSE)
+harvey(mainlm, auxdesign = NA, statonly = FALSE)
 }
 \arguments{
 \item{mainlm}{Either an object of \code{\link[base]{class}} \code{"lm"}
@@ -13,16 +13,18 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{auxdesign}{A \code{\link[base]{data.frame}} or
 \code{\link[base]{matrix}} representing an auxiliary design matrix of
 containing exogenous variables that (under alternative hypothesis) are
 related to error variance, or a character "fitted.values" indicating
 that the fitted \eqn{\hat{y}_i} values from OLS should be used.
-If set to \code{NULL} (the default), the
+If set to \code{NA} (the default), the
 design matrix of the original regression model is used. An intercept
 is included in the auxiliary regression even if the first column of
 \code{auxdesign} is not a vector of ones.}

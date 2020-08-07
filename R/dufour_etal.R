@@ -6,12 +6,13 @@
 #'    heteroskedasticity in a linear regression model.
 #'
 #' The test implements a Monte Carlo procedure as follows. (1) The observed
-#'    value of the test statistic \eqn{T_0} is computed using \code{hettest}.
-#'    (2) \code{R} replications of the random error vector are generated from
-#'    the distribution specified using \code{errorgen}. (3) \code{R}
-#'    replications of the test statistic, \eqn{T_1,T_2,\ldots,T_R}, are
-#'    computed from the generated error vectors. (4) The empirical
-#'    \code{p}-value is computed as \eqn{\frac{\hat{G}_R(T_0)+1}{R+1}}, where
+#'    value of the test statistic \eqn{T_0} is computed using function
+#'    with name \code{hettest}. (2) \code{R} replications of the random error
+#'    vector are generated from the distribution specified using
+#'    \code{errorgen}. (3) \code{R} replications of the test statistic,
+#'    \eqn{T_1,T_2,\ldots,T_R}, are computed from the generated error vectors.
+#'    (4) The empirical \code{p}-value is computed as
+#'    \eqn{\frac{\hat{G}_R(T_0)+1}{R+1}}, where
 #'    \eqn{\hat{G}_R(x)=\sum_{j=1}^{R} 1_{T_j \ge x}}, \eqn{1_{\bullet}}
 #'    being the indicator function. The test is right-tailed, regardless of the
 #'    tailedness of \code{hettest}. Note that the heteroskedasticity
@@ -28,13 +29,13 @@
 #'
 #' @param R An integer specifying the number of Monte Carlo replicates to
 #'    generate. Defaults to \code{1000}.
-#' @param hettest A function, or a character specifying the name of a function,
+#' @param hettest A character specifying the name of a function
 #'    that implements a heteroskedasticity test on a linear regression model.
 #'    The function is called with the \code{statonly} argument set to
 #'    \code{TRUE} to improve computational efficiency.
 #' @param alternative The tailedness of the test whose statistic is computed by
-#'    \code{hettest}; one of \code{"greater"} (the default), \code{"less"}, or
-#'    \code{"two.sided"}.
+#'    \code{hettest} function; one of \code{"greater"} (the default),
+#'    \code{"less"}, or \code{"two.sided"}.
 #' @param errorgen A function, or a character specifying the name of a
 #'    function, from which the random errors are to be generated. The function
 #'    should correspond to a continuous probability distribution that has (or
@@ -43,14 +44,14 @@
 #'    This argument is ignored if \code{errorgen} is
 #'    \code{\link[stats]{rnorm}}, since \code{mean} must be set to 0, and
 #'    \code{sd} is set to 1 because the heteroskedasticity test implemented by
-#'    \code{hettest} is assumed to be scale invariant. If \code{errorgen} is
-#'    not \code{rnorm}, \code{errorparam} should be chosen in such a way that
-#'    the error distribution has a mean of 0.
+#'    \code{hettest} function is assumed to be scale invariant. If
+#'    \code{errorgen} is not \code{rnorm}, \code{errorparam} should be chosen
+#'    in such a way that the error distribution has a mean of 0.
 #' @param seed An integer specifying a seed to pass to
 #'    \code{\link[base]{set.seed}} for random number generation. This allows
-#'    reproducibility of Monte Carlo results. A value of \code{NULL}
+#'    reproducibility of Monte Carlo results. A value of \code{NA}
 #'    results in not setting a seed.
-#' @param ... Additional arguments to pass to \code{hettest}
+#' @param ... Additional arguments to pass to function with name \code{hettest}
 #'
 #' @inheritParams breusch_pagan
 #' @return An object of \code{\link[base]{class}} \code{"htest"}. If object
@@ -62,7 +63,7 @@
 #'
 #' @examples
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
-#' dufour_etal(mtcars_lm, hettest = breusch_pagan)
+#' dufour_etal(mtcars_lm, hettest = "breusch_pagan")
 #'
 
 dufour_etal <- function(mainlm, hettest, R = 1000L, alternative = c("greater",
@@ -70,25 +71,41 @@ dufour_etal <- function(mainlm, hettest, R = 1000L, alternative = c("greater",
                         errorparam = list(), seed = 1234, ...) {
 
   alternative <- match.arg(alternative, c("greater", "less", "two.sided"))
-  if (is.character(hettest)) hettest <- get(hettest)
+  if (is.character(hettest)) {
+    hettestfunc <- get(hettest)
+  } else {
+    stop("hettest must be a character naming a function")
+  }
   if (is.character(errorgen)) errorgen <- get(errorgen)
   arguments <- list(...)
   invisible(list2env(arguments, envir = environment()))
-  if ("alternative" %in% names(formals(hettest))) arguments$alternative <- alternative
-  hettestchar <- deparse(substitute(hettest))
+  if ("alternative" %in% names(formals(hettestfunc)))
+    arguments$alternative <- alternative
   processmainlm(m = mainlm)
   n <- length(e)
 
-  if (hettestchar == "horn") {
+  if (hettest == "horn") {
     if (exists("exact", where = environment(), inherits = FALSE)) {
       if (exact) stop("This method is only available for tests with a continuous test statistic")
     } else {
       if (n - p <= 11) stop("This method is only available for tests with a continuous test statistic")
     }
-  } else if (hettestchar %in% c("anscombe", "bickel")) {
+  } else if (hettest %in% c("anscombe", "bickel", "wilcox_keselman")) {
     stop("This method is only available for tests that are invariant with respect
-         to nuisance parameters and for which the test statistic can be computed
-         based only on the design matrix and the OLS residuals.")
+       to nuisance parameters and for which the test statistic can be computed
+       based only on the design matrix and the OLS residuals.")
+  } else if (hettest == "simonoff_tsai") {
+    if (!exists("method", where = environment(), inherits = FALSE)) {
+      stop("This function is only available for hettest `simonoff_tsai` with `method` argument set to \"score\".")
+    } else if (method != "score") {
+      stop("This function is only available for hettest `simonoff_tsai` with `method` argument set to \"score\".")
+    }
+  } else if (hettest == "zhou_etal" && p > 2) {
+    if (exists("method", where = environment(), inherits = FALSE)) {
+      if (method %in% c("covariate-specific", "hybrid")) {
+        stop("`zhou_etal` cannot be used in godfrey_orme with method \"covariate-specific\" or \"hybrid\" when model has more than two covariates")
+      }
+    }
   }
 
   if (exists("deflator", where = environment(), inherits = FALSE)) {
@@ -96,18 +113,18 @@ dufour_etal <- function(mainlm, hettest, R = 1000L, alternative = c("greater",
       arguments$deflator <- which(colnames(X) == deflator)
   }
 
-  statobs <- do.call(what = hettest,
+  statobs <- do.call(what = hettestfunc,
               args = append(list("mainlm" = list("y" = y, "X" = X),
                                  "statonly" = TRUE), arguments))
 
-  if (!(hettestchar == "goldfeld_quandt")) {
+  if (!(hettest == "goldfeld_quandt")) {
     M <- fastM(X, n)
-    if (!is.null(seed)) set.seed(seed)
+    if (!is.na(seed)) set.seed(seed)
     epsgen <- replicate(R, do.call(errorgen, c("n" = n, errorparam)),
                         simplify = FALSE)
     egen <- lapply(epsgen, function(eps) M %*% eps)
 
-    statgen <- vapply(1:R, function(j) do.call(what = hettest,
+    statgen <- vapply(1:R, function(j) do.call(what = hettestfunc,
                 args = append(list("mainlm" = list("X" = X, "e" = egen[[j]]),
                          "statonly" = TRUE), arguments)), NA_real_)
   } else { # Goldfeld-Quandt
@@ -116,7 +133,7 @@ dufour_etal <- function(mainlm, hettest, R = 1000L, alternative = c("greater",
       if (method == "nonparametric") stop("This method is only available for tests with a continuous test statistic")
     }
 
-    if (!is.null(seed)) set.seed(seed)
+    if (!is.na(seed)) set.seed(seed)
     epsgen <- replicate(R, do.call(errorgen, c("n" = n, errorparam)),
                         simplify = FALSE)
 
@@ -130,13 +147,17 @@ dufour_etal <- function(mainlm, hettest, R = 1000L, alternative = c("greater",
       }
     }
 
-    if (!exists("deflator", where = environment(), inherits = FALSE)) deflator <- NULL
+    if (!exists("deflator", where = environment(), inherits = FALSE)) deflator <- NA
     if (!exists("prop_central", where = environment(), inherits = FALSE)) prop_central <- 1 / 3
     if (!exists("group1prop", where = environment(), inherits = FALSE)) group1prop <- 1 / 2
     checkdeflator(deflator, X, p, hasintercept[[1]])
-    theind <- gqind(n, prop_central, group1prop)
 
-    if (!is.null(deflator)) {
+    theind <- gqind(n, p, prop_central, group1prop)
+
+    if (!is.na(deflator) && !is.null(deflator)) {
+      if (!is.na(suppressWarnings(as.integer(deflator)))) {
+        deflator <- as.integer(deflator)
+      }
       X <- X[order(X[, deflator]), , drop = FALSE]
     }
     M1 <- fastM(X[theind[[1]], , drop = FALSE], length(theind[[1]]))

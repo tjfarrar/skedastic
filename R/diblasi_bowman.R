@@ -31,9 +31,9 @@
 #'   replications to be used, if \code{distmethod="bootstrap"}.
 #' @param ignorecov A logical. If \code{TRUE} (the default), the
 #'   variance-covariance matrix of \eqn{s} is assumed to be diagonal. (This
-#'   assumption is, strictly speaking, invalid, but improves computational
-#'   efficiency considerably for what should be a small loss of
-#'   statistical precision).
+#'   assumption is, strictly speaking, invalid, but usually yields a reasonable
+#'   approximation. Computation time is
+#'   prohibitive for large sample sizes if set to \code{FALSE}).
 #'
 #' @inheritParams breusch_pagan
 #' @inheritParams wilcox_keselman
@@ -154,7 +154,7 @@ diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
   } else if (distmethod == "bootstrap") {
 
     Tstar <- rep(NA_real_, B)
-    if (!is.null(seed)) set.seed(seed)
+    if (!is.na(seed)) set.seed(seed)
     for (b in 1:B) {
       ystar <- stats::rnorm(n, mean = yhat,
                      sd = sqrt(sigma_hat_sq))

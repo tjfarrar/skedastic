@@ -6,12 +6,12 @@
 \usage{
 goldfeld_quandt(
   mainlm,
-  method = "parametric",
-  deflator = NULL,
+  method = c("parametric", "nonparametric"),
+  deflator = NA,
   prop_central = 1/3,
   group1prop = 1/2,
   alternative = c("greater", "less", "two.sided"),
-  prob = NULL,
+  prob = NA,
   twosidedmethod = c("doubled", "kulinskaya"),
   restype = c("ols", "blus"),
   statonly = FALSE,
@@ -25,9 +25,11 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{method}{A character indicating which of the two tests derived in
 \insertCite{Goldfeld65;textual}{skedastic} should be implemented.
@@ -39,7 +41,7 @@ design matrix of \code{mainlm} or an integer giving the index of a
 column of the design matrix. This variable is suspected to be
 related to the error variance under the alternative hypothesis.
 \code{deflator} may not correspond to a column of 1's (intercept).
-Default \code{NULL} means the data will be left in its current order
+Default \code{NA} means the data will be left in its current order
 (e.g. in case the existing index is believed to be associated with
 error variance).}
 
@@ -66,11 +68,13 @@ information is available on the suspected direction of the association,
 \item{prob}{A vector of probabilities corresponding to values of the test
 statistic (number of peaks) from 0 to \eqn{n-1} inclusive (used
 only when \code{method} is \code{"nonparametric"}). If
-\code{NULL} (the default), probabilities are calculated within the
+\code{NA} (the default), probabilities are calculated within the
 function by calling \code{ppeak}. The user can improve computational
 performance of the test (for instance, when the test is being used
 repeatedly in a simulation) by pre-specifying the exact probability
-distribution of the number of peaks using this argument.}
+distribution of the number of peaks using this argument, e.g. by
+calling the \eqn{n}th element of \code{\link{dpeakdat}} (or \eqn{(n-p)}th
+element, if BLUS residuals are used).}
 
 \item{twosidedmethod}{A character indicating the method to be used to compute
 two-sided \eqn{p}-values for the parametric test when \code{alternative}

@@ -4,11 +4,21 @@
 \alias{pDtrend}
 \title{Cumulative distribution function of nonparametric trend statistic \eqn{D}}
 \usage{
-pDtrend(k, n, lower.tail = TRUE, exact = (n <= 10), tiefreq = NULL)
+pDtrend(
+  k,
+  n,
+  lower.tail = TRUE,
+  exact = (n <= 10),
+  tiefreq = NA,
+  override = FALSE
+)
 }
 \arguments{
-\item{k}{An integer of \code{length} 1; the value must be between 0 and
-\eqn{\frac{n(n-1)(n+1)}{3}} inclusive.}
+\item{k}{An integer of \code{length} \eqn{\ge 1}
+or a character \code{"all"} indicating that the cumulative
+distribution function should be applied to the entire support of \eqn{D}.
+The latter is only acceptable when \code{exact} is \code{TRUE}, since
+the distribution is otherwise continuous.}
 
 \item{n}{A positive integer representing the number of observations in the
 series.}
@@ -19,16 +29,24 @@ tailed cumulative probabilities are computed inclusive of \code{k}.}
 
 \item{exact}{A logical. Should exact distribution of \eqn{D} be used by
 calling \code{\link{dDtrend}}? If \code{FALSE}, a normal approximation
-is used. If \code{tiefreq} is not \code{NULL} (ties are present),
-normal approximation is used regardless of the value of \code{exact}.}
+is used. If \code{tiefreq} is not \code{NA} (ties are present),
+normal approximation is used regardless of the value of \code{exact}.
+By default, \code{exact} is set to \code{TRUE} provided that
+\code{n <= 10}. Setting \code{exact} to \code{TRUE} for \code{n > 11}
+results in an error unless \code{override} is set to \code{TRUE}.}
 
 \item{tiefreq}{A double vector corresponding to the value of \eqn{d_i}
 in \insertCite{Lehmann75;textual}{skedastic}. These are the frequencies
-of the various tied ranks. If ties are absent, \code{NULL} (the default).}
+of the various tied ranks. If ties are absent, \code{NA} (the default).}
+
+\item{override}{A logical. By default, the \code{dDtrend} function aborts if
+\eqn{n > 11} due to the prohibitively slow computation (which may cause
+some systems to crash). Setting this argument to \code{TRUE} overrides
+the abort. Ignored unless \code{exact} is \code{TRUE}.}
 }
 \value{
 A double between 0 and 1 representing the probability/ies of \eqn{D}
-   taking on at least (or at most) a value of \eqn{k}.
+   taking on at least (at most) the value(s) in the \code{names} attribute.
 }
 \description{
 This function computes \eqn{\Pr(D \le k)} (\eqn{\Pr(D \ge k)}), i.e.

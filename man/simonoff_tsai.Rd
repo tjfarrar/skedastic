@@ -6,13 +6,14 @@
 \usage{
 simonoff_tsai(
   mainlm,
-  auxdesign = NULL,
+  auxdesign = NA,
   method = c("mlr", "score"),
   hetfun = c("mult", "add", "logmult"),
   basetest = c("koenker", "cook_weisberg"),
-  mlestart = 0.1,
   bartlett = TRUE,
-  statonly = FALSE
+  optmethod = "Nelder-Mead",
+  statonly = FALSE,
+  ...
 )
 }
 \arguments{
@@ -22,16 +23,18 @@ a list of two objects: a response vector and a design matrix. The objects
 are assumed to be in that order, unless they are given the names
 \code{"X"}  and \code{"y"} to distinguish them. The design matrix passed
 in a list must begin with a column of ones if an intercept is to be
-included in the linear model. For tests that use ordinary least squares
-residuals, one can also pass a vector of residuals in the list, which
-should either be the third object or be named \code{"e"}.}
+included in the linear model. The design matrix passed in a list should
+not contain factors, as all columns are treated 'as is'. For tests that
+use ordinary least squares residuals, one can also pass a vector of
+residuals in the list, which should either be the third object or be
+named \code{"e"}.}
 
 \item{auxdesign}{A \code{\link[base]{data.frame}} or
 \code{\link[base]{matrix}} representing an auxiliary design matrix of
 containing exogenous variables that (under alternative hypothesis) are
 related to error variance, or a character "fitted.values" indicating
 that the fitted \eqn{\hat{y}_i} values from OLS should be used.
-If set to \code{NULL} (the default), the
+If set to \code{NA} (the default), the
 design matrix of the original regression model is used. An intercept
 is included in the auxiliary regression even if the first column of
 \code{auxdesign} is not a vector of ones.}
@@ -63,11 +66,6 @@ with argument \code{koenker} set to \code{TRUE}, while
 \code{\link{cook_weisberg}}. Partial matching is used. This argument is
 only used if \code{method} is \code{"score"}.}
 
-\item{mlestart}{The numerical value of the \code{start} argument of
-\code{\link[maxLik]{maxLik}}. If it is of \code{length} 1, the value will
-be replicated \eqn{q} times using \code{\link[base]{rep}}. Default is 0.1.
-This argument is used only if \code{method} is \code{"mlr"}.}
-
 \item{bartlett}{A logical specifying whether a Bartlett correction should be
 made, as per \insertCite{Ferrari04;textual}{skedastic}, to improve the
 fit of the test statistic to the asymptotic null distribution. This
@@ -75,9 +73,23 @@ argument is only applicable where \code{method} is \code{"mlr"}, and is
 implemented only where \code{hetfun} is \code{"mult"} or
 \code{"logmult"}.}
 
+\item{optmethod}{A character specifying the optimisation method to use with
+\code{\link[stats]{optim}}, if \code{method} is \code{"mlr"}. The
+default, \code{"Nelder-Mead"}, corresponds to the default \code{method}
+value in \code{\link[stats]{optim}}. Warnings about Nelder-Mead algorithm
+being unreliable for one-dimensional optimization have been suppressed,
+since the algorithm does appear to work for the three implemented choices
+of \code{hetfun}.}
+
 \item{statonly}{A logical. If \code{TRUE}, only the test statistic value
 is returned, instead of an object of \code{\link[base]{class}}
 \code{"htest"}. Defaults to \code{FALSE}.}
+
+\item{...}{Optional arguments to pass to \code{\link[stats]{optim}}, such as
+\code{par} (initial value of \eqn{\lambda}) and \code{maxit} (maximum
+number of iterations to use in optimisation algorithm), and \code{trace}
+(to provide detailed output on optimisation algorithm). Default initial
+value of \eqn{\lambda} is \code{rep(1e-3, q)}.}
 }
 \value{
 An object of \code{\link[base]{class}} \code{"htest"}. If object is

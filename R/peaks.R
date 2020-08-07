@@ -3,7 +3,7 @@
 #' This function computes the number of peaks in a double vector, with
 #' peak defined as per \insertCite{Goldfeld65;textual}{skedastic}. The function
 #' is used in the Goldfeld-Quandt nonparametric test for heteroskedasticity in
-#' a linear model.
+#' a linear model. \code{NA} and \code{NaN} values in the sequence are ignored.
 #'
 #' @param x A double vector.
 #'
@@ -22,9 +22,14 @@
 #'
 
 countpeaks <- function(x) {
-  x <- x[!is.na(x)]
-  if (!is.double(x)) stop("x must be a double")
+  x <- x[!is.na(x) & !is.nan(x)]
+  if (!is.double(x)) stop("x must be a double. Consider using `as.double` with argument.")
   n <- length(x)
+  if (n == 0L) {
+    stop("There are no finite values in the sequence")
+  } else if (n == 1L) {
+    return(0L)
+  }
   npeaks <- 0L
   peak <- x[1]
   for (i in 2:n) {
@@ -73,6 +78,10 @@ countpeaks <- function(x) {
 #' plot(0:9, dpeak(0:9, 10), type = "p", pch = 20, xlab = "Number of Peaks",
 #'          ylab = "Probability")
 #'
+#' # This would be extremely slow if usedata were set to FALSE:
+#' prob <- dpeak(0:199, 200, usedata = TRUE)
+#' plot(0:199, prob, type = "l", xlab = "Number of Peaks", ylab = "Probability")
+#'
 #' # `dpeakdat` is a dataset containing probabilities generated from `dpeak`
 #' utils::data(dpeakdat)
 #' expval <- unlist(lapply(dpeakdat,
@@ -81,43 +90,70 @@ countpeaks <- function(x) {
 #'      ylab = "Expected Number of Peaks")
 
 dpeak <- function(k, n, usedata = FALSE) {
-  if (length(k) == 1) {
-    maxk <- k
-  } else if (length(k) > 1) {
-    if (!all(k[-1] - k[-length(k)]) == 1) stop("Only sequential k values permitted")
-    maxk <- max(k)
-  }
-  if (maxk >= n) {
-    warning(paste0("No. of peaks `k` must be less than no. of observations `n`\n
-            k truncated at n - 1 = ", n - 1))
-    k <- ifelse(length(k) == 1, n - 1, min(k):(n - 1))
-    maxk <- n - 1
-  }
+
+  if (!all.equal(as.integer(k), k)) stop("vector k must consist only of integer values")
+
   if (usedata) {
     utils::data(dpeakdat)
-    dpeakdat[[n]][k+1]
+    if (n > length(dpeakdat)) stop("Probabilities for this n value are not stored in dpeakdat")
+    return(dpeakdat[[n]][k + 1])
   } else {
-    if (n > 170) {
-      N <- Rmpfr::mpfrArray(0, precBits = 53, dim = c(n, maxk + 1))
-      factorial_denom <- gmp::factorialZ(n)
-    } else {
-      N <- matrix(data = 0, nrow = n, ncol = maxk + 1) # k can be 0
-      factorial_denom <- factorial(n)
-    }
-    N[1, 1] <- 1
-    if (n > 1) {
-      for (i in 2:n) {
-        N[i, 1] <- (i - 1) * N[i - 1, 1]
-        if (maxk >= 1) {
-          for (j in 2:(maxk + 1)) {
-            N[i, j] <- (i - 1) * N[i - 1, j] + N[i - 1, j - 1]
+    if (length(k) == 1 || all(diff(k) == 1)) {
+      maxk <- max(k, na.rm = TRUE)
+      if (maxk >= n) {
+        stop("Support for no. of peaks consists of integers from 0 to n - 1")
+      }
+      if (n > 170) {
+        N <- Rmpfr::mpfrArray(0, precBits = 53, dim = c(n, maxk + 1))
+        factorial_denom <- gmp::factorialZ(n)
+      } else {
+        N <- matrix(data = 0, nrow = n, ncol = maxk + 1) # k can be 0
+        factorial_denom <- factorial(n)
+      }
+      N[1, 1] <- 1
+      if (n > 1) {
+        for (i in 2:n) {
+          N[i, 1] <- (i - 1) * N[i - 1, 1]
+          if (maxk >= 1) {
+            for (j in 2:(maxk + 1)) {
+              N[i, j] <- (i - 1) * N[i - 1, j] + N[i - 1, j - 1]
+            }
           }
         }
       }
+      probs <- as.double(N[n, k + 1] / factorial_denom)
+      names(probs) <- as.character(k)
+      return(probs)
+    } else {
+      message("Procedure is slower for non-sequential k due to recursion")
+      dpeak_inner <- function(l, m = n) {
+        if (l >= m) {
+          stop("Support for no. of peaks consists of integers from 0 to n - 1")
+        }
+        if (m > 170) {
+          N <- Rmpfr::mpfrArray(0, precBits = 53, dim = c(m, l + 1))
+          factorial_denom <- gmp::factorialZ(m)
+        } else {
+          N <- matrix(data = 0, nrow = m, ncol = l + 1)
+          factorial_denom <- factorial(m)
+        }
+        N[1, 1] <- 1
+        if (m > 1) {
+          for (i in 2:m) {
+            N[i, 1] <- (i - 1) * N[i - 1, 1]
+            if (l >= 1) {
+              for (j in 2:(l + 1)) {
+                N[i, j] <- (i - 1) * N[i - 1, j] + N[i - 1, j - 1]
+              }
+            }
+          }
+        }
+        return(as.double(N[m, l + 1] / factorial_denom))
+      }
+      probs <- Vectorize(dpeak_inner, USE.NAMES = FALSE)(l = k)
+      names(probs) <- as.character(k)
+      return(probs)
     }
-    output <- as.double(N[n, k + 1] / factorial_denom)
-    names(output) <- as.character(k)
-    return(output)
   }
 }
 
