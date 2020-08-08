@@ -9,12 +9,18 @@ jobs:
       r: release
       before_install:
         - sudo apt-get install libmpfr-dev
+      script:
+        - R CMD build .
+        - travis_wait 45 R CMD check cliR*tar.gz --as-cran
     - name: "Linux Xenial R-Devel"
       os: linux
       dist: xenial
       r: devel
       before_install:
         - sudo apt-get install libmpfr-dev
+      script:
+        - R CMD build .
+        - travis_wait 45 R CMD check cliR*tar.gz --as-cran
     - name: "Mac OSX 9.4 R-Release"
       os: osx
       osx_image: xcode9.4
@@ -23,3 +29,6 @@ jobs:
         - tidymodels/broom
         - RcppCore/RcppArmadillo
         - r-lib/vctrs
+      script:
+        - R CMD build .
+        - travis_wait 45 R CMD check cliR*tar.gz --as-cran
