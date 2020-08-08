@@ -13,6 +13,7 @@ myttest[[2]] <- stats::t.test(x = normdat$r1[[1]], y = normdat$r1[[2]],
                          alternative = "two.sided", var.equal = TRUE)
 
 test_that("t-tests give same value for `doubled` and `kulinskaya` methods", {
+  skip_on_cran()
   pvals <- vapply(c("doubled", "kulinskaya"), function(m)
     twosidedpval(q = abs(myttest[[1]]$statistic), CDF = pt, continuous = TRUE,
     method = m, Aloc = 0, df = n[1] + n[2] - 2), NA_real_, USE.NAMES = FALSE)
@@ -86,6 +87,7 @@ test_that("Binomial tests give different values for `doubled`, `kulinskaya`, and
 # Poisson
 
 test_that("twosidedpval works with Poisson distribution", {
+  skip_on_cran()
   pvals <- vapply(c("doubled", "kulinskaya", "minlikelihood"), function(m)
     twosidedpval(q = 3, CDF = ppois, continuous = FALSE,
                  method = m, Aloc = 10, lambda = 10,

@@ -16,6 +16,7 @@ allargs <- allargs[-which(vapply(1:nrow(allargs), function(i) allargs$deflator[i
 
 
 test_that("linear regression works with all combinations of formals", {
+  skip_on_cran()
   pvals <- vapply(1:nrow(allargs), function(i) do.call(what = szroeter,
               args = append(list("statonly" = FALSE),
               unlist(allargs[i, ], recursive = FALSE)))$p.value, NA_real_)

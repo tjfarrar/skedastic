@@ -153,7 +153,7 @@ pDtrend <- function(k, n, lower.tail = TRUE, exact = (n <= 10), tiefreq = NA,
     }
   } else if (any(!is.numeric(k))) stop("Invalid k value(s)")
 
-  if (exact && (is.na(tiefreq) || is.null(tiefreq))) {
+  if (exact && (is.na(tiefreq[1]) || is.null(tiefreq))) {
 
     prob <- dDtrend(k = "all", n = n, override = override)
     values <- as.integer(names(prob))
@@ -169,7 +169,7 @@ pDtrend <- function(k, n, lower.tail = TRUE, exact = (n <= 10), tiefreq = NA,
   } else {
 
     if (kall) stop("k = \"all\" is only valid when the exact, discrete distribution is used")
-    if (is.na(tiefreq) || is.null(tiefreq)) {
+    if (is.na(tiefreq[1]) || is.null(tiefreq)) {
       ED <- (n ^ 3 - n) / 6
       VD <- (n ^ 2 * (n + 1) ^ 2 * (n - 1)) / 36
       cumprob <- vapply(k, function(j) stats::pnorm((j - 1 - ED) / sqrt(VD),

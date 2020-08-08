@@ -51,6 +51,8 @@ test_that("nonparametric test with prob NA: linear regression works with all com
 })
 
 test_that("nonparametric test with prob not NA: linear regression works with all combinations of formals", {
+
+  skip_on_cran()
   theargs.npar2 <- list("deflator" = c(NA, "speed", "crim", "2"), "method" = c("nonparametric"),
                         "restype" = c("ols", "blus"), "prob" = list(dpeakdat[[ncars]],
                     dpeakdat[[nboston]], dpeakdat[[ncars - 2]], dpeakdat[[nboston - 14]]),

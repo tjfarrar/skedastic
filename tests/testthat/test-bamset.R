@@ -19,6 +19,7 @@ allargs <- allargs[-which(vapply(1:nrow(allargs), function(i) allargs$deflator[i
               !("crim" %in% colnames(model.matrix(allargs$mainlm[[i]]))), NA)), ]
 
 test_that("linear regression works with all combinations of formals", {
+  skip_on_cran()
   pvals <- vapply(1:nrow(allargs), function(i) do.call(what = bamset,
                   args = append(list("statonly" = FALSE),
                   unlist(allargs[i, ], recursive = FALSE)))$p.value, NA_real_)

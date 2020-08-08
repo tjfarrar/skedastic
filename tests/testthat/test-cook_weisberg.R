@@ -34,9 +34,8 @@ allargs <- allargs[-which(vapply(1:nrow(allargs),
                function(i) allargs$hetfun[i] == "logmult" & dim1[i] == 0, NA)), ]
 
 test_that("linear regression works with all combinations of formals", {
-  pvals <- vapply(1:nrow(allargs), function(i) {print(i)
-    do.call(what = cook_weisberg,
+  pvals <- vapply(1:nrow(allargs), function(i) do.call(what = cook_weisberg,
                 args = append(list("statonly" = FALSE),
-                unlist(allargs[i, ], recursive = FALSE)))$p.value}, NA_real_)
+                unlist(allargs[i, ], recursive = FALSE)))$p.value, NA_real_)
   lapply(1:length(pvals), function(i) expect_true(is.btwn01(pvals[i])))
 })

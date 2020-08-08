@@ -216,7 +216,7 @@ simonoff_tsai <- function(mainlm, auxdesign = NA, method = c("mlr", "score"),
     L <- -2 * (ellp(lambda0) - MLE$value)
     w_at_MLE <- vapply(1:n, function(i) w(Z[i, ], MLE$par), NA_real_)
     Ghat <- diag(w_at_MLE / (prod(w_at_MLE ^ (1 / n))))
-    Xmhat <- pracma::sqrtm(solve(Ghat)) %*% X
+    Xmhat <- pracma::sqrtm(solve(Ghat))$B %*% X
     teststat <- as.double((n - p - 2) / n * L +
       log(det(crossprod(X)) / det(crossprod(Xmhat))))
     if (bartlett) {
