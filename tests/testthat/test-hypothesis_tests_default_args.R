@@ -8,6 +8,7 @@ htest <- c("anscombe", "bamset", "bickel",
 
 test_that("simple linear regression works with default arguments and
           gives same p-value for lm or list mainlm argument", {
+  skip_on_cran()
   carslm <- lm(dist ~ speed, data = cars)
   carslist <- list("y" = cars$dist, "X" = cbind(1, cars$speed))
   carslmpvals <- unlist(lapply(htest, function(h) do.call(what = h,
@@ -21,6 +22,7 @@ test_that("simple linear regression works with default arguments and
 test_that("simple linear regression through origin works with default
           arguments and gives same p-value for lm or list mainlm
           argument", {
+            skip_on_cran()
             carslm0 <- lm(dist ~ 0 + speed, data = cars)
             carslist0 <- list("y" = cars$dist, "X" = as.matrix(cars$speed))
             carslm0pvals <- unlist(lapply(htest, function(h) do.call(what = h,
@@ -82,6 +84,7 @@ test_that("multiple linear regression through origin works with default
 test_that("multiple linear regression with random data in vectors rather than
            data frames works with default arguments and
            gives same p-value for lm or list mainlm argument", {
+          skip_on_cran()
           myn <- 10
           myp <- 3
           myX <- matrix(data = runif(myn * myp),

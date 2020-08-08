@@ -30,6 +30,7 @@ test_that("diblasi-bowman works with all combinations of formals (carslm)", {
 })
 
 test_that("diblasi-bowman works with all combinations of formals (bostonlm)", {
+  skip_on_cran()
   pvals <- vapply(1:nrow(allargs2), function(i) do.call(what = diblasi_bowman,
                 args = append(list("B" = 500L, "seed" = 1234,
                                        "statonly" = FALSE),

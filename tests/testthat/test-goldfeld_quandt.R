@@ -30,6 +30,7 @@ ncars <- nrow(model.matrix(carslm))
 nboston <- nrow(model.matrix(bostonlm))
 
 test_that("nonparametric test with prob NA: linear regression works with all combinations of formals", {
+  skip_on_cran()
   theargs.npar1 <- list("deflator" = c(NA, "speed", "crim", "2"), "method" = c("nonparametric"),
                       "restype" = c("ols", "blus"), "prob" = NA,
                       "alternative" = c("greater", "less", "two.sided"),

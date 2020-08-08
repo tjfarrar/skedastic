@@ -21,6 +21,7 @@ allargs1 <- expand.grid(theargs1, stringsAsFactors = FALSE)
 allargs2 <- expand.grid(theargs2, stringsAsFactors = FALSE)
 
 test_that("carslm works with all combinations of formals", {
+  skip_on_cran()
   pvals <- vapply(1:nrow(allargs1), function(i) do.call(what = honda,
               args = append(list("statonly" = FALSE),
               unlist(allargs1[i, ], recursive = FALSE)))$p.value, NA_real_)

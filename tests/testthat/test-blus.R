@@ -40,6 +40,7 @@ allargs1 <- expand.grid(theargs1, stringsAsFactors = FALSE)
 allargs2 <- expand.grid(theargs2, stringsAsFactors = FALSE)
 
 test_that("simple linear regression (bostonlm) works with all combinations of formals", {
+  skip_on_cran()
   bostonblus1 <- lapply(1:nrow(allargs1), function(i) do.call(what = blus,
         args = append(list("mainlm" = bostonlm), allargs1[i, ])))
   lapply(1:length(bostonblus1), function(i)

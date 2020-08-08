@@ -36,6 +36,7 @@ myFtest[[2]] <- stats::var.test(x = normdat$r2[[1]], y = normdat$r2[[2]],
                                 alternative = "two.sided")
 
 test_that("F-tests give different values for `doubled` and `kulinskaya` methods", {
+  skip_on_cran()
   pvals <- vapply(c("doubled", "kulinskaya"), function(m)
     twosidedpval(q = myFtest[[1]]$statistic, CDF = pf, continuous = TRUE,
                  method = m, Aloc = 1, df1 = n[1] - 1, df2 = n[2] - 1),
@@ -60,6 +61,7 @@ mybtest[[1]] <- stats::binom.test(x = binomdat$r0, n = n[1], p = 0.4)
 mybtest[[2]] <- stats::binom.test(x = binomdat$r1, n = n[1], p = 0.4)
 
 test_that("Binomial tests give different values for `doubled`, `kulinskaya`, and `minlikelihood` methods", {
+  skip_on_cran()
   pvals <- vapply(c("doubled", "kulinskaya", "minlikelihood"), function(m)
     twosidedpval(q = mybtest[[1]]$statistic, CDF = pbinom, continuous = FALSE,
                  method = m, Aloc = n[1] * 0.4, supportlim = c(0, n[1]),

@@ -4,6 +4,7 @@ context("horn works for two lm examples across all argument permutations")
 # theargs <- formals(horn)
 
 test_that("linear regression works with all combinations of formals", {
+  skip_on_cran()
   carslm <- lm(dist ~ speed, data = cars)
   bostonlm <- lm(medv ~ crim + zn + indus + chas + nox + rm +
                    age + dis + rad + tax + ptratio + b + lstat, data = BostonHousing)

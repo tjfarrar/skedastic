@@ -42,12 +42,14 @@ for (i in 6:10) {
 #
 
 test_that("hetplot works with all combinations of formals for carslm, filetype NA", {
+  skip_on_cran()
   doplots <- lapply(1:nrow(allargs[[1]]), function(i) do.call(what = hetplot,
   args = append(list(), unlist(allargs[[1]][i, ], recursive = FALSE))))
   expect_true(length(doplots) == 350L)
 })
 
 test_that("hetplot works with all combinations of formals for carslm, filetype png", {
+  skip_on_cran()
   doplots <- lapply(1:nrow(allargs[[2]]), function(i) do.call(what = hetplot,
             args = append(list(), unlist(allargs[[2]][i, ], recursive = FALSE))))
   lpng <- list.files(paste0(tempdir(), "/hetplot/"), pattern = "png")
