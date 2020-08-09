@@ -27,14 +27,11 @@ Gauss-Markov Assumptions). This assumption, known as homoskedasticity, holds
 that the variance of the random error term remains constant across all 
 observations.
 
-Most of the functions in the package implement particular hypothesis testing 
-methods for detecting heteroskedasticity that have been published in a journal 
-article or book. Other functions implement graphical methods for detecting 
-heteroskedasticity or perform supporting tasks for the tests such as computing transformations of the Ordinary Least Squares (OLS) residuals that are useful in heteroskedasticity detection, or computing probabilities from the null distribution of a test statistic.
+23 distinct functions in the package implement hypothesis testing 
+methods for detecting heteroskedasticity that have been previously published in academic literature. Other functions implement graphical methods for detecting 
+heteroskedasticity or perform supporting tasks for the tests such as computing transformations of the Ordinary Least Squares (OLS) residuals that are useful in heteroskedasticity detection, or computing probabilities from the null distribution of a nonparametric test statistic. Certain functions have applications beyond the problem of heteroskedasticity in linear regression. These include `pRQF`, which computes cumulative probabilities from the distribution of a ratio of quadratic forms in normal random vectors, `twosidedpval`, which implements three different approaches for calculating two-sided $p$-values from asymmetric null distributions, and `dDtrend` and `pdDtrend`, which compute probabilities from Lehmann's nonparametric trend statistic. 
 
-Nearly all of the exported functions in the package require as an argument an  
-`lm` object (or, for advanced users desiring faster computation, a list 
-containing the response vector, the design matrix, and optionally the vector of OLS residuals). Thus, to use this package a user must first be familiar 
+Most of the exported functions in the package take a linear model as their primary argument (which can be passed as an `lm` object). Thus, to use this package a user must first be familiar 
 with how to fit linear regression models using the `lm` function from package 
 `stats`. Note that the package currently supports only linear regression models 
 fit using OLS.
@@ -42,8 +39,7 @@ fit using OLS.
 For heteroskedasticity tests that are implemented in other R packages on CRAN, 
 or in other statistical software such as SAS or SHAZAM, the functions in the 
 `skedastic` package have been checked against them to ensure that they produce 
-the same values of the test statistic and $p$-value. This is true for the 
-following functions: `breusch_pagan`, `cook_weisberg`, `glejser`, 
+the same values of the test statistic and $p$-value. This is true of `breusch_pagan`, `cook_weisberg`, `glejser`, 
 `goldfeld_quandt` (parametric test only), `harvey`, and `white_lm`.
 
 Here is an example of implementing the Breusch-Pagan Test for heteroskedasticity 
@@ -54,11 +50,7 @@ speed (`cars$speed`) as the explanatory (independent) variable.
 ```R
 library(skedastic)
 mylm <- lm(dist ~ speed, data = cars)
-bp <- breusch_pagan(mylm)
-bp
-attributes(bp)
-bp$statistic
-bp$p.value
+breusch_pagan(mylm)
 ```
 
 To compute BLUS residuals for the same model:
@@ -66,8 +58,6 @@ To compute BLUS residuals for the same model:
 ```R
 myblusres <- blus(mylm, omit = "last")
 myblusres
-# Plot OLS residuals against BLUS residuals
-plot(mylm$residuals, myblusres)
 ```
 
 To create customised residual plots for the same model:
