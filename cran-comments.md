@@ -86,3 +86,4 @@ These DOIs have all been checked and are all valid: (10.2307/1911963)[https://do
 (10.2307/1913974)[https://doi.org/10.2307/1913974],
 (10.2307/2986026)[https://doi.org/10.2307/2986026].
 
+* A previous attempt to submit this package version failed incoming checks due to non-availability of two package dependencies, `mvtnorm` and `data.table`. This may have been a temporary issue with those packages that would resolve itself, but as the dependency on those packages was non-essential, I have resolved the issue by eliminating the dependencies.
