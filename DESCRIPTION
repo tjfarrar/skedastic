@@ -65,7 +65,6 @@ Imports:
     plm (>= 2.2.0),
     berryFunctions (>= 1.17),
     bazar (>= 1.0.11),
-    shiny (>= 1.4.0.2),
     expm (>= 0.999.4)
 Suggests:
     knitr,
