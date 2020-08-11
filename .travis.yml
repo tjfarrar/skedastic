@@ -12,6 +12,7 @@ jobs:
         - tidyr
         - RcppEigen
         - minqa
+        - RcppArmadillo
       before_install:
         - sudo apt-get install libmpfr-dev
       script:
@@ -26,6 +27,7 @@ jobs:
         - tidyr
         - RcppEigen
         - minqa
+        - RcppArmadillo
       before_install:
         - sudo apt-get install libmpfr-dev
       script:
