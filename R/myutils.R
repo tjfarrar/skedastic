@@ -279,11 +279,6 @@ meanfromCDF <- function(theCDF, cont, suplim, ...) {
   }
 }
 
-# normexp_integrand2 <- function(x, Sigmat) {
-#   function(x)
-#     force(mvtnorm::dmvnorm(x, sigma = Sigmat))
-# }
-
 # qreg arguments:
 # x and y are independent and dependent variables (matrix and vector)
 # qval is the quantile to be used, which defaults to median

@@ -60,17 +60,18 @@ test_that("pRQF: test some trivial cases", {
 })
 
 
-### Monte Carlo
-S <- 1e4
-set.seed(1234)
-eps <- replicate(S, rnorm(n1), simplify = FALSE)
-eps2 <- replicate(S, mvtnorm::rmvnorm(n = 1, sigma = mySigma), simplify = FALSE)
-R <- unlist(lapply(eps, function(x)
-       (t(x) %*% Arnd %*% x) / (t(x) %*% Brnd %*% x)))
-R2 <- unlist(lapply(eps2, function(x)
-        (x %*% Arnd %*% t(x)) / (x %*% Brnd %*% t(x))))
-
 test_that("pRQF: Monte Carlo results", {
+  skip_on_cran()
+  ### Monte Carlo
+  S <- 1e4
+  set.seed(1234)
+  eps <- replicate(S, rnorm(n1), simplify = FALSE)
+  eps2 <- replicate(S, mvtnorm::rmvnorm(n = 1, sigma = mySigma), simplify = FALSE)
+  R <- unlist(lapply(eps, function(x)
+    (t(x) %*% Arnd %*% x) / (t(x) %*% Brnd %*% x)))
+  R2 <- unlist(lapply(eps2, function(x)
+    (x %*% Arnd %*% t(x)) / (x %*% Brnd %*% t(x))))
+
   expect_true(abs(sum(R < 1) / S - pRQF(r = 1, A = Arnd, B = Brnd)) <= 1e-2)
   expect_true(abs(sum(R2 < 0.875) / S -
               pRQF(r = 0.875, A = Arnd, B = Brnd, Sigma = mySigma)) <= 1e-2)
