@@ -13,7 +13,8 @@ This is the second time the package is submitted to CRAN.
 * mac osx xcode 9.4 (on travis-ci), r-release (4.0.2); could not build for r-devel due to https://cloud.r-project.org/bin/macosx/el-capitan/contrib/r-devel/ package repository being empty
 
 ## R CMD check results
-No ERRORs or WARNINGs from any checks.
+
+* No ERRORs or WARNINGs from Windows (r-release, r-devel) checks or Mac OSX (r-release) check or Linux Xenial (r-devel) check. The Linux Xenial (r-release) check on travis-ci has an ERROR due to failure of lazy loading for some packages. This seems to be a temporary and unavoidable issue external to my package that will hopefully resolve itself.
 
 * The Windows check returned a NOTE:
 
@@ -86,4 +87,3 @@ These DOIs have all been checked and are all valid: (10.2307/1911963)[https://do
 (10.2307/1913974)[https://doi.org/10.2307/1913974],
 (10.2307/2986026)[https://doi.org/10.2307/2986026].
 
-* A previous attempt to submit this package version failed incoming checks due to non-availability of two package dependencies, `mvtnorm` and `data.table`. This may have been a temporary issue with those packages that would resolve itself, but as the dependency on those packages was non-essential, I have resolved the issue by eliminating the dependencies.

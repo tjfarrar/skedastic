@@ -7,12 +7,6 @@ jobs:
       os: linux
       dist: xenial
       r: release
-      r_binary_packages:
-        - shiny
-        - tidyr
-        - RcppEigen
-        - minqa
-        - RcppArmadillo
       before_install:
         - sudo apt-get install libmpfr-dev
       script:
@@ -22,12 +16,6 @@ jobs:
       os: linux
       dist: xenial
       r: devel
-      r_binary_packages:
-        - shiny
-        - tidyr
-        - RcppEigen
-        - minqa
-        - RcppArmadillo
       before_install:
         - sudo apt-get install libmpfr-dev
       script:
