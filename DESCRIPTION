@@ -63,7 +63,9 @@ Imports:
     plm (>= 2.2.0),
     berryFunctions (>= 1.17),
     bazar (>= 1.0.11),
-    expm (>= 0.999.4)
+    expm (>= 0.999.4),
+    mvtnorm (>= 1.1.0),
+    data.table (>= 1.12.8)
 Suggests:
     knitr,
     rmarkdown,
@@ -74,8 +76,7 @@ Suggests:
     tibble,
     het.test,
     testthat,
-    mlbench,
-    mvtnorm
+    mlbench
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

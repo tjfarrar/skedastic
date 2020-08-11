@@ -111,8 +111,7 @@ horn <- function(mainlm, deflator = NA, restype = c("ols", "blus"),
   }
   nres <- length(absres)
 
-  # R <- data.table::frank(absres, ties.method = "average")
-  R <- rank(absres, ties.method = "average")
+  R <- data.table::frank(absres, ties.method = "average")
   teststat <- sum((R - 1:nres) ^ 2)
   if (statonly) return(teststat)
   d <- table(R)
