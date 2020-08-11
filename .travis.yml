@@ -7,8 +7,9 @@ jobs:
       os: linux
       dist: xenial
       r: release
-      r_github_packages:
-        - rstudio/shiny
+      r_binary_packages:
+        - shiny
+        - tidyr
       before_install:
         - sudo apt-get install libmpfr-dev
       script:
@@ -20,6 +21,7 @@ jobs:
       r: devel
       r_github_packages:
         - rstudio/shiny
+        - tidyverse/tidyr
       before_install:
         - sudo apt-get install libmpfr-dev
       script:
