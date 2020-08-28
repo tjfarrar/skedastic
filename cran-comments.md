@@ -1,11 +1,10 @@
-## Second submission
+## Third submission
 
-This is the second time the package is submitted to CRAN.
+This is the third time the package is submitted to CRAN.
 
 ## Revisions after previous submission
 
-* More than 20 new functions were added to the package, so that it now implements most heteroskedasticity tests found in the literature.
-* Unit testing was added in tests folder.
+* This is a very minor revision. There was a dependency on `plm` package, and I was notified that `plm` package has been earmarked for archiving. Thus I have removed the dependency.
 
 ## Test environments
 * ubuntu xenial 16.04 (on travis-ci), r-release (4.0.2) and r-devel (4.1.0)

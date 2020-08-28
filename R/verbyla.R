@@ -65,15 +65,11 @@ verbyla <- function(mainlm, auxdesign = NA, statonly = FALSE) {
   term1 <- t(t(e ^ 2 / sigma_hatbar - diag(M)))
 
   mat_to_invert <- t(Z) %*% (M ^ 2) %*% Z
-  quiet <- function(x) {
-    sink(tempfile())
-    on.exit(sink())
-    invisible(force(x))
-  }
-  if (!is.null(quiet(plm::detect.lindep(mat_to_invert)))) {
-    message("Intercept not included in auxiliary design in order to avoid linear dependency")
+  if (det(mat_to_invert) == 0) {
     Z <- Z[, -1, drop = FALSE]
     mat_to_invert <- t(Z) %*% (M ^ 2) %*% Z
+    if (det(mat_to_invert) == 0) stop("Linear dependency detected in auxiliary matrix")
+    message("Intercept not included in auxiliary design in order to avoid linear dependency")
   }
 
   teststat <- as.double(1 / 2 * t(term1) %*% Z %*% solve(mat_to_invert)
