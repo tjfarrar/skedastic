@@ -10,7 +10,7 @@
 #' of \eqn{\lambda} (called \eqn{\delta} in
 #' \insertCite{Simonoff94;textual}{skedastic}) is computed from the modified
 #' profile log-likelihood function using the Nelder-Mead algorithm in
-#' \code{\link[maxLik]{maxLik}}. Under the null hypothesis of homoskedasticity,
+#' \code{\link[stats]{optim}}. Under the null hypothesis of homoskedasticity,
 #' the distribution of the test statistic is asymptotically chi-squared with
 #' \eqn{q} degrees of freedom. The test is right-tailed.
 #'
