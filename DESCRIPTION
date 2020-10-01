@@ -1,7 +1,7 @@
 Package: skedastic
 Type: Package
 Title: Heteroskedasticity Diagnostics for Linear Regression Models
-Version: 1.0.1
+Version: 1.0.2.9991
 Authors@R: c(person(given = "Thomas", family = "Farrar", 
             email = "tjfarrar@alumni.uwaterloo.ca", role = c("aut", "cre"), 
             comment = c(ORCID = "0000-0003-0744-6972")),
@@ -9,7 +9,7 @@ Authors@R: c(person(given = "Thomas", family = "Farrar",
 Description: Implements numerous methods for detecting heteroskedasticity 
     (sometimes called heteroscedasticity) in the classical linear regression 
     model. These include a test based on Anscombe (1961) 
-    <https://projecteuclid.org/ euclid.bsmsp/1200512155>, Ramsey's (1969) 
+    <https://projecteuclid.org/euclid.bsmsp/1200512155>, Ramsey's (1969) 
     BAMSET Test <doi:10.1111/j.2517-6161.1969.tb00796.x>, the tests of Bickel 
     (1978) <doi:10.1214/aos/1176344124>, Breusch and Pagan (1979)  
     <doi:10.2307/1911963> with and without the modification 
@@ -23,9 +23,9 @@ Description: Implements numerous methods for detecting heteroskedasticity
     <doi:10.1080/01621459.1969.10500976> as formulated by 
     Mittelhammer, Judge and Miller (2000, ISBN: 0-521-62394-4), Godfrey and 
     Orme (1999) <doi:10.1080/07474939908800438>, Goldfeld and Quandt 
-    (1965) <doi:10.1080/01621459.1965.10480811>, Harvey (1976) 
-    <doi:10.2307/1913974>, Honda (1989) 
-    <doi:10.1111/j.2517-6161.1989.tb01749.x>, Horn (1981) 
+    (1965) <doi:10.1080/01621459.1965.10480811>, Harrison and McCabe (1979) 
+    <doi:10.1080/01621459.1979.10482544>, Harvey (1976) <doi:10.2307/1913974>, 
+    Honda (1989) <doi:10.1111/j.2517-6161.1989.tb01749.x>, Horn (1981) 
     <doi:10.1080/03610928108828074>, Li and Yao (2019) 
     <doi:10.1016/j.ecosta.2018.01.001> with and without the modification of 
     Bai, Pan, and Yin (2016) <doi:10.1007/s11749-017-0575-x>, Rackauskas and 

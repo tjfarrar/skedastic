@@ -2,7 +2,7 @@ context("hypothesis tests work with default arguments for different kinds of mai
 
 htest <- c("anscombe", "bamset", "bickel",
            "breusch_pagan", "carapeto_holt", "cook_weisberg", "diblasi_bowman", "evans_king", "glejser",
-           "goldfeld_quandt", "harvey", "honda", "horn",
+           "goldfeld_quandt", "harrison_mccabe", "harvey", "honda", "horn",
            "li_yao", "rackauskas_zuokas", "simonoff_tsai",
            "szroeter", "verbyla", "white_lm", "wilcox_keselman", "zhou_etal")
 
