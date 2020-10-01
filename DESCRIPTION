@@ -35,15 +35,16 @@ Description: Implements numerous methods for detecting heteroskedasticity
     Szroeter (1978) <doi:10.2307/1913831>, Verbyla (1993) 
     <doi:10.1111/j.2517-6161.1993.tb01918.x>, White (1980) 
     <doi:10.2307/1912934>, Wilcox and Keselman (2006) 
-    <doi:10.1080/10629360500107923>, and Zhou, Song, and Thompson (2015) 
-    <doi:10.1002/cjs.11252>. Besides these heteroskedasticity tests, there are 
-    supporting functions that compute the BLUS residuals of Theil (1965) 
-    <doi:10.1080/01621459.1965.10480851>, the conditional two-sided p-values of 
-    Kulinskaya (2008) <arXiv:0810.2124v1>, and probabilities for the 
-    nonparametric trend statistic of Lehmann (1975, ISBN: 0-816-24996-1). 
-    Homoskedasticity refers to the assumption of constant variance that is 
-    imposed on the model errors (disturbances); heteroskedasticity is the 
-    violation of this assumption.
+    <doi:10.1080/10629360500107923>, Yuce (2008) 
+    <https://dergipark.org.tr/en/pub/iuekois/issue/8989/112070>, and Zhou, 
+    Song, and Thompson (2015) <doi:10.1002/cjs.11252>. Besides these 
+    heteroskedasticity tests, there are supporting functions that compute the 
+    BLUS residuals of Theil (1965) <doi:10.1080/01621459.1965.10480851>, the 
+    conditional two-sided p-values of Kulinskaya (2008) <arXiv:0810.2124v1>, 
+    and probabilities for the nonparametric trend statistic of Lehmann (1975, 
+    ISBN: 0-816-24996-1). Homoskedasticity refers to the assumption of 
+    constant variance that is imposed on the model errors (disturbances); 
+    heteroskedasticity is the violation of this assumption.
 RdMacros: Rdpack
 Depends: 
     R (>= 4.0.0)
