@@ -63,8 +63,8 @@ white_lm(mtcars_lm, interactions = TRUE)
 }
 \seealso{
 This function should not be confused with
-  \code{\link[het.test:whites.htest]{het.test::whites.htest}} and
-  \code{\link[tseries:white.test]{tseries::white.test}}, which do \emph{not}
-  implement the method of \insertCite{White80;textual}{skedastic} for
-  testing for heteroskedasticity in a linear model.
+  \code{\link[tseries:white.test]{tseries::white.test}}, which does
+  \emph{not} implement the method of
+  \insertCite{White80;textual}{skedastic} for testing for
+  heteroskedasticity in a linear model.
 }

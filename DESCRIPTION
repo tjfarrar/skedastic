@@ -1,7 +1,7 @@
 Package: skedastic
 Type: Package
 Title: Heteroskedasticity Diagnostics for Linear Regression Models
-Version: 1.0.2.9991
+Version: 1.0.3
 Authors@R: c(person(given = "Thomas", family = "Farrar", 
             email = "tjfarrar@alumni.uwaterloo.ca", role = c("aut", "cre"), 
             comment = c(ORCID = "0000-0003-0744-6972")),
@@ -47,7 +47,7 @@ Description: Implements numerous methods for detecting heteroskedasticity
     heteroskedasticity is the violation of this assumption.
 RdMacros: Rdpack
 Depends: 
-    R (>= 4.0.0)
+    R (>= 3.6.0)
 Imports: 
     Rdpack (>= 0.11.1),
     broom (>= 0.5.6),
@@ -66,7 +66,8 @@ Imports:
     expm (>= 0.999.4),
     mvtnorm (>= 1.1.0),
     data.table (>= 1.12.8),
-    dplyr (>= 0.8.5)
+    dplyr (>= 0.8.5),
+    Hmisc (>= 4.4.2),
 Suggests:
     knitr,
     rmarkdown,
@@ -75,7 +76,6 @@ Suggests:
     car,
     tseries,
     tibble,
-    het.test,
     testthat,
     mlbench
 License: MIT + file LICENSE

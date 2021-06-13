@@ -1,18 +1,19 @@
-## Third submission
+## Fourth submission
 
-This is the third time the package is submitted to CRAN.
+This is the fourth time the package is submitted to CRAN.
 
 ## Revisions after previous submission
 
-* This is a very minor revision. There was a dependency on `plm` package, and I was notified that `plm` package has been earmarked for archiving. Thus I have removed the dependency.
+* The package is being resubmitted because it was archived on 2021-06-08 due to an issue not having been corrected quickly enough. The issue was that the package had a dependency on `het.test` package which was archived. This dependency has now been removed.
 
 ## Test environments
-* ubuntu xenial 16.04 (on travis-ci), r-release (4.0.2) and r-devel (4.1.0)
-* win-builder (in RStudio), r-release (4.0.2) and r-devel (4.1.0) 
-* mac osx xcode 9.4 (on travis-ci), r-release (4.0.2); could not build for r-devel due to https://cloud.r-project.org/bin/macosx/el-capitan/contrib/r-devel/ package repository being empty
+
+* ubuntu xenial 16.04 (on travis-ci), r-release and r-devel
+* win-builder (in RStudio), r-oldrelease, r-release and r-devel 
+* mac osx xcode 9.4 (on travis-ci), r-release ; could not build for r-devel due to https://cloud.r-project.org/bin/macosx/el-capitan/contrib/r-devel/ package repository being empty
 
 ## R CMD check results
 
 * No ERRORs or WARNINGs from Windows (r-release, r-devel) checks or Mac OSX (r-release) check or Linux Xenial (r-release, r-devel) check.
 
-* The Windows checks returned no NOTEs. Previous Windows checks have returned NOTEs about possible misspelled words or possible invalid DOIs but these NOTEs were spurious.
+* The Windows checks returned one NOTE. This referred to possible misspelled words, but none of these words were misspelled. Most of them were surnames or acronyms, while 'heteroskedasticity' is a legitimate spelling of this word used in the academic literature (though sometimes spelled 'heteroscedasticity').

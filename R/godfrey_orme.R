@@ -77,7 +77,7 @@ godfrey_orme <- function(mainlm, hettest, B = 1000L, alternative = c("greater",
       arguments$deflator <- which(colnames(X) == deflator)
   }
 
-  statobs <- do.call(what = hettest,
+  teststat <- do.call(what = hettest,
               args = append(list("mainlm" = list("y" = y, "X" = X),
                                  "statonly" = TRUE), arguments))
 
@@ -91,15 +91,15 @@ godfrey_orme <- function(mainlm, hettest, B = 1000L, alternative = c("greater",
                        "statonly" = TRUE), arguments)), NA_real_)
 
   if (alternative == "greater") {
-    teststat <- sum(statgen >= statobs)
+    statcount <- sum(statgen >= teststat)
   } else if (alternative == "less") {
-    teststat <- sum(statgen <= statobs)
+    statcount <- sum(statgen <= teststat)
   } else if (alternative == "two.sided") {
-    teststat <- min(sum(statgen >= statobs),
-                    sum(statgen <= statobs))
+    statcount <- min(sum(statgen >= teststat),
+                    sum(statgen <= teststat))
   }
 
-  pval <- teststat / B * ifelse(alternative == "two.sided", 2, 1)
+  pval <- statcount / B * ifelse(alternative == "two.sided", 2, 1)
 
   rval <- structure(list(statistic = teststat, parameter = B, p.value = pval,
                null.value = "Homoskedasticity",

@@ -52,7 +52,7 @@ replications to be used, if \code{distmethod="bootstrap"}.}
 
 \item{seed}{An integer specifying a seed to pass to
 \code{\link[base]{set.seed}} for random number generation. This allows
-reproducibility of bootstrap results. The default value, \code{NA},
+reproducibility of bootstrap results. The value \code{NA}
 results in not setting a seed.}
 
 \item{statonly}{A logical. If \code{TRUE}, only the test statistic value

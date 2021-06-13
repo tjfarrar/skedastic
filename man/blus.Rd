@@ -46,7 +46,7 @@ greater than \code{1e4L} are treated as \code{NA}.}
 
 \item{seed}{An integer specifying a seed to pass to
 \code{\link[base]{set.seed}} for random number generation. This allows
-reproducibility of bootstrap results. The default value, \code{NA},
+reproducibility of bootstrap results. The value \code{NA}
 results in not setting a seed.}
 }
 \value{

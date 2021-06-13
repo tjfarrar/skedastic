@@ -9,10 +9,10 @@ processmainlm <- function(m, needX = TRUE, needy = TRUE, neede = TRUE,
   if (class(m) == "lm") {
     if (needX) X <- stats::model.matrix(m)
     if (!exists("e", where = environment(), inherits = FALSE) && neede) {
-      e <- m$residuals
+      e <- stats::resid(m)
     }
     if (needy) y <- stats::model.response(stats::model.frame(m))
-    if (needyhat) yhat <- m$fitted.values
+    if (needyhat) yhat <- stats::fitted(m)
   } else if (class(m) == "list") {
     if (is.null(names(m))) {
       y <- m[[1]]
@@ -36,9 +36,9 @@ processmainlm <- function(m, needX = TRUE, needy = TRUE, neede = TRUE,
     if ((!exists("e", where = environment(), inherits = FALSE) || is.null(e))) {
       if (neede) {
         m <- stats::lm.fit(x = X, y = y)
-        e <- m$residuals
+        e <- stats::resid(m)
       }
-      if (needyhat) yhat <- m$fitted.values
+      if (needyhat) yhat <- stats::fitted(m)
     } else {
       if (needyhat) yhat <- y - e
     }
@@ -407,4 +407,76 @@ is.singular.mat <- function(a) {
   if (!is.numeric(a))
     stop("argument a is not a numeric matrix")
   berryFunctions::almost.equal(det(a), 0)
+}
+
+errormat <- function(res, design, HCCME = "HC4", k = 0.7, gamma = c(1, 1.5),
+                     coeff = FALSE) {
+  n <- nrow(design)
+  p <- ncol(design)
+  if (HCCME == "const") {
+    sum(res ^ 2) / (n - p) * diag(n)
+  } else if (HCCME == "HC0") {
+    diag(res ^ 2)
+  } else if (HCCME == "HC1") {
+    diag(res ^ 2 * n / (n - p))
+  } else if (HCCME %in% c("HC2", "HC3", "HC4", "HC5", "HC4m")) {
+    hdiag <- diag(design %*% solve(crossprod(design)) %*% t(design))
+    hbar <- p / n
+    if (HCCME == "HC2") {
+      delta <- 1
+    } else if (HCCME == "HC3") {
+      delta <- 2
+    } else if (HCCME == "HC4") {
+      delta <- vapply(1:n, function(i) {
+        min(4, hdiag[i] / hbar)
+      }, NA_real_)
+    } else if (HCCME == "HC5") {
+      hmax <- max(hdiag)
+      maxcompare <- max(4, k * hmax / hbar)
+      delta <- vapply(1:n, function(i) {
+        min(maxcompare, hdiag[i] / hbar)
+      }, NA_real_) / 2
+    } else if (HCCME == "HC4m") {
+      delta <- vapply(1:n, function(i) {
+        min(gamma[1], hdiag[i] / hbar) + min(gamma[2], hdiag[i] / hbar)
+      }, NA_real_)
+    }
+    if (!coeff) {
+      diag(res ^ 2 / (1 - hdiag) ^ delta)
+    } else {
+      solve(crossprod(design)) %*% t(design) %*%
+        diag(res ^ 2 / (1 - hdiag) ^ delta) %*%
+        design %*% solve(crossprod(design))
+    }
+  }
+}
+
+wma <- function(x, order.by2 = NULL, k2, wt2, ntrim2) {
+  n <- length(x)
+  if (!is.null(order.by2)) {
+    o <- order(order.by2)
+    x <- x[o]
+  }
+  w <- c(1:(k2 + 1), k2:1)
+  avg <- vapply((k2 + 1):(n - k2), function(i) {
+    if (wt2 == "const") {
+      mean(x[(i - k2):(i + k2)], trim = ntrim2 / (2 * k2 + 1))
+    } else if (wt2 == "integer") {
+      sum(w * x[(i - k2):(i + k2)]) / (k2 + 1) ^ 2
+    }
+  }, NA_real_)
+  xnew <- c(rep(NA_real_, k2), avg, rep(NA_real_, k2))
+  xnew[order(o)]
+}
+
+midpoint <- function(x) {
+  d <- diff(x)
+  xlesslast <- x[-length(x)]
+  xlesslast + d / 2
+}
+
+quiet <- function(x) {
+  sink(tempfile())
+  on.exit(sink())
+  invisible(force(x))
 }
