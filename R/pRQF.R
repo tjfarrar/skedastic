@@ -96,10 +96,10 @@ pRQF <- function(r, A, B, Sigma = diag(nrow(A)),
     PLambP <- Astar - s * Bstar
 
     mylambda <- bazar::almost.unique(eigen(PLambP, only.values = TRUE)$values)
-    if (any(!berryFunctions::almost.equal(Im(mylambda), 0)))
+    if (any(abs(Im(mylambda)) > sqrt(.Machine$double.eps)))
       stop("Astar - r * Bstar has complex eigenvalue(s)")
-    mylambda <- mylambda[!berryFunctions::almost.equal(Re(mylambda), 0) &
-                           berryFunctions::almost.equal(Im(mylambda), 0)]
+    mylambda <- mylambda[(abs(Re(mylambda)) > .Machine$double.eps &
+                         abs(Im(mylambda)) < .Machine$double.eps)]
     mylambda <- as.numeric(Re(mylambda))
 
     if (algorithm %in% c("imhof", "davies")) {

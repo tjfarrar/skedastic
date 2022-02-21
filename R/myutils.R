@@ -378,7 +378,7 @@ is.symmetric.mat <- function(a) {
   if (!is.square.mat(a))
     stop("argument a is not a square numeric matrix")
 
-  all(berryFunctions::almost.equal(a[upper.tri(a)], t(a)[upper.tri(t(a))]))
+  all(abs(a[upper.tri(a)] - t(a)[upper.tri(t(a))]) < sqrt(.Machine$double.eps))
 }
 
 is.pos.semidef.mat <- function(a) {
@@ -391,14 +391,13 @@ is.pos.semidef.mat <- function(a) {
   myeigen <- eigen(a, only.values = TRUE)$values
   cplxeigen <- which(Im(myeigen) != 0)
 
-  if (length(cplxeigen) == 0 || all(berryFunctions::almost.equal(Im(myeigen[cplxeigen]), 0))) {
+  if (length(cplxeigen) == 0 || all(abs(Im(myeigen[cplxeigen])) < sqrt(.Machine$double.eps))) {
     myeigen[cplxeigen] <- Re(myeigen[cplxeigen])
     myeigen <- as.numeric(myeigen)
   } else stop("matrix a has complex eigenvalues")
 
   negeigen <- which(myeigen < 0)
-  (length(negeigen) == 0 | all(berryFunctions::almost.equal(myeigen[negeigen],
-                                                            0)))
+  (length(negeigen) == 0 | all(abs(myeigen[negeigen]) < sqrt(.Machine$double.eps)))
 }
 
 is.singular.mat <- function(a) {
@@ -406,7 +405,8 @@ is.singular.mat <- function(a) {
     stop("argument a is not a square matrix")
   if (!is.numeric(a))
     stop("argument a is not a numeric matrix")
-  berryFunctions::almost.equal(det(a), 0)
+
+  abs(det(a)) < sqrt(.Machine$double.eps)
 }
 
 errormat <- function(res, design, HCCME = "HC4", k = 0.7, gamma = c(1, 1.5),

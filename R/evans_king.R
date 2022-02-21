@@ -104,10 +104,10 @@ evans_king <- function(mainlm, method = c("GLS", "LM"), deflator = NA,
     if (statonly) return(teststat)
     pval <- pRQF(r = teststat, A = M %*% N %*% M,
                     B = M, algorithm = qfmethod, lower.tail = TRUE)
-    if (pval < 0 && berryFunctions::almost.equal(pval, 0)) {
+    if (pval < 0 && abs(pval) < sqrt(.Machine$double.eps)) {
       message("p-value returned by algorithm in pRQF slightly < 0 and thus changed to 0")
       pval <- 0
-    } else if (pval > 1 && berryFunctions::almost.equal(pval, 1)) {
+    } else if (pval > 1 && abs(pval - 1) < sqrt(.Machine$double.eps)) {
       message("p-value returned by algorithm in pRQF slightly > 1 and thus changed to 1")
       pval <- 0
     }
