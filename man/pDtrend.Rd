@@ -68,8 +68,6 @@ pDtrend(k = 50, n = 6)
 # Normal approximation of the above with continuity correction is
 # 0.8145
 pDtrend(k = 50, n = 6, exact = FALSE)
-# For an independent sample of size 50, the probability that D is >= 20000 is
-# is 0.6093583
 
 }
 \references{

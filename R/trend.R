@@ -143,8 +143,6 @@ dDtrend <- function(k = "all", n, override = FALSE) {
 #' # Normal approximation of the above with continuity correction is
 #' # 0.8145
 #' pDtrend(k = 50, n = 6, exact = FALSE)
-#' # For an independent sample of size 50, the probability that D is >= 20000 is
-#' # is 0.6093583
 #'
 
 pDtrend <- function(k, n, lower.tail = TRUE, exact = (n <= 10), tiefreq = NA,

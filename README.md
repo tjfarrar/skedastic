@@ -1,7 +1,5 @@
 # skedastic
 
-[![Build Status](https://travis-ci.org/tjfarrar/skedastic.svg?branch=master)](https://travis-ci.org/tjfarrar/skedastic)
-
 The purpose of the `skedastic` package is to make a suite of old and new 
 methods for detecting and correcting for heteroskedasticity in linear 
 regression models accessible to R users.
