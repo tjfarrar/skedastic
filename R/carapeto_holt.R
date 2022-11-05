@@ -4,7 +4,7 @@
 #'    \insertCite{Carapeto03;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' The test is based on the methodology of
+#' @details The test is based on the methodology of
 #'    \insertCite{Goldfeld65;textual}{skedastic} but does not require any
 #'    auxiliary regression. It entails ordering the observations by some
 #'    suspected deflator (one of the explanatory variables) in such a way
@@ -70,7 +70,7 @@ carapeto_holt <- function(mainlm, deflator = NA, prop_central = 1 / 3,
   processmainlm(m = mainlm, needy = FALSE)
 
   hasintercept <- columnof1s(X)
-  if (class(mainlm) == "list") {
+  if (inherits(mainlm, "list")) {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column
                                        of design matrix")
@@ -115,7 +115,7 @@ carapeto_holt <- function(mainlm, deflator = NA, prop_central = 1 / 3,
                       lower.tail = TRUE)
     } else if (alternative == "two.sided") {
       pval <- twosidedpval(q = teststat, CDF = pRQF, method = twosidedmethod,
-              continuous = TRUE, Aloc = 1, A = M %*% Istar_hi %*% M,
+              locpar = 1, continuous = TRUE, A = M %*% Istar_hi %*% M,
               B = M %*% Istar_lo %*% M, algorithm = qfmethod,
               lower.tail = TRUE)
     }
@@ -135,8 +135,8 @@ carapeto_holt <- function(mainlm, deflator = NA, prop_central = 1 / 3,
                       lower.tail = TRUE)
     } else if (alternative == "two.sided") {
       pval <- twosidedpval(q = teststat, CDF = pRQF,
-                      method = twosidedmethod, Aloc = 1, continuous = TRUE,
-                       A = M %*% A %*% Istar_hi %*% A %*% M,
+                      method = twosidedmethod, continuous = TRUE,
+                       locpar = 1, A = M %*% A %*% Istar_hi %*% A %*% M,
                        B = M %*% A %*% Istar_lo %*% A %*% M,
                        algorithm = qfmethod, lower.tail = TRUE)
     }

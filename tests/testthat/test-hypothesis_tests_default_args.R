@@ -4,7 +4,7 @@ htest <- c("anscombe", "bamset", "bickel",
            "breusch_pagan", "carapeto_holt", "cook_weisberg", "diblasi_bowman", "evans_king", "glejser",
            "goldfeld_quandt", "harrison_mccabe", "harvey", "honda", "horn",
            "li_yao", "rackauskas_zuokas", "simonoff_tsai",
-           "szroeter", "verbyla", "white_lm", "wilcox_keselman", "zhou_etal")
+           "szroeter", "verbyla", "white", "wilcox_keselman", "zhou_etal")
 
 test_that("simple linear regression works with default arguments and
           gives same p-value for lm or list mainlm argument", {

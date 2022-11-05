@@ -44,16 +44,16 @@ This function implements the residual maximum likelihood test of
    in a linear regression model.
 }
 \details{
-Verbyla's Test entails fitting a generalised auxiliary regression model
-in which the response variable is the vector of standardised squared
-residuals \eqn{e_i^2/\hat{\sigma}^2} from the original OLS
-model and the design matrix is some function of \eqn{Z}, an
-\eqn{n \times q} matrix consisting of \eqn{q} exogenous variables, appended
-to a column of ones.
-The test statistic is half the residual sum of squares from this generalised
-auxiliary regression. Under the null hypothesis of homoskedasticity, the
-distribution of the test statistic is asymptotically chi-squared with
-\eqn{q} degrees of freedom. The test is right-tailed.
+Verbyla's Test entails fitting a generalised auxiliary regression
+   model in which the response variable is the vector of standardised
+   squared residuals \eqn{e_i^2/\hat{\omega}} from the original OLS model
+   and the design matrix is some function of \eqn{Z}, an \eqn{n \times q}
+   matrix consisting of \eqn{q} exogenous variables, appended to a column of
+   ones. The test statistic is half the residual sum of squares from this
+   generalised auxiliary regression. Under the null hypothesis of
+   homoskedasticity, the distribution of the test statistic is
+   asymptotically chi-squared with \eqn{q} degrees of freedom. The test is
+   right-tailed.
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)

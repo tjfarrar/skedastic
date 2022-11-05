@@ -4,11 +4,12 @@
 #'    \insertCite{Rackauskas07;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' Rackauskas and Zuokas propose a class of tests that entails determining the
-#'    largest weighted difference in variance of estimated error. The
-#'    asymptotic behaviour of their test statistic \eqn{T_{n,\alpha}} is
-#'    studied using the empirical polygonal process constructed from partial
-#'    sums of the squared residuals. The test is right-tailed.
+#' @details Rackauskas and Zuokas propose a class of tests that entails
+#'    determining the largest weighted difference in variance of estimated
+#'    error. The asymptotic behaviour of their test statistic
+#'    \eqn{T_{n,\alpha}} is studied using the empirical polygonal process
+#'    constructed from partial sums of the squared residuals. The test is
+#'    right-tailed.
 #' @param alpha A double such that \eqn{0 \le \alpha < 1/2}; a hyperparameter
 #'    of the test. Defaults to 0.
 #' @param pvalmethod A character, either \code{"data"} or \code{"sim"},

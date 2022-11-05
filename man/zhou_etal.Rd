@@ -61,7 +61,10 @@ An object of \code{\link[base]{class}} "htest". If object is not
 \description{
 This function implements the methods of
    \insertCite{Zhou15;textual}{skedastic} for testing for
-   heteroskedasticity in a linear regression model. The authors propose
+   heteroskedasticity in a linear regression model.
+}
+\details{
+\insertCite{Zhou15;textual}{skedastic} The authors propose
    three variations based on comparisons between sandwich and model-based
    estimators for the variances of individual regression coefficient
    esimators. The covariate-specific method computes a test statistic and

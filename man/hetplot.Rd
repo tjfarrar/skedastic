@@ -42,7 +42,7 @@ a separate plot is created for each.}
 vertical axis (\code{"res"} for OLS residuals [the default],
 \code{"res_blus"} for \code{\link[=blus]{BLUS}} residuals,
 \code{"res_stand"} for standardised OLS residuals:
-\eqn{e_i/\hat{\sigma}}, \code{"res_constvar"} for OLS residuals
+\eqn{e_i/\sqrt{\hat{\omega}}}, \code{"res_constvar"} for OLS residuals
 transformed to have constant variance: \eqn{e_i/\sqrt{m_{ii}}},
 \code{"res_stud"} for studentised OLS residuals:
 \eqn{e_i/(s\sqrt{m_{ii}})}. If more than one value is specified,
@@ -85,18 +85,18 @@ A list containing two \code{\link[base:data.frame]{data frames}}, one
 }
 \description{
 This function creates various two-dimensional scatter plots that can aid in
-detecting heteroskedasticity in a linear regression model.
+   detecting heteroskedasticity in a linear regression model.
 }
 \details{
 The variable plotted on the horizontal axis could be the original
-data indices, one of the explanatory variables, the OLS predicted (fitted)
-values, or any other numeric vector specified by the user. The variable
-plotted on the vertical axis is some function of the OLS residuals or
-transformed version thereof such as the BLUS residuals
-\insertCite{Theil68;textual}{skedastic} or standardised or studentised
-residuals as discussed in \insertCite{Cook83;textual}{skedastic}. A separate
-plot is created for each (\code{horzvar}, \code{vertvar}, \code{vertfun})
-combination.
+   data indices, one of the explanatory variables, the OLS predicted
+   (fitted) values, or any other numeric vector specified by the user. The
+   variable plotted on the vertical axis is some function of the OLS
+   residuals or transformed version thereof such as the BLUS residuals
+   \insertCite{Theil68;textual}{skedastic} or standardised or studentised
+   residuals as discussed in \insertCite{Cook83;textual}{skedastic}. A
+   separate plot is created for each (\code{horzvar}, \code{vertvar},
+   \code{vertfun}) combination.
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)

@@ -4,7 +4,7 @@
 #'    \insertCite{Szroeter78;textual}{skedastic} for testing for
 #'    heteroskedasticity in a linear regression model.
 #'
-#' The test entails putting the data rows in increasing order of
+#' @details The test entails putting the data rows in increasing order of
 #'    some specified deflator (e.g., one of the explanatory variables) that
 #'    is believed to be related to the error variance by some non-decreasing
 #'    function. The test statistic is a ratio of quadratic forms in the OLS
@@ -45,7 +45,7 @@ szroeter <- function (mainlm, deflator = NA, h = SKH,
 
   n <- nrow(X)
   hasintercept <- columnof1s(X)
-  if (class(mainlm) == "list") {
+  if (inherits(mainlm, "list")) {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
       colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))

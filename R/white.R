@@ -4,18 +4,20 @@
 #'    \insertCite{White80;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' White's Test entails fitting an auxiliary regression model in which the
-#' response variable is the vector of squared residuals from the original
-#' model and the design matrix includes the original explanatory variables,
-#' their squares, and (optionally) their two-way interactions. The test
-#' statistic is the number of observations multiplied by the coefficient of
-#' determination from the auxiliary regression model:
-#' \deqn{T = n r_{\mathrm{aux}}^2}
+#' @details White's Test entails fitting an auxiliary regression model in which
+#'    the response variable is the vector of squared residuals from the
+#'    original model and the design matrix includes the original explanatory
+#'    variables, their squares, and (optionally) their two-way interactions.
+#'    The test statistic is the number of observations multiplied by the
+#'    coefficient of determination from the auxiliary regression model:
+#'    \deqn{T = n r_{\mathrm{aux}}^2}
+#'
 #' White's Test is thus a special case of the method of
-#' \insertCite{Breusch79;textual}{skedastic}. Under the null hypothesis of
+#'    \insertCite{Breusch79;textual}{skedastic}. Under the null hypothesis of
 #'    homoskedasticity, the distribution of the test statistic is
 #'    asymptotically chi-squared with \code{parameter} degrees of freedom.
 #'    The test is right-tailed.
+#'
 #' @param interactions A logical. Should two-way interactions between explanatory
 #'    variables be included in the auxiliary regression? Defaults to
 #'    \code{FALSE}, since when interaction terms are present the test is not a
@@ -36,11 +38,11 @@
 #'
 #' @examples
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
-#' white_lm(mtcars_lm)
-#' white_lm(mtcars_lm, interactions = TRUE)
+#' white(mtcars_lm)
+#' white(mtcars_lm, interactions = TRUE)
 #'
 
-white_lm <- function(mainlm, interactions = FALSE, statonly = FALSE) {
+white <- function(mainlm, interactions = FALSE, statonly = FALSE) {
 
   processmainlm(m = mainlm, needy = FALSE)
 
@@ -75,3 +77,5 @@ white_lm <- function(mainlm, interactions = FALSE, statonly = FALSE) {
                          method = "White's Test"), class = "htest")
   broom::tidy(rval)
 }
+
+white_lm <- white

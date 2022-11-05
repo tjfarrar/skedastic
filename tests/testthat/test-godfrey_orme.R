@@ -4,7 +4,7 @@ htest <- c("anscombe", "bickel", "bamset", "breusch_pagan", "carapeto_holt", "co
            "diblasi_bowman", "evans_king", "glejser",
            "goldfeld_quandt", "harvey", "honda", "horn",
            "li_yao", "rackauskas_zuokas", "simonoff_tsai",
-           "szroeter", "verbyla", "white_lm", "wilcox_keselman",
+           "szroeter", "verbyla", "white", "wilcox_keselman",
            "zhou_etal")
 
 carslm <- lm(dist ~ speed, data = cars)

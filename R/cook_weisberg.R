@@ -4,16 +4,17 @@
 #'    \insertCite{Cook83;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' The Cook-Weisberg Score Test entails fitting an auxiliary regression model
-#' in which the response variable is the vector of standardised squared
-#' residuals \eqn{e_i^2/\hat{\sigma}^2} from the original OLS
-#' model and the design matrix is some function of \eqn{Z}, an
-#' \eqn{n \times q} matrix consisting of \eqn{q} exogenous variables, appended
-#' to a column of ones.
-#' The test statistic is half the residual sum of squares from this auxiliary
-#' regression. Under the null hypothesis of homoskedasticity, the distribution
-#' of the test statistic is asymptotically chi-squared with \eqn{q} degrees of
-#' freedom. The test is right-tailed.
+#' @details The Cook-Weisberg Score Test entails fitting an auxiliary
+#'    regression model in which the response variable is the vector of
+#'    standardised squared residuals \eqn{e_i^2/\hat{\omega}} from the original
+#'    OLS model and the design matrix is some function of \eqn{Z}, an
+#'    \eqn{n \times q} matrix consisting of \eqn{q} exogenous variables,
+#'    appended to a column of ones. The test statistic is half the residual sum
+#'    of squares from this auxiliary regression. Under the null hypothesis of
+#'    homoskedasticity, the distribution of the test statistic is
+#'    asymptotically chi-squared with \eqn{q} degrees of freedom. The test is
+#'    right-tailed.
+#'
 #' @param hetfun A character describing the form of \eqn{w(\cdot)}, the error
 #'    variance function under the heteroskedastic alternative. Possible values
 #'    are \code{"mult"} (the default), corresponding to

@@ -5,8 +5,8 @@
 #'    \insertCite{Dufour04;textual}{skedastic} for testing for
 #'    heteroskedasticity in a linear regression model.
 #'
-#' The test implements a Monte Carlo procedure as follows. (1) The observed
-#'    value of the test statistic \eqn{T_0} is computed using function
+#' @details The test implements a Monte Carlo procedure as follows. (1) The
+#'    observed value of the test statistic \eqn{T_0} is computed using function
 #'    with name \code{hettest}. (2) \code{R} replications of the random error
 #'    vector are generated from the distribution specified using
 #'    \code{errorgen}. (3) \code{R} replications of the test statistic,
@@ -18,7 +18,7 @@
 #'    tailedness of \code{hettest}. Note that the heteroskedasticity
 #'    test implemented by \code{hettest} must have a test statistic that is
 #'    continuous and that is invariant with respect to nuisance parameters
-#'    (\eqn{\sigma^2} and \eqn{\beta}). Note further that if \code{hettest}
+#'    (\eqn{\omega} and \eqn{\beta}). Note further that if \code{hettest}
 #'    is \code{goldfeld_quandt} with \code{method} argument
 #'    \code{"parametric"}, the replicated Goldfeld-Quandt \eqn{F} statistics
 #'    are computed directly within this function rather than by calling
@@ -138,7 +138,7 @@ dufour_etal <- function(mainlm, hettest, R = 1000L, alternative = c("greater",
                         simplify = FALSE)
 
     hasintercept <- columnof1s(X)
-    if (class(mainlm) == "list") {
+    if (inherits(mainlm, "list")) {
       if (hasintercept[[1]]) {
         if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
         colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))

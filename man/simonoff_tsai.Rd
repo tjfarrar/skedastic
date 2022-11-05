@@ -98,53 +98,53 @@ An object of \code{\link[base]{class}} \code{"htest"}. If object is
 }
 \description{
 This function implements the modified profile likelihood ratio test and
-  score test of \insertCite{Simonoff94;textual}{skedastic} for testing
-  for heteroskedasticity in a linear regression model.
+   score test of \insertCite{Simonoff94;textual}{skedastic} for testing
+   for heteroskedasticity in a linear regression model.
 }
 \details{
-The Simonoff-Tsai Likelihood Ratio Test involves a modification of the
-profile likelihood function so that the nuisance parameter will be
-orthogonal to the parameter of interest. The maximum likelihood estimate
-of \eqn{\lambda} (called \eqn{\delta} in
-\insertCite{Simonoff94;textual}{skedastic}) is computed from the modified
-profile log-likelihood function using the Nelder-Mead algorithm in
-\code{\link[stats]{optim}}. Under the null hypothesis of homoskedasticity,
-the distribution of the test statistic is asymptotically chi-squared with
-\eqn{q} degrees of freedom. The test is right-tailed.
+The Simonoff-Tsai Likelihood Ratio Test involves a modification of
+   the profile likelihood function so that the nuisance parameter will be
+   orthogonal to the parameter of interest. The maximum likelihood estimate
+   of \eqn{\lambda} (called \eqn{\delta} in
+   \insertCite{Simonoff94;textual}{skedastic}) is computed from the modified
+   profile log-likelihood function using the Nelder-Mead algorithm in
+   \code{\link[stats]{optim}}. Under the null hypothesis of
+   homoskedasticity, the distribution of the test statistic is
+   asymptotically chi-squared with \eqn{q} degrees of freedom. The test is
+   right-tailed.
 
 The Simonoff-Tsai Score Test entails adding a term to either the score
-statistic of \insertCite{Cook83;textual}{skedastic} (a test implemented in
-\code{\link{cook_weisberg}}) or to that of
-\insertCite{Koenker81;textual}{skedastic} (a test implemented in
-\code{\link{breusch_pagan}} with argument \code{koenker} set to
-\code{TRUE}), in order to improve the robustness of these respective tests
-in the presence of non-normality. This test likewise has a test statistic
-that is asymptotically \eqn{\chi^2(q)}-distributed and the test is likewise
-right-tailed.
+   statistic of \insertCite{Cook83;textual}{skedastic} (a test implemented
+   in \code{\link{cook_weisberg}}) or to that of
+   \insertCite{Koenker81;textual}{skedastic} (a test implemented in
+   \code{\link{breusch_pagan}} with argument \code{koenker} set to
+   \code{TRUE}), in order to improve the robustness of these respective
+   tests in the presence of non-normality. This test likewise has a test
+   statistic that is asymptotically \eqn{\chi^2(q)}-distributed and the test
+   is likewise right-tailed.
 
 The assumption of underlying both tests is that
-\eqn{\mathrm{Cov}(\epsilon)=\sigma^2 W}, where \eqn{W} is
-an \eqn{n\times n} diagonal matrix with \eqn{i}th diagonal element
-\eqn{w_i=w(Z_i, \lambda)}. Here, \eqn{Z_i} is the \eqn{i}th row of an
-\eqn{n \times q} nonstochastic auxiliary design matrix \eqn{Z}. Note:
-\eqn{Z} as defined here does not have a column of ones, but is concatenated
-to a column of ones when used in an auxiliary regression.
-\eqn{\lambda} is a \eqn{q}-vector of unknown parameters, and \eqn{w(\cdot)}
-is a real-valued, twice-differentiable function having the property that
-there exists some \eqn{\lambda_0} for which
-\eqn{w(Z_i,\lambda_0)=0} for all \eqn{i=1,2,\ldots,n}. Thus, the null
-hypothesis of homoskedasticity may be expressed as
-\eqn{\lambda=\lambda_0}.
+   \eqn{\mathrm{Cov}(\epsilon)=\omega W}, where \eqn{W} is
+   an \eqn{n\times n} diagonal matrix with \eqn{i}th diagonal element
+   \eqn{w_i=w(Z_i, \lambda)}. Here, \eqn{Z_i} is the \eqn{i}th row of an
+   \eqn{n \times q} nonstochastic auxiliary design matrix \eqn{Z}. Note:
+   \eqn{Z} as defined here does not have a column of ones, but is
+   concatenated to a column of ones when used in an auxiliary regression.
+   \eqn{\lambda} is a \eqn{q}-vector of unknown parameters, and
+   \eqn{w(\cdot)} is a real-valued, twice-differentiable function having the
+   property that there exists some \eqn{\lambda_0} for which
+   \eqn{w(Z_i,\lambda_0)=0} for all \eqn{i=1,2,\ldots,n}. Thus, the null
+   hypothesis of homoskedasticity may be expressed as
+   \eqn{\lambda=\lambda_0}.
 
-In the score test, the added term in the test statistic is of the
-form
-\deqn{\sum_{j=1}^{q} \left(\sum_{i=1}^{n} h_{ii} t_{ij}\right) \tau_j},
-where \eqn{t_{ij}} is the \eqn{(i,j)}th element of the Jacobian matrix
-\eqn{J} evaluated at \eqn{\lambda=\lambda_0}:
-\deqn{t_{ij}=\left.\frac{\partial w(Z_i, \lambda)}{\partial \lambda_j}\right|_{\lambda=\lambda_0}},
-and \eqn{\tau=(\bar{J}'\bar{J})^{-1}\bar{J}'d}, where \eqn{d} is the
-\eqn{n}-vector whose \eqn{i}th element is \eqn{e_i^2\bar{\sigma}^{-2}},
-\eqn{\bar{\sigma}^2=n^{-1}e'e}, and \eqn{\bar{J}=(I_n-1_n 1_n'/n)J}.
+In the score test, the added term in the test statistic is of the form
+   \deqn{\sum_{j=1}^{q} \left(\sum_{i=1}^{n} h_{ii} t_{ij}\right) \tau_j},
+   where \eqn{t_{ij}} is the \eqn{(i,j)}th element of the Jacobian matrix
+   \eqn{J} evaluated at \eqn{\lambda=\lambda_0}:
+   \deqn{t_{ij}=\left.\frac{\partial w(Z_i, \lambda)}{\partial \lambda_j}\right|_{\lambda=\lambda_0}},
+   and \eqn{\tau=(\bar{J}'\bar{J})^{-1}\bar{J}'d}, where \eqn{d} is the
+   \eqn{n}-vector whose \eqn{i}th element is \eqn{e_i^2\bar{\omega}^{-1}},
+   \eqn{\bar{\omega}=n^{-1}e'e}, and \eqn{\bar{J}=(I_n-1_n 1_n'/n)J}.
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)

@@ -4,8 +4,8 @@
 #'    (BAMSET) method of \insertCite{Ramsey69;textual}{skedastic} for testing
 #'    for heteroskedasticity in a linear regression model.
 #'
-#' BAMSET is an analogue of Bartlett's \eqn{M} Test for heterogeneity of
-#'    variances across independent samples from \eqn{k} populations. In this
+#' @details BAMSET is an analogue of Bartlett's \eqn{M} Test for heterogeneity
+#'    of variances across independent samples from \eqn{k} populations. In this
 #'    case the populations are \eqn{k} subsets of the residuals from a linear
 #'    regression model. In order to meet the independence assumption,
 #'    \link[=blus]{BLUS residuals} are computed, meaning that only \eqn{n-p}
@@ -24,7 +24,13 @@
 #'    margins of the \code{k} subsets be passed to \code{\link{blus}} as the
 #'    \code{omit} argument? If \code{TRUE} (the default), this overrides any
 #'    \code{omit} argument passed directly. If \code{FALSE}, the \code{omit}
-#'    argument must be specified and cannot be left as \code{NA}.
+#'    argument must be specified and cannot be left as \code{NA}. If
+#'    \code{categorical} is \code{TRUE}, setting \code{omitatmargins} to
+#'    \code{TRUE} results in omitting observations from the most frequently
+#'    occurring factor levels or values.
+#' @param categorical A logical. Is the deflator a categorical variable? If
+#'    so, the number of levels will be used as \eqn{k} with each level forming
+#'    a subset. Defaults to \code{FALSE}.
 #'
 #' @inheritParams breusch_pagan
 #' @inheritParams goldfeld_quandt
@@ -47,12 +53,13 @@
 #'
 
 bamset <- function(mainlm, k = 3, deflator = NA, correct = TRUE,
-                   omitatmargins = TRUE, omit = NA, statonly = FALSE) {
+                   omitatmargins = TRUE, omit = NA,
+                   categorical = FALSE, statonly = FALSE) {
 
   processmainlm(m = mainlm, needy = FALSE)
 
   hasintercept <- columnof1s(X)
-  if (class(mainlm) == "list") {
+  if (inherits(mainlm, "list")) {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column
                                          of design matrix")
@@ -74,19 +81,37 @@ bamset <- function(mainlm, k = 3, deflator = NA, correct = TRUE,
 
   n <- nrow(X)
   nprime <- n - p
-  min_subset_size <- as.integer(nprime / k) # called r_1 in Ramsey (1969)
-  nprime_modk <- nprime %% k
 
-  # slightly different definition of v_i compared with Ramsey (1969)
-  # this one makes the subsets more equitable in size (not differing by more than 1)
-  v <- rep(min_subset_size, k) + c(rep(1, nprime_modk), rep(0, k - nprime_modk))
+  if (categorical) {
+    if (is.factor(X[, deflator])) {
+      lev <- levels(X[, deflator])
+    } else {
+      lev <- unique(sort(X[, deflator]))
+    }
+    k <- length(lev)
+    min_subset_size <- as.integer(nprime / k) # called r_1 in Ramsey (1969)
+    nprime_modk <- nprime %% k
+    v <- table(X[, deflator])
+
+  } else {
+    min_subset_size <- as.integer(nprime / k) # called r_1 in Ramsey (1969)
+    nprime_modk <- nprime %% k
+
+    # slightly different definition of v_i compared with Ramsey (1969)
+    # this one makes the subsets more equitable in size (not differing by more than 1)
+    v <- rep(min_subset_size, k) + c(rep(1, nprime_modk), rep(0, k - nprime_modk))
+  }
   sub_ind <- vector("list", k)
   sub_ind[[1]] <- seq.int(from = 1, by = 1, length.out = v[1])
   for (j in 2:k) {
     sub_ind[[j]] <- seq.int(from = max(sub_ind[[j - 1]]) + 1, by = 1,
                             length.out = v[j])
   }
-  if (omitatmargins) omit <- margin_indices(v, p, sub_ind)
+
+  if (omitatmargins)
+    omit <- margin_indices(v, p, sub_ind,
+                                       categ = categorical)
+
   res <- blus(mainlm = list("X" = X, "e" = e), omit)
 
   s_sq <- unlist(lapply(sub_ind, function(i, e)

@@ -9,8 +9,8 @@ twosidedpval(
   CDF,
   continuous,
   method = c("doubled", "kulinskaya", "minlikelihood"),
-  Aloc,
-  supportlim,
+  locpar,
+  supportlim = c(-Inf, Inf),
   ...
 )
 }
@@ -36,12 +36,12 @@ than or equal to that of the observed value. Partial matching is used.
 Note that the \code{"minlikelihood"} method is available only
 for discrete distributions.}
 
-\item{Aloc}{a double representing a generic location parameter chosen to
-separate the tails of the distribution. Note that if \code{Aloc}
+\item{locpar}{a double representing a generic location parameter chosen to
+separate the tails of the distribution. Note that if \code{locpar}
 corresponds to the median of \code{CDF}, there is no difference between
-the two methods, in the continuous case. If \code{Aloc} is not specified,
+the two methods, in the continuous case. If \code{locpar} is not specified,
 the function attempts to compute the expectation of \code{CDF} using
-numerical integration and, if successful, uses this as \code{Aloc}.
+numerical integration and, if successful, uses this as \code{locpar}.
 However, this may yield unexpected results, especially if \code{CDF} is
 not one of the cumulative distribution functions of well-known
 distributions included in the \code{stats} package.}
@@ -50,7 +50,7 @@ distributions included in the \code{stats} package.}
 and maximum values in the support of the distribution whose cumulative
 distribution function is \code{CDF}. This argument is only used if the
 distribution is discrete (i.e. if \code{continuous} is \code{FALSE}) and
-if \code{method} is \code{"minlikelihood"} or \code{Aloc} is not
+if \code{method} is \code{"minlikelihood"} or \code{locpar} is not
 specified. If \code{supportlim} is not supplied, the function assumes
 that the support is \code{-1e6:1e6}. Values of \code{-Inf} and \code{Inf}
 may be supplied, but if so, the support is truncated at \code{-1e6} and
@@ -69,11 +69,12 @@ Computes the conditional \eqn{p}-value \eqn{P_C} for a continuous
    distribution.
 }
 \details{
-Let \eqn{T} be a statistic that, under the null hypothesis, has cumulative
-   distribution function \eqn{F} and probability density or mass function
-   \eqn{f}. Denote by \eqn{A} a generic location parameter chosen to separate
-   the two tails of the distribution. Particular examples include the mean
-   \eqn{E(T|\mathrm{H}_0)}, the mode \eqn{\arg \sup_{t} f(t)}, or the median
+Let \eqn{T} be a statistic that, under the null hypothesis, has
+   cumulative distribution function \eqn{F} and probability density or mass
+   function \eqn{f}. Denote by \eqn{A} a generic location parameter chosen
+   to separate the two tails of the distribution. Particular examples
+   include the mean \eqn{E(T|\mathrm{H}_0)}, the mode
+   \eqn{\arg \sup_{t} f(t)}, or the median
    \eqn{F^{-1}\left(\frac{1}{2}\right)}. Let \eqn{q} be the observed value
    of \eqn{T}.
 
@@ -101,10 +102,10 @@ x2 <- stats::rnorm(n2, mean = 0, sd = 3)
 stats::var.test(x1, x2, alternative = "two.sided")$p.value
 # This is replicated in `twosidedpval` by setting `method` argument to `"doubled"`
 twosidedpval(q = var(x1) / var(x2), CDF = stats::pf, continuous = TRUE,
- method = "doubled", Aloc = 1, df1 = n1 - 1, df2 = n2 - 1)
+ method = "doubled", locpar = 1, df1 = n1 - 1, df2 = n2 - 1)
 # Conditional two-sided p-value centered at df (mean of chi-squared r.v.):
 twosidedpval(q = var(x1) / var(x2), CDF = stats::pf, continuous = TRUE,
- method = "kulinskaya", Aloc = 1, df1 = n1 - 1, df2 = n2 - 1)
+ method = "kulinskaya", locpar = 1, df1 = n1 - 1, df2 = n2 - 1)
 }
 \references{
 {\insertAllCited{}}

@@ -50,10 +50,10 @@ This function implements the popular method of
    studentising modification of \insertCite{Koenker81;textual}{skedastic}.
 }
 \details{
-The Breusch-Pagan Test entails fitting an auxiliary regression model in
-   which the response variable is the vector of squared residuals from the
-   original model and the design matrix \eqn{Z} consists of one or more
-   exogenous variables that are suspected of being related to the error
+The Breusch-Pagan Test entails fitting an auxiliary regression
+   model in which the response variable is the vector of squared residuals
+   from the original model and the design matrix \eqn{Z} consists of one or
+   more exogenous variables that are suspected of being related to the error
    variance. In the absence of prior information on a possible choice of
    \eqn{Z}, one would typically use the explanatory variables from the
    original model. Under the null hypothesis of homoskedasticity, the
@@ -76,6 +76,6 @@ breusch_pagan(mtcars_list)
 \code{\link[lmtest:bptest]{lmtest::bptest}}, which performs exactly
    the same test as this function; \code{\link[car:ncvTest]{car::ncvTest}},
    which is not the same test but is implemented in
-   \code{\link{cook_weisberg}}; \code{\link{white_lm}}, which is a special
+   \code{\link{cook_weisberg}}; \code{\link{white}}, which is a special
    case of the Breusch-Pagan Test.
 }

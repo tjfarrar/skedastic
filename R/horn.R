@@ -4,7 +4,7 @@
 #'    \insertCite{Horn81;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' The test entails specifying a 'deflator', an explanatory variable
+#' @details The test entails specifying a 'deflator', an explanatory variable
 #'    suspected of being related to the error variance. Residuals are ordered
 #'    by the deflator and the nonparametric trend statistic
 #'    \eqn{D=\sum (R_i - i)^2} proposed by
@@ -78,7 +78,7 @@ horn <- function(mainlm, deflator = NA, restype = c("ols", "blus"),
   processmainlm(m = mainlm, needy = FALSE)
 
   hasintercept <- columnof1s(X)
-  if (class(mainlm) == "list") {
+  if (inherits(mainlm, "list")) {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
       colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
@@ -111,7 +111,7 @@ horn <- function(mainlm, deflator = NA, restype = c("ols", "blus"),
   }
   nres <- length(absres)
 
-  R <- data.table::frank(absres, ties.method = "average")
+  R <- rank(absres, ties.method = "average")
   teststat <- sum((R - 1:nres) ^ 2)
   if (statonly) return(teststat)
   d <- table(R)

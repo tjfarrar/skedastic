@@ -6,7 +6,7 @@
 #'    \insertCite{Mittelhammer00;textual}{skedastic} gives the
 #'    formulation of the test used here.
 #'
-#' Harvey's Test entails fitting an auxiliary regression model in
+#' @details Harvey's Test entails fitting an auxiliary regression model in
 #'    which the response variable is the log of the  vector of squared
 #'    residuals from the original model and the design matrix \eqn{Z}
 #'    consists of one or more exogenous variables that are suspected of being

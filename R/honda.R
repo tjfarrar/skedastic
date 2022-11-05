@@ -4,11 +4,11 @@
 #'    \insertCite{Honda89;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' The test assumes that heteroskedasticity, if present, would be either of
-#'    the form \eqn{\sigma_i^2 = \sigma^2(1+\theta z_i)} or of the
-#'    form \eqn{\sigma_i^2 = \sigma^2 e^{\theta z_i}}, where
+#' @details The test assumes that heteroskedasticity, if present, would be
+#'    either of the form \eqn{\omega_i = \omega(1+\theta z_i)} or of the
+#'    form \eqn{\omega_i = \omega e^{\theta z_i}}, where
 #'    where \eqn{z_i} is a deflator (a nonstochastic variable
-#'    suspected of being related to the error variance), \eqn{\sigma^2} is
+#'    suspected of being related to the error variance), \eqn{\omega} is
 #'    some unknown constant, and \eqn{\theta} is an unknown parameter
 #'    representing the degree of heteroskedasticity. Since the test
 #'    statistic \eqn{Q=\frac{e' A_0 e}{e'e}} is a ratio of quadratic forms
@@ -52,7 +52,7 @@ honda <- function(mainlm, deflator = NA, alternative = c("two.sided",
   processmainlm(m = mainlm, needy = FALSE)
 
   hasintercept <- columnof1s(X)
-  if (class(mainlm) == "list") {
+  if (inherits(mainlm, "list")) {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
       colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
@@ -84,7 +84,7 @@ honda <- function(mainlm, deflator = NA, alternative = c("two.sided",
                     B = M, algorithm = qfmethod, lower.tail = TRUE)
   } else if (alternative == "two.sided") {
     pval <- twosidedpval(q = teststat, CDF = pRQF,
-                         method = twosidedmethod, Aloc = 1, continuous = TRUE,
+                         method = twosidedmethod, continuous = TRUE,
                          A = M %*% A0 %*% M, B = M, algorithm = qfmethod,
                          lower.tail = TRUE)
   }

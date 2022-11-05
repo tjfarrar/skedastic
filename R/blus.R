@@ -5,11 +5,11 @@
 #'    \insertCite{Theil65;textual}{skedastic} and explained further in
 #'    \insertCite{Theil68;textual}{skedastic}.
 #'
-#'    Under the ideal linear model conditions, the BLUS residuals have a scalar
-#'    covariance matrix \eqn{\sigma^2 I} (meaning they have a constant variance
-#'    and are mutually uncorrelated), unlike the OLS residuals, which have
-#'    covariance matrix \eqn{\sigma^2 M} where \eqn{M} is a function of the
-#'    design matrix. Use of BLUS residuals could improve the performance of
+#' @details Under the ideal linear model conditions, the BLUS residuals have a
+#'    scalar covariance matrix \eqn{\omega I} (meaning they have a constant
+#'    variance and are mutually uncorrelated), unlike the OLS residuals, which
+#'    have covariance matrix \eqn{\omega M} where \eqn{M} is a function of
+#'    the design matrix. Use of BLUS residuals could improve the performance of
 #'    tests for heteroskedasticity and/or autocorrelation in the linear model.
 #'    A linear model with \eqn{n} observations and an \eqn{n\times p} design
 #'    matrix yields only \eqn{n-p} BLUS residuals. The choice of which \eqn{p}
@@ -17,11 +17,11 @@
 #'    within the algorithm.
 #'
 #' @param omit A numeric vector of length \eqn{p} (the number of columns in the
-#'    linear model design matrix) giving the indices of \eqn{p} observations to omit in
-#'    the BLUS residual vector; or a character partially matching \code{"first"}
-#'    (for the first \eqn{p}) observations, \code{"last"} (for the last \eqn{p}
-#'    observations), or \code{"random"} (for a random sample of \eqn{p} indices
-#'    between 1 and \eqn{n}). Defaults to \code{"first"}.
+#'    linear model design matrix) giving the indices of \eqn{p} observations to
+#'    omit in the BLUS residual vector; or a character partially matching
+#'    \code{"first"} (for the first \eqn{p}) observations, \code{"last"} (for
+#'    the last \eqn{p} observations), or \code{"random"} (for a random sample
+#'    of \eqn{p} indices between 1 and \eqn{n}). Defaults to \code{"first"}.
 #' @param keepNA A logical. Should BLUS residuals for omitted observations be
 #'    returned as \code{NA_real_} to preserve the length of the residual vector?
 #' @param exhaust An integer. If singular matrices are encountered

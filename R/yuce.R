@@ -4,12 +4,13 @@
 #'    \insertCite{Yuce08;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' These two tests are straightforward to implement; in both cases the test
-#'     statistic is a function only of the residuals of the linear regression
-#'     model. The first test statistic has an asymptotic chi-squared
-#'     distribution and the second has an asymptotic \eqn{t}-distribution. In
-#'     both cases the degrees of freedom are \eqn{n-p}. The chi-squared test
-#'     is right-tailed whereas the \eqn{t}-test is two-tailed.
+#' @details These two tests are straightforward to implement; in both cases the
+#'    test statistic is a function only of the residuals of the linear
+#'    regression model. The first test statistic has an asymptotic chi-squared
+#'    distribution and the second has an asymptotic \eqn{t}-distribution. In
+#'    both cases the degrees of freedom are \eqn{n-p}. The chi-squared test
+#'    is right-tailed whereas the \eqn{t}-test is two-tailed.
+#'
 #' @param method A character indicating which of the two tests presented in
 #'    \insertCite{Yuce08;textual}{skedastic} should be implemented. Possible
 #'    values are \code{"A"} (the chi-squared test) and

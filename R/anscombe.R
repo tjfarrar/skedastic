@@ -6,7 +6,7 @@
 #'    studentising modification of
 #'    \insertCite{Bickel78;textual}{skedastic}.
 #'
-#' Anscombe's Test is among the earliest suggestions for heteroskedasticity
+#' @details Anscombe's Test is among the earliest suggestions for heteroskedasticity
 #'    diagnostics in the linear regression model. The test is not based on
 #'    formally derived theory but on a test statistic that Anscombe intuited
 #'    to be approximately standard normal under the null hypothesis of
@@ -14,8 +14,6 @@
 #'    the test and suggests a studentising modification (included in this
 #'    function) as well as a robustifying modification
 #'    (included in \code{\link{bickel}}). The test is two-tailed.
-#'
-#' The original form of the test is as follows.
 #'
 #' @param studentise A logical. Should studentising modification of
 #'    \insertCite{Bickel78;textual}{skedastic} be implemented? Defaults to

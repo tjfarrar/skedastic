@@ -1,6 +1,6 @@
-context("white_lm works for two lm examples across all argument permutations")
+context("white works for two lm examples across all argument permutations")
 
-theargs <- formals(white_lm)
+theargs <- formals(white)
 
 carslm <- lm(dist ~ speed, data = cars)
 ncars <- nrow(model.matrix(carslm))
@@ -17,7 +17,7 @@ theargs <- list("interactions" = c(TRUE, FALSE),
 allargs <- expand.grid(theargs, stringsAsFactors = FALSE)
 
 test_that("linear regression works with all combinations of formals", {
-  pvals <- vapply(1:nrow(allargs), function(i) do.call(what = white_lm,
+  pvals <- vapply(1:nrow(allargs), function(i) do.call(what = white,
                 args = append(list("statonly" = FALSE),
                 unlist(allargs[i, ], recursive = FALSE)))$p.value, NA_real_)
   lapply(1:length(pvals), function(i) expect_true(is.btwn01(pvals[i])))

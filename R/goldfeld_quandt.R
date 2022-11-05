@@ -4,13 +4,13 @@
 #'    \insertCite{Goldfeld65;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' The parametric test entails putting the data rows in increasing order of
-#'    some specified deflator (one of the explanatory variables). A specified
-#'    proportion of the most central observations (under this ordering) is
-#'    removed, leaving a subset of lower observations and a subset of upper
-#'    observations. Separate OLS regressions are fit to these two subsets of
-#'    observations (using all variables from the original model). The test
-#'    statistic is the ratio of the sum of squared residuals from the
+#' @details The parametric test entails putting the data rows in increasing
+#'    order of some specified deflator (one of the explanatory variables). A
+#'    specified proportion of the most central observations (under this
+#'    ordering) is removed, leaving a subset of lower observations and a subset
+#'    of upper observations. Separate OLS regressions are fit to these two
+#'    subsets of observations (using all variables from the original model).
+#'    The test statistic is the ratio of the sum of squared residuals from the
 #'    'upper' model to the sum of squared residuals from the 'lower' model.
 #'    Under the null hypothesis, the test statistic is exactly F-distributed
 #'    with numerator and denominator degrees of freedom equal to
@@ -115,7 +115,7 @@ goldfeld_quandt <- function(mainlm, method = c("parametric", "nonparametric"),
   processmainlm(m = mainlm, needy = (method == "parametric"))
 
   hasintercept <- columnof1s(X)
-  if (class(mainlm) == "list") {
+  if (inherits(mainlm, "list")) {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
       colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
@@ -153,7 +153,8 @@ goldfeld_quandt <- function(mainlm, method = c("parametric", "nonparametric"),
     } else if (alternative == "less") {
       pval <- stats::pf(teststat, df1 = thedf1, df2 = thedf2, lower.tail = TRUE)
     } else if (alternative == "two.sided") {
-      pval <- twosidedpval(q = teststat, Aloc = 1, CDF = stats::pf,
+      pval <- twosidedpval(q = teststat, CDF = stats::pf,
+                       locpar = thedf2 / (thedf2 - 2),
                        method = twosidedmethod, continuous = TRUE,
                        df1 = thedf1, df2 = thedf2,
                        lower.tail = TRUE)
@@ -187,7 +188,7 @@ goldfeld_quandt <- function(mainlm, method = c("parametric", "nonparametric"),
       } else if (alternative == "two.sided") {
           peakmean <- sum(0:(newn - 1) * dpeak(k = 0:(newn - 1), n = newn,
                                                usedata = (newn <= 1000)))
-          pval <- twosidedpval(q = teststat, Aloc = peakmean, CDF = ppeak,
+          pval <- twosidedpval(q = teststat, locpar = peakmean, CDF = ppeak,
                            method = twosidedmethod, continuous = FALSE,
                            n = newn, lower.tail = TRUE, usedata = (newn <= 1000))
       }
@@ -202,7 +203,7 @@ goldfeld_quandt <- function(mainlm, method = c("parametric", "nonparametric"),
             sum(prob[1:(k + 1)])
           }
           peakmean <- sum(0:(newn - 1) * prob)
-          pval <- twosidedpval(q = teststat, Aloc = peakmean, CDF = pfunc,
+          pval <- twosidedpval(q = teststat, locpar = peakmean, CDF = pfunc,
                            method = twosidedmethod, continuous = FALSE)
       }
     }

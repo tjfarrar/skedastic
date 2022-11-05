@@ -4,13 +4,13 @@
 #'    \insertCite{Li19;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' These two tests are straightforward to implement; in both cases the test
-#'     statistic is a function only of the residuals of the linear regression
-#'     model. Furthermore, in both cases the test statistic is asymptotically
-#'     normally distributed under the null hypothesis of homoskedasticity.
-#'     Both tests are right-tailed. These tests are designed to be especially
-#'     powerful in high-dimensional regressions, i.e. when the number of
-#'     explanatory variables is large.
+#' @details These two tests are straightforward to implement; in both cases the
+#'    test statistic is a function only of the residuals of the linear
+#'    regression model. Furthermore, in both cases the test statistic is
+#'    asymptotically normally distributed under the null hypothesis of
+#'    homoskedasticity. Both tests are right-tailed. These tests are designed
+#'    to be especially powerful in high-dimensional regressions, i.e. when the
+#'    number of explanatory variables is large.
 #' @param method A character indicating which of the two tests derived in
 #'    \insertCite{Li19;textual}{skedastic} should be implemented. Possible
 #'    values are \code{"alrt"} (approximate likelihood-ratio test) and

@@ -34,7 +34,7 @@ the \eqn{p}-values, either \code{"moment.match"} or \code{"bootstrap"}.}
 function used for weights in nonparametric smoothing. If a double of
 length 1 (the default), \code{H} is set to \eqn{h I_{p^\prime}} where
 \eqn{h} is the scalar bandwidth value entered and \eqn{I_{p^\prime}}
-is the \eqn{p^prime \times p^\prime} identity matrix (where
+is the \eqn{p^\prime \times p^\prime} identity matrix (where
 \eqn{p^\prime} is the number of columns in the \eqn{X} matrix, excluding
 an intercept if present). If a double of length \eqn{p^\prime}, \code{H}
 is set to \eqn{diag(h)} where \eqn{h} is the bandwidth vector entered.
@@ -86,10 +86,6 @@ mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 diblasi_bowman(mtcars_lm)
 \donttest{diblasi_bowman(mtcars_lm, ignorecov = FALSE)}
 diblasi_bowman(mtcars_lm, distmethod = "bootstrap")
-
-# Example discussed in Diblasi and Bowman (1997)
-malecats_lm <- lm(Hwt ~ Bwt, data = boot::catsM)
-diblasi_bowman(malecats_lm, H = (max(boot::catsM$Bwt) - min(boot::catsM$Bwt)) / 8)
 
 }
 \references{

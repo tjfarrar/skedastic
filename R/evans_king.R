@@ -4,7 +4,7 @@
 #'    \insertCite{Evans88;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' The test entails putting the data rows in increasing order of
+#' @details The test entails putting the data rows in increasing order of
 #'    some specified deflator (e.g., one of the explanatory variables) that
 #'    is believed to be related to the error variance by some non-decreasing
 #'    function. There are two statistics that can be used, corresponding to
@@ -58,7 +58,7 @@ evans_king <- function(mainlm, method = c("GLS", "LM"), deflator = NA,
   processmainlm(m = mainlm, needy = FALSE)
 
   hasintercept <- columnof1s(X)
-  if (class(mainlm) == "list") {
+  if (inherits(mainlm, "list")) {
     if (hasintercept[[1]]) {
       if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
       colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))

@@ -6,14 +6,14 @@ processmainlm <- function(m, needX = TRUE, needy = TRUE, neede = TRUE,
   X <- NULL
   yhat <- NULL
   p <- NULL
-  if (class(m) == "lm") {
+  if (inherits(m, "lm")) {
     if (needX) X <- stats::model.matrix(m)
     if (!exists("e", where = environment(), inherits = FALSE) && neede) {
       e <- stats::resid(m)
     }
     if (needy) y <- stats::model.response(stats::model.frame(m))
     if (needyhat) yhat <- stats::fitted(m)
-  } else if (class(m) == "list") {
+  } else if (inherits(m, "list")) {
     if (is.null(names(m))) {
       y <- m[[1]]
       X <- m[[2]]
@@ -150,7 +150,7 @@ generate_interactions <- function(X) { # generate all two-way interactions
 }
 
 checklm <- function(mylm) { # Check validity of lm object
-  if (class(mylm) != "lm") stop("`mylm` must be an object of class `lm`")
+  if (!inherits(mylm, "lm")) stop("`mylm` must be an object of class `lm`")
   if (!all(c("residuals", "df.residual", "coefficients", "model",
              "fitted.values", "terms") %in% names(mylm))) {
     stop("`mylm` must contain the components expected in class `lm`")
@@ -160,29 +160,42 @@ checklm <- function(mylm) { # Check validity of lm object
   }
 }
 
-margin_indices <- function(v, p, sub_ind) {
+margin_indices <- function(v, p, sub_ind, categ = FALSE) {
 
-  k <- length(v)
-  reptimes <- floor(p / (k - 1))
-  pmodk1 <- p %% (k - 1)
-  omit_ind <- vector("list", reptimes + 1)
-  if (reptimes >= 1) {
-    for (r in 1:reptimes) {
-      if (r %% 2 == 1) {
-        omit_ind[[r]] <- unlist(lapply(sub_ind, max))[1:(k - 1)]
-      } else if (r %% 2 == 0) {
-        omit_ind[[r]] <- unlist(lapply(sub_ind, min))[2:k]
+  if (!categ) {
+    k <- length(v)
+    reptimes <- floor(p / (k - 1))
+    pmodk1 <- p %% (k - 1)
+    omit_ind <- vector("list", reptimes + 1)
+    if (reptimes >= 1) {
+      for (r in 1:reptimes) {
+        if (r %% 2 == 1) {
+          omit_ind[[r]] <- unlist(lapply(sub_ind, max))[1:(k - 1)]
+        } else if (r %% 2 == 0) {
+          omit_ind[[r]] <- unlist(lapply(sub_ind, min))[2:k]
+        }
       }
     }
-  }
-  if (pmodk1 != 0) {
-    if (reptimes %% 2 == 0) {
-      omit_ind[[reptimes + 1]] <- unlist(lapply(sub_ind, max))[1:pmodk1]
-    } else if (reptimes %% 2 == 1) {
-      omit_ind[[reptimes + 1]] <- unlist(lapply(sub_ind, min))[2:(pmodk1 + 1)]
+    if (pmodk1 != 0) {
+      if (reptimes %% 2 == 0) {
+        omit_ind[[reptimes + 1]] <- unlist(lapply(sub_ind, max))[1:pmodk1]
+      } else if (reptimes %% 2 == 1) {
+        omit_ind[[reptimes + 1]] <- unlist(lapply(sub_ind, min))[2:(pmodk1 + 1)]
+      }
     }
+    unlist(omit_ind)
+  } else {
+    v0 <- as.numeric(v)
+    omit_ind <- rep(NA_integer_, p)
+    for (i in 1:p) {
+      omitfrom <- which.max(v0)
+      randomit <- sample(v0[omitfrom], size = 1)
+      omit_ind[i] <- sub_ind[[omitfrom]][randomit]
+      sub_ind[[omitfrom]] <- sub_ind[[omitfrom]][-randomit]
+      v0[omitfrom] <- v0[omitfrom] - 1
+    }
+    omit_ind
   }
-  unlist(omit_ind)
 }
 
 do_omit <- function(omit, n, p, seed.) {
@@ -247,8 +260,10 @@ meanfromCDF <- function(theCDF, cont, suplim, ...) {
   CDF2 <- function(x) theCDF(x, ...)
   surv <- function(x) 1 - theCDF(x, ...)
   if (cont) {
-    stats::integrate(surv, lower = 0, upper = Inf)$value -
-      stats::integrate(CDF2, lower = -Inf, upper = 0)$value
+    pracma::quadinf(f = surv, xa = 0,
+                    xb = Inf, tol = 1e-6)$Q -
+      pracma::quadinf(f = CDF2, xa = -Inf,
+                      xb = 0, tol = 1e-6)$Q
   } else {
     if (missing(suplim)) {
       meanval <- sum(surv(0:1e6)) - sum(CDF2(-1e6:-1))
@@ -347,7 +362,7 @@ gqind <- function(n, p, propremove, propgroup1) {
 }
 
 fastM <- function(X, n) {
-  diag(n) - X %*% solve(crossprod(X)) %*% t(X)
+  diag(n) - X %*% Rfast::spdinv(crossprod(X)) %*% t(X)
 }
 
 SKH <- function(i) {
@@ -420,7 +435,7 @@ errormat <- function(res, design, HCCME = "HC4", k = 0.7, gamma = c(1, 1.5),
   } else if (HCCME == "HC1") {
     diag(res ^ 2 * n / (n - p))
   } else if (HCCME %in% c("HC2", "HC3", "HC4", "HC5", "HC4m")) {
-    hdiag <- diag(design %*% solve(crossprod(design)) %*% t(design))
+    hdiag <- diag(design %*% Rfast::spdinv(crossprod(design)) %*% t(design))
     hbar <- p / n
     if (HCCME == "HC2") {
       delta <- 1
@@ -444,9 +459,9 @@ errormat <- function(res, design, HCCME = "HC4", k = 0.7, gamma = c(1, 1.5),
     if (!coeff) {
       diag(res ^ 2 / (1 - hdiag) ^ delta)
     } else {
-      solve(crossprod(design)) %*% t(design) %*%
+      Rfast::spdinv(crossprod(design)) %*% t(design) %*%
         diag(res ^ 2 / (1 - hdiag) ^ delta) %*%
-        design %*% solve(crossprod(design))
+        design %*% Rfast::spdinv(crossprod(design))
     }
   }
 }
@@ -479,4 +494,24 @@ quiet <- function(x) {
   sink(tempfile())
   on.exit(sink())
   invisible(force(x))
+}
+
+handle.error <- function(expr, returniferror = NULL) {
+  expr_name <- deparse(substitute(expr))
+  test <- try(expr, silent = TRUE)
+  if (inherits(test, "try-error")) {
+    returniferror
+  } else {
+    test
+  }
+}
+
+is.error <- function(expr) {
+  expr_name <- deparse(substitute(expr))
+  test <- try(expr, silent = TRUE)
+  inherits(test, "try-error")
+}
+
+silly <- function(x) {
+  CompQuadForm::imhof(q = 2, lambda = 3)
 }

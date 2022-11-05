@@ -81,11 +81,12 @@ This function implements the two methods of
    in a linear regression model.
 }
 \details{
-Rackauskas and Zuokas propose a class of tests that entails determining the
-   largest weighted difference in variance of estimated error. The
-   asymptotic behaviour of their test statistic \eqn{T_{n,\alpha}} is
-   studied using the empirical polygonal process constructed from partial
-   sums of the squared residuals. The test is right-tailed.
+Rackauskas and Zuokas propose a class of tests that entails
+   determining the largest weighted difference in variance of estimated
+   error. The asymptotic behaviour of their test statistic
+   \eqn{T_{n,\alpha}} is studied using the empirical polygonal process
+   constructed from partial sums of the squared residuals. The test is
+   right-tailed.
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)

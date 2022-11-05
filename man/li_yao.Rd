@@ -48,13 +48,13 @@ This function implements the two methods of
    in a linear regression model.
 }
 \details{
-These two tests are straightforward to implement; in both cases the test
-    statistic is a function only of the residuals of the linear regression
-    model. Furthermore, in both cases the test statistic is asymptotically
-    normally distributed under the null hypothesis of homoskedasticity.
-    Both tests are right-tailed. These tests are designed to be especially
-    powerful in high-dimensional regressions, i.e. when the number of
-    explanatory variables is large.
+These two tests are straightforward to implement; in both cases the
+   test statistic is a function only of the residuals of the linear
+   regression model. Furthermore, in both cases the test statistic is
+   asymptotically normally distributed under the null hypothesis of
+   homoskedasticity. Both tests are right-tailed. These tests are designed
+   to be especially powerful in high-dimensional regressions, i.e. when the
+   number of explanatory variables is large.
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)

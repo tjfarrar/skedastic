@@ -11,6 +11,7 @@ bamset(
   correct = TRUE,
   omitatmargins = TRUE,
   omit = NA,
+  categorical = FALSE,
   statonly = FALSE
 )
 }
@@ -48,14 +49,21 @@ constant to improve the chi-squared approximation? Defaults to
 margins of the \code{k} subsets be passed to \code{\link{blus}} as the
 \code{omit} argument? If \code{TRUE} (the default), this overrides any
 \code{omit} argument passed directly. If \code{FALSE}, the \code{omit}
-argument must be specified and cannot be left as \code{NA}.}
+argument must be specified and cannot be left as \code{NA}. If
+\code{categorical} is \code{TRUE}, setting \code{omitatmargins} to
+\code{TRUE} results in omitting observations from the most frequently
+occurring factor levels or values.}
 
 \item{omit}{A numeric vector of length \eqn{p} (the number of columns in the
-linear model design matrix) giving the indices of \eqn{p} observations to omit in
-the BLUS residual vector; or a character partially matching \code{"first"}
-(for the first \eqn{p}) observations, \code{"last"} (for the last \eqn{p}
-observations), or \code{"random"} (for a random sample of \eqn{p} indices
-between 1 and \eqn{n}). Defaults to \code{"first"}.}
+linear model design matrix) giving the indices of \eqn{p} observations to
+omit in the BLUS residual vector; or a character partially matching
+\code{"first"} (for the first \eqn{p}) observations, \code{"last"} (for
+the last \eqn{p} observations), or \code{"random"} (for a random sample
+of \eqn{p} indices between 1 and \eqn{n}). Defaults to \code{"first"}.}
+
+\item{categorical}{A logical. Is the deflator a categorical variable? If
+so, the number of levels will be used as \eqn{k} with each level forming
+a subset. Defaults to \code{FALSE}.}
 
 \item{statonly}{A logical. If \code{TRUE}, only the test statistic value
 is returned, instead of an object of \code{\link[base]{class}}
@@ -72,8 +80,8 @@ This function implements the Bartlett's \eqn{M} Specification Error Test
    for heteroskedasticity in a linear regression model.
 }
 \details{
-BAMSET is an analogue of Bartlett's \eqn{M} Test for heterogeneity of
-   variances across independent samples from \eqn{k} populations. In this
+BAMSET is an analogue of Bartlett's \eqn{M} Test for heterogeneity
+   of variances across independent samples from \eqn{k} populations. In this
    case the populations are \eqn{k} subsets of the residuals from a linear
    regression model. In order to meet the independence assumption,
    \link[=blus]{BLUS residuals} are computed, meaning that only \eqn{n-p}

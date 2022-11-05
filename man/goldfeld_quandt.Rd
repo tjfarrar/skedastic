@@ -107,13 +107,13 @@ This function implements the two methods (parametric and nonparametric) of
    in a linear regression model.
 }
 \details{
-The parametric test entails putting the data rows in increasing order of
-   some specified deflator (one of the explanatory variables). A specified
-   proportion of the most central observations (under this ordering) is
-   removed, leaving a subset of lower observations and a subset of upper
-   observations. Separate OLS regressions are fit to these two subsets of
-   observations (using all variables from the original model). The test
-   statistic is the ratio of the sum of squared residuals from the
+The parametric test entails putting the data rows in increasing
+   order of some specified deflator (one of the explanatory variables). A
+   specified proportion of the most central observations (under this
+   ordering) is removed, leaving a subset of lower observations and a subset
+   of upper observations. Separate OLS regressions are fit to these two
+   subsets of observations (using all variables from the original model).
+   The test statistic is the ratio of the sum of squared residuals from the
    'upper' model to the sum of squared residuals from the 'lower' model.
    Under the null hypothesis, the test statistic is exactly F-distributed
    with numerator and denominator degrees of freedom equal to

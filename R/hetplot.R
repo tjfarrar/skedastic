@@ -1,17 +1,17 @@
 #' Graphical Methods for Detecting Heteroskedasticity in a Linear Regression Model
 #'
 #' This function creates various two-dimensional scatter plots that can aid in
-#' detecting heteroskedasticity in a linear regression model.
+#'    detecting heteroskedasticity in a linear regression model.
 #'
-#' The variable plotted on the horizontal axis could be the original
-#' data indices, one of the explanatory variables, the OLS predicted (fitted)
-#' values, or any other numeric vector specified by the user. The variable
-#' plotted on the vertical axis is some function of the OLS residuals or
-#' transformed version thereof such as the BLUS residuals
-#' \insertCite{Theil68;textual}{skedastic} or standardised or studentised
-#' residuals as discussed in \insertCite{Cook83;textual}{skedastic}. A separate
-#' plot is created for each (\code{horzvar}, \code{vertvar}, \code{vertfun})
-#' combination.
+#' @details The variable plotted on the horizontal axis could be the original
+#'    data indices, one of the explanatory variables, the OLS predicted
+#'    (fitted) values, or any other numeric vector specified by the user. The
+#'    variable plotted on the vertical axis is some function of the OLS
+#'    residuals or transformed version thereof such as the BLUS residuals
+#'    \insertCite{Theil68;textual}{skedastic} or standardised or studentised
+#'    residuals as discussed in \insertCite{Cook83;textual}{skedastic}. A
+#'    separate plot is created for each (\code{horzvar}, \code{vertvar},
+#'    \code{vertfun}) combination.
 #'
 #' @param horzvar A character vector describing the variable(s) to plot on
 #'    horizontal axes (\code{"index"} for the data index \eqn{i},
@@ -27,7 +27,7 @@
 #'    vertical axis (\code{"res"} for OLS residuals [the default],
 #'    \code{"res_blus"} for \code{\link[=blus]{BLUS}} residuals,
 #'    \code{"res_stand"} for standardised OLS residuals:
-#'    \eqn{e_i/\hat{\sigma}}, \code{"res_constvar"} for OLS residuals
+#'    \eqn{e_i/\sqrt{\hat{\omega}}}, \code{"res_constvar"} for OLS residuals
 #'    transformed to have constant variance: \eqn{e_i/\sqrt{m_{ii}}},
 #'    \code{"res_stud"} for studentised OLS residuals:
 #'    \eqn{e_i/(s\sqrt{m_{ii}})}. If more than one value is specified,
@@ -80,12 +80,15 @@
 #' "res_constvar"), vertfun = c("identity", "abs", "2"), filetype = "png")}
 #'
 
-hetplot <- function (mainlm, horzvar = "index", vertvar = "res", vertfun = "identity",
+hetplot <- function (mainlm, horzvar = "index", vertvar = "res",
+                     vertfun = "identity",
                      filetype = NA, values = FALSE, ...) {
 
   args <- list(...)
-  grdevargnames <- c("filename", "width", "height", "units", "pointsize", "bg",
-                   "res", "family", "restoreConsole", "compression", "antialias",
+  grdevargnames <- c("filename", "width", "height", "units",
+                     "pointsize", "bg",
+                   "res", "family", "restoreConsole", "compression",
+                   "antialias",
                    "quality", "gtype")
   plotargnames <- c("type", "main", "sub", "xlab", "ylab", "asp")
   if ("omit" %in% names(args)) {
@@ -112,30 +115,26 @@ hetplot <- function (mainlm, horzvar = "index", vertvar = "res", vertfun = "iden
   sigma_hat_sq <- sum(e ^ 2) / n
   s_sq <- sum(e ^ 2) / (n - p)
 
-  # hasintercept <- columnof1s(X)
-  # if (hasintercept[[1]]) {
-  #   if (hasintercept[[2]] != 1) stop("Column of 1's must be first column of design matrix")
-  #   colnames(X) <- c("(Intercept)", paste0("X", 1:(p - 1)))
-  # } else {
-  #   colnames(X) <- paste0("X", 1:p)
-  # }
-
   if ("explanatory" %in% horzvar) {
     horzvar <- c(horzvar[-which(horzvar == "explanatory")], colnames(X))
-    if ("(Intercept)" %in% horzvar) horzvar <- horzvar[-which(horzvar == "(Intercept)")]
+    if ("(Intercept)" %in% horzvar) horzvar <-
+        horzvar[-which(horzvar == "(Intercept)")]
   }
   if ("log_explanatory" %in% horzvar) {
-    horzvar <- c(horzvar[-which(horzvar == "log_explanatory")], paste0("log_", colnames(X)))
-    if ("log_(Intercept)" %in% horzvar) horzvar <- horzvar[-which(horzvar == "log_(Intercept)")]
+    horzvar <- c(horzvar[-which(horzvar == "log_explanatory")],
+                 paste0("log_", colnames(X)))
+    if ("log_(Intercept)" %in% horzvar)
+      horzvar <- horzvar[-which(horzvar == "log_(Intercept)")]
   }
 
-  x_hor <- as.data.frame(lapply(horzvar, function(x) if (x %in% colnames(X)) {X[, x]}
-                                    else if (regexpr("log_", substr(x, 1, 4)) != -1) {
-                                      log(X[, substr(x, 5, nchar(x))])
-                                    }
-                                    else if (x == "fitted.values") {yhat}
-                                    else if (x == "fitted.values2") {diag(M) * yhat}
-                                    else if (x == "index") {1:n}))
+  x_hor <- as.data.frame(lapply(horzvar, function(x)
+    if (x %in% colnames(X)) {X[, x]}
+                else if (regexpr("log_", substr(x, 1, 4)) != -1) {
+                  log(X[, substr(x, 5, nchar(x))])
+                }
+               else if (x == "fitted.values") {yhat}
+              else if (x == "fitted.values2") {diag(M) * yhat}
+              else if (x == "index") {1:n}))
   names(x_hor) <- horzvar
 
   vertfun_function <- lapply(vertfun, function(x) {
@@ -144,11 +143,11 @@ hetplot <- function (mainlm, horzvar = "index", vertvar = "res", vertfun = "iden
     })
 
   y_ver_nofunc <- lapply(vertvar, function(x) if (x == "res") {e}
-                                else if (x == "res_blus") {
-                                  if (exists("omitarg")) {
-                                    blus(mainlm, omit = omitarg, keepNA = TRUE)
-                                  } else { blus(mainlm, keepNA = TRUE)}
-                                }
+                    else if (x == "res_blus") {
+                      if (exists("omitarg")) {
+                        blus(mainlm, omit = omitarg, keepNA = TRUE)
+                      } else { blus(mainlm, keepNA = TRUE)}
+                    }
               else if (x == "res_stand") {e / sqrt(sigma_hat_sq)}
               else if (x == "res_constvar") {e / sqrt(diag(M))}
               else if (x == "res_stud") {e / sqrt(diag(M) * s_sq)})
@@ -177,12 +176,14 @@ hetplot <- function (mainlm, horzvar = "index", vertvar = "res", vertfun = "iden
   numplots <- length(horzvar) * length(vertvar) * length(vertfun)
   if (is.na(filetype) || is.null(filetype)) {
     mfrow_dim <- plotdim(numplots)
-    if (max(mfrow_dim) >= 5) warning("Large number of plots in one dimension")
+    if (max(mfrow_dim) >= 5)
+      warning("Large number of plots in one dimension")
     graphics::par(mfrow = mfrow_dim)
     if (!las_passed) parargs$las <- 1
     if (!mar_passed) parargs$mar <- c(4, 5.5, 0.5, 1.5)
     do.call(graphics::par, parargs)
-    mapply(function(y, ynames, yline) mapply(function(x, xnames, y, ynames, yline) {
+    mapply(function(y, ynames, yline) mapply(function(x, xnames,
+                                                      y, ynames, yline) {
       if (!main_passed) plotargs$main <- ""
       if (!xlab_passed) plotargs$xlab <- ""
       if (!ylab_passed) plotargs$ylab <- ""
@@ -197,21 +198,24 @@ hetplot <- function (mainlm, horzvar = "index", vertvar = "res", vertfun = "iden
                               side = 2, line = yline, las = 1,
                               cex = ifelse(cex_passed,
                                                         parargs$cex, 0.8))
-    }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = FALSE),
+    }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline),
+    SIMPLIFY = FALSE),
     y_ver, names(y_ver), yline_mtext, SIMPLIFY = FALSE)
     graphics::par(new = FALSE)
   } else {
     if (!dir.exists(paste0(tempdir(),"/hetplot"))) {
       dir.create(paste0(tempdir(),"/hetplot"))
     }
-    mapply(function(y, ynames, yline) mapply(function(x, xnames, y, ynames, yline) {
+    mapply(function(y, ynames, yline) mapply(function(x, xnames, y,
+                                                      ynames, yline) {
       if (!filename_passed) {
         grdevargs$filename <- paste0(tempdir(),"/hetplot/",xnames, "_",
                           ynames, "_", gsub("[[:space:]]|[[:punct:]]",
                                   "_", Sys.time()), ".", filetype)
         if (file.exists(grdevargs$filename))
           grdevargs$filename <- paste0(substr(grdevargs$filename, start = 1,
-           stop = regexpr(filetype, grdevargs$filename) - 2), "(1).", filetype)
+           stop = regexpr(filetype, grdevargs$filename) - 2), "(1).",
+           filetype)
       }
       do.call(get(filetype), grdevargs)
       if (!las_passed) parargs$las <- 1
@@ -232,7 +236,8 @@ hetplot <- function (mainlm, horzvar = "index", vertvar = "res", vertfun = "iden
       if (length(grDevices::dev.list()) > 59) {
         grDevices::graphics.off()
       }
-    }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline), SIMPLIFY = FALSE),
+    }, x_hor, names(x_hor), MoreArgs = list(y, ynames, yline),
+    SIMPLIFY = FALSE),
            y_ver, names(y_ver), yline_mtext, SIMPLIFY = FALSE)
     grDevices::graphics.off()
   }

@@ -28,15 +28,18 @@ This function computes \eqn{\Pr(D = k)}, i.e. the probability mass
   function for \eqn{D=\sum_{i=1}^{n} (R_i - i)^2}, the nonparametric trend
   statistic proposed by \insertCite{Lehmann75;textual}{skedastic}, under the
   assumption that the ranks \eqn{R_i} are computed on a series of \eqn{n}
-  independent and identically distributed random variables with no ties. The
-  function is used within \code{\link{horn}} in computing \eqn{p}-values for
-  Horn's nonparametric test for heteroskedasticity in a linear regression
-  model \insertCite{Horn81}{skedastic}. The support of \eqn{D}
-  consists of consecutive even numbers from 0 to \eqn{\frac{n(n-1)(n+1)}{3}},
-  with the exception of the case \eqn{n=3}, when the value 4 is excluded from
-  the support. Note that computation speed for \code{k = "all"} is about the
-  same as when \code{k} is set to an individual integer value, because the
-  entire distribution is still computed in the latter case.
+  independent and identically distributed random variables with no ties.
+}
+\details{
+The function is used within \code{\link{horn}} in computing
+  \eqn{p}-values for Horn's nonparametric test for heteroskedasticity in a
+  linear regression model \insertCite{Horn81}{skedastic}. The support of
+  \eqn{D} consists of consecutive even numbers from 0 to
+  \eqn{\frac{n(n-1)(n+1)}{3}}, with the exception of the case \eqn{n=3},
+  when the value 4 is excluded from the support. Note that computation speed
+  for \code{k = "all"} is about the same as when \code{k} is set to an
+  individual integer value, because the entire distribution is still
+  computed in the latter case.
 }
 \examples{
 prob <- dDtrend(k = "all", n = 9)

@@ -49,8 +49,6 @@ Anscombe's Test is among the earliest suggestions for heteroskedasticity
    the test and suggests a studentising modification (included in this
    function) as well as a robustifying modification
    (included in \code{\link{bickel}}). The test is two-tailed.
-
-The original form of the test is as follows.
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)

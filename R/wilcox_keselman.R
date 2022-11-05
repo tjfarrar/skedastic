@@ -51,6 +51,12 @@ wilcox_keselman <- function(mainlm, gammapar = 0.2, B = 500L,
                     p.adjust.method = "none", seed = NA, rqwarn = FALSE,
                     matchWRS = FALSE, statonly = FALSE) {
 
+  if (!requireNamespace("quantreg", quietly = TRUE)) {
+    stop(
+      "Package \"quantreg\" must be installed to use this function.",
+      call. = FALSE
+    )
+  }
   processmainlm(m = mainlm)
 
   hasintercept <- columnof1s(X)

@@ -2,7 +2,9 @@
 #'
 #' This function computes cumulative probabilities (lower or upper tail) on a
 #'    ratio of quadratic forms in a vector of normally distributed
-#'    random variables. Most of the work is done by other functions, namely
+#'    random variables.
+#'
+#' @details Most of the work is done by other functions, namely
 #'    \code{\link[CompQuadForm]{imhof}}, \code{\link[CompQuadForm]{davies}},
 #'    or \code{\link[stats]{integrate}} (depending on the \code{algorithm}
 #'    argument). It is assumed that the ratio of quadratic forms can be

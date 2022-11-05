@@ -104,6 +104,13 @@ dpeak <- function(k, n, usedata = FALSE) {
         stop("Support for no. of peaks consists of integers from 0 to n - 1")
       }
       if (n > 170) {
+        if (!requireNamespace("gmp", quietly = TRUE) ||
+            !requireNamespace("Rmpfr", quietly = TRUE)) {
+          stop(
+            "Packages \"gmp\" and \"Rmpfr\" must be installed to use this function for n > 170.",
+            call. = FALSE
+          )
+        }
         N <- Rmpfr::mpfrArray(0, precBits = 53, dim = c(n, maxk + 1))
         factorial_denom <- gmp::factorialZ(n)
       } else {
@@ -131,6 +138,13 @@ dpeak <- function(k, n, usedata = FALSE) {
           stop("Support for no. of peaks consists of integers from 0 to n - 1")
         }
         if (m > 170) {
+          if (!requireNamespace("gmp", quietly = TRUE) ||
+              !requireNamespace("Rmpfr", quietly = TRUE)) {
+            stop(
+              "Packages \"gmp\" and \"Rmpfr\" must be installed to use this function for n > 170.",
+              call. = FALSE
+            )
+          }
           N <- Rmpfr::mpfrArray(0, precBits = 53, dim = c(m, l + 1))
           factorial_denom <- gmp::factorialZ(m)
         } else {

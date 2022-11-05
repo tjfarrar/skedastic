@@ -6,7 +6,7 @@
 #'    scale-invariance modification of
 #'    \insertCite{Carroll81;textual}{skedastic}.
 #'
-#' Bickel's Test is a robust extension of Anscombe's Test
+#' @details Bickel's Test is a robust extension of Anscombe's Test
 #'    \insertCite{Anscombe61}{skedastic} in which the OLS residuals and
 #'    estimated standard error are replaced with an \eqn{M} estimator. Under
 #'    the null hypothesis of homoskedasticity, the distribution of the test

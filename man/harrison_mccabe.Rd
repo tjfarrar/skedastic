@@ -73,13 +73,13 @@ This function implements the method of
    in a linear regression model.
 }
 \details{
-The test assumes that heteroskedasticity, if present, is monotonically
-   related to one of the explanatory variables (known as the deflator).
-   The OLS residuals \eqn{e} are placed in increasing order of the deflator
-   variable and we let \eqn{A} be an \eqn{n\times n} selector matrix whose
-   first \eqn{m} diagonal elements are 1 and all other elements are 0. The
-   alternative hypothesis posits that the error variance changes around
-   index \eqn{m}. Under the null hypothesis of homoskedasticity, the
+The test assumes that heteroskedasticity, if present, is
+   monotonically related to one of the explanatory variables (known as the
+   deflator). The OLS residuals \eqn{e} are placed in increasing order of
+   the deflator variable and we let \eqn{A} be an \eqn{n\times n} selector
+   matrix whose first \eqn{m} diagonal elements are 1 and all other elements
+   are 0. The alternative hypothesis posits that the error variance changes
+   around index \eqn{m}. Under the null hypothesis of homoskedasticity, the
    ratio of quadratic forms \eqn{Q=\frac{e' A e}{e'e}} should be close to
    \eqn{\frac{m}{n}}. Since the test statistic \eqn{Q} is a ratio of
    quadratic forms in the errors, the Imhof algorithm is used to compute

@@ -67,11 +67,11 @@ This function implements the two-sided LM Test of
    in a linear regression model.
 }
 \details{
-The test assumes that heteroskedasticity, if present, would be either of
-   the form \eqn{\sigma_i^2 = \sigma^2(1+\theta z_i)} or of the
-   form \eqn{\sigma_i^2 = \sigma^2 e^{\theta z_i}}, where
+The test assumes that heteroskedasticity, if present, would be
+   either of the form \eqn{\omega_i = \omega(1+\theta z_i)} or of the
+   form \eqn{\omega_i = \omega e^{\theta z_i}}, where
    where \eqn{z_i} is a deflator (a nonstochastic variable
-   suspected of being related to the error variance), \eqn{\sigma^2} is
+   suspected of being related to the error variance), \eqn{\omega} is
    some unknown constant, and \eqn{\theta} is an unknown parameter
    representing the degree of heteroskedasticity. Since the test
    statistic \eqn{Q=\frac{e' A_0 e}{e'e}} is a ratio of quadratic forms

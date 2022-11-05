@@ -2,7 +2,9 @@
 #'
 #' This function implements the methods of
 #'    \insertCite{Zhou15;textual}{skedastic} for testing for
-#'    heteroskedasticity in a linear regression model. The authors propose
+#'    heteroskedasticity in a linear regression model.
+#'
+#' @details \insertCite{Zhou15;textual}{skedastic} The authors propose
 #'    three variations based on comparisons between sandwich and model-based
 #'    estimators for the variances of individual regression coefficient
 #'    esimators. The covariate-specific method computes a test statistic and
@@ -92,7 +94,7 @@ zhou_etal <- function(mainlm, auxdesign = NA,
   if (!is.na(seed)) set.seed(seed)
   Xi <- replicate(Bperturbed, stats::rnorm(n), simplify = FALSE)
   sigmahatsq <- sum(e ^ 2) / n
-  H <- Z %*% solve(crossprod(Z)) %*% t(Z)
+  H <- Z %*% Rfast::spdinv(crossprod(Z)) %*% t(Z)
 
   if (method == "pooled" || method == "hybrid") {
     wpool <- diag(H) / q
@@ -106,7 +108,7 @@ zhou_etal <- function(mainlm, auxdesign = NA,
   if (method == "covariate-specific" || method == "hybrid") {
 
     Hminus <- lapply(1:q, function(j) Z[, -j, drop = FALSE] %*%
-              solve(crossprod(Z[, -j, drop = FALSE])) %*%
+              Rfast::spdinv(crossprod(Z[, -j, drop = FALSE])) %*%
                 t(Z[, -j, drop = FALSE]))
     w <- lapply(1:q, function(j) diag(H) - diag(Hminus[[j]]))
     IR <- vapply(1:q, function(j) sum(e ^ 2 * w[[j]]) / sigmahatsq, NA_real_)

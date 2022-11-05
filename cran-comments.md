@@ -15,6 +15,4 @@ This is the fourth time the package is submitted to CRAN.
 
 * No ERRORs or WARNINGs from Windows (r-release, r-devel, r-oldrelease) checks or Linux Xenial (r-release, r-devel) checks.
 
-* The Windows checks returned one NOTE. This referred to possible misspelled words, but none of these words were misspelled. Most of them were surnames or acronyms, while 'heteroskedasticity' is a legitimate spelling of this word used in the academic literature (though sometimes spelled 'heteroscedasticity').
-
-* The Windows checks also reported `Status: Forbidden`, `Message: 403` for some of the URLs and DOIs in the DESCRIPTION file. However, all of these URLs and DOIs are correct and working.
+* The Windows checks returned one NOTE. This referred to `Status: Forbidden`, `Message: 403` for some of the URLs and DOIs in the DESCRIPTION file. However, all of these URLs and DOIs are correct and working.

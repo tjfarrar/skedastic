@@ -35,7 +35,7 @@ is included in the auxiliary regression even if the first column of
 \code{auxdesign} is not a vector of ones.}
 
 \item{sigmaest}{A character indicating which model residuals to use in the
-\eqn{\hat{\sigma}^2} estimator in the denominator of the test statistic.
+\eqn{\hat{\omega}} estimator in the denominator of the test statistic.
 If \code{"main"} (the default), the OLS residuals from the original model
 are used; this produces results identical to the Glejser Test in SHAZAM
 software. If \code{"auxiliary"}, the OLS residuals from the auxiliary

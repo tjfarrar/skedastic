@@ -4,16 +4,17 @@
 #'    \insertCite{Verbyla93;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' Verbyla's Test entails fitting a generalised auxiliary regression model
-#' in which the response variable is the vector of standardised squared
-#' residuals \eqn{e_i^2/\hat{\sigma}^2} from the original OLS
-#' model and the design matrix is some function of \eqn{Z}, an
-#' \eqn{n \times q} matrix consisting of \eqn{q} exogenous variables, appended
-#' to a column of ones.
-#' The test statistic is half the residual sum of squares from this generalised
-#' auxiliary regression. Under the null hypothesis of homoskedasticity, the
-#' distribution of the test statistic is asymptotically chi-squared with
-#' \eqn{q} degrees of freedom. The test is right-tailed.
+#' @details Verbyla's Test entails fitting a generalised auxiliary regression
+#'    model in which the response variable is the vector of standardised
+#'    squared residuals \eqn{e_i^2/\hat{\omega}} from the original OLS model
+#'    and the design matrix is some function of \eqn{Z}, an \eqn{n \times q}
+#'    matrix consisting of \eqn{q} exogenous variables, appended to a column of
+#'    ones. The test statistic is half the residual sum of squares from this
+#'    generalised auxiliary regression. Under the null hypothesis of
+#'    homoskedasticity, the distribution of the test statistic is
+#'    asymptotically chi-squared with \eqn{q} degrees of freedom. The test is
+#'    right-tailed.
+#'
 #' @inheritParams breusch_pagan
 #'
 #' @return An object of \code{\link[base]{class}} \code{"htest"}. If object is
@@ -72,7 +73,8 @@ verbyla <- function(mainlm, auxdesign = NA, statonly = FALSE) {
     message("Intercept not included in auxiliary design in order to avoid linear dependency")
   }
 
-  teststat <- as.double(1 / 2 * t(term1) %*% Z %*% solve(mat_to_invert)
+  teststat <- as.double(1 / 2 * t(term1) %*% Z %*%
+                          solve(mat_to_invert)
                         %*% t(Z) %*% term1)
   if (statonly) return(teststat)
 

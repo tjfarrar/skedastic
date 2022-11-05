@@ -6,7 +6,7 @@
 #'    heteroskedasticity in a linear regression model. The procedure is more
 #'    clearly described in \insertCite{Godfrey06;textual}{skedastic}.
 #'
-#' The procedure runs as follows. (1) The observed
+#' @details The procedure runs as follows. (1) The observed
 #'    value of the test statistic \eqn{T_0} is computed using function with
 #'    name \code{hettest}. (2) A sample
 #'    \eqn{e_1^\star,e_2^\star,\ldots,e_n^\star} is drawn with replacement from
@@ -83,7 +83,7 @@ godfrey_orme <- function(mainlm, hettest, B = 1000L, alternative = c("greater",
 
   if (!is.na(seed)) set.seed(seed)
   estar <- replicate(B, sample(e, size = n, replace = TRUE), simplify = FALSE)
-  betahat <- solve(crossprod(X)) %*% t(X) %*% y
+  betahat <- Rfast::spdinv(crossprod(X)) %*% t(X) %*% y
   ystar <- lapply(estar, function(u) X %*% betahat + u)
 
   statgen <- vapply(1:B, function(b) do.call(what = hettest,

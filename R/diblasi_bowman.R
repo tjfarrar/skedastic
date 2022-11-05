@@ -4,7 +4,7 @@
 #'    \insertCite{Diblasi97;textual}{skedastic} for testing for heteroskedasticity
 #'    in a linear regression model.
 #'
-#' The test entails undertaking a transformation of the OLS residuals
+#' @details The test entails undertaking a transformation of the OLS residuals
 #'   \eqn{s_i=\sqrt{|e_i|}-E_0(\sqrt{|e_i|})}, where \eqn{E_0} denotes
 #'   expectation under the null hypothesis of homoskedasticity. The kernel
 #'   method of nonparametric regression is used to fit the relationship
@@ -19,7 +19,7 @@
 #'   function used for weights in nonparametric smoothing. If a double of
 #'   length 1 (the default), \code{H} is set to \eqn{h I_{p^\prime}} where
 #'   \eqn{h} is the scalar bandwidth value entered and \eqn{I_{p^\prime}}
-#'   is the \eqn{p^prime \times p^\prime} identity matrix (where
+#'   is the \eqn{p^\prime \times p^\prime} identity matrix (where
 #'   \eqn{p^\prime} is the number of columns in the \eqn{X} matrix, excluding
 #'   an intercept if present). If a double of length \eqn{p^\prime}, \code{H}
 #'   is set to \eqn{diag(h)} where \eqn{h} is the bandwidth vector entered.
@@ -50,10 +50,6 @@
 #' diblasi_bowman(mtcars_lm)
 #' \donttest{diblasi_bowman(mtcars_lm, ignorecov = FALSE)}
 #' diblasi_bowman(mtcars_lm, distmethod = "bootstrap")
-#'
-#' # Example discussed in Diblasi and Bowman (1997)
-#' malecats_lm <- lm(Hwt ~ Bwt, data = boot::catsM)
-#' diblasi_bowman(malecats_lm, H = (max(boot::catsM$Bwt) - min(boot::catsM$Bwt)) / 8)
 #'
 
 diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
@@ -103,16 +99,19 @@ diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
   Bmat <- (t(diag(n) - W)) %*% (diag(n) - W)
   Cmat <- diag(n) - matrix(data = 1 / n, nrow = n, ncol = n) - Bmat
   sigma_hat_sq <- sum(e ^ 2) / (n - p)
-  M <- diag(n) - X %*% solve(t(X) %*% X) %*% t(X)
+  M <- diag(n) - X %*% Rfast::spdinv(crossprod(X)) %*% t(X)
   E0 <- gamma(3 / 4) * (2 * sigma_hat_sq * diag(M)) ^ (1 / 4) / sqrt(pi)
   s <- sqrt(abs(e)) - E0
   teststat <- as.double((t(s) %*% Cmat %*% s) / (t(s) %*% Bmat %*% s))
   if (statonly) return(teststat)
 
-  if (distmethod == "moment.match") {
-    if (ignorecov) {
+  if (distmethod == "moment.match" &&
+      requireNamespace("expm", quietly = TRUE)) {
+    if (ignorecov || !requireNamespace("cubature", quietly = TRUE)) {
       Sigma <- diag(sqrt(2) / pi * (sqrt(pi) - gamma(3 / 4) ^ 2) *
         sqrt(sigma_hat_sq * diag(M)))
+      if (!ignorecov)
+        warning("Covariance ignored because Package \"cubature\" not installed")
     } else {
       # Sigma <- matrix(data = unlist(lapply(1:n, function(i) lapply(1:n,
       #   function(j) ifelse(j <= i, NA_real_, cubature::adaptIntegrate(bvtnormcub(x,
@@ -151,7 +150,11 @@ diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
     df <- trvec[2] ^ 3 / trvec[3] ^ 2
     pval <- stats::pchisq(teststatpval, df = df, lower.tail = FALSE)
 
-  } else if (distmethod == "bootstrap") {
+  } else {
+
+    if (distmethod != "bootstrap") {
+      warning("Moment matching can only be used if \"expm\" package is installed.\n Switching to bootstrap")
+    }
 
     Tstar <- rep(NA_real_, B)
     if (!is.na(seed)) set.seed(seed)
@@ -170,7 +173,7 @@ diblasi_bowman <- function(mainlm, distmethod = c("moment.match", "bootstrap"),
     pval <- sum(Tstar >= teststat) / B
     df <- NULL
 
-  } else stop("Invalid value of argument `method`")
+  }
 
   rval <- structure(list(statistic = teststat, p.value = pval, parameter = df,
                null.value = "Homoskedasticity", alternative = "greater"),

@@ -6,7 +6,7 @@
 #'    \insertCite{Mittelhammer00;textual}{skedastic} gives the
 #'    formulation of the test used here.
 #'
-#' Glejser's Test entails fitting an auxiliary regression model in
+#' @details Glejser's Test entails fitting an auxiliary regression model in
 #'    which the response variable is the absolute residual from the original
 #'    model and the design matrix \eqn{Z} consists of one or more exogenous
 #'    variables that are suspected of being related to the error variance.
@@ -17,7 +17,7 @@
 #'    of freedom. The test is right-tailed.
 #'
 #' @param sigmaest A character indicating which model residuals to use in the
-#'    \eqn{\hat{\sigma}^2} estimator in the denominator of the test statistic.
+#'    \eqn{\hat{\omega}} estimator in the denominator of the test statistic.
 #'    If \code{"main"} (the default), the OLS residuals from the original model
 #'    are used; this produces results identical to the Glejser Test in SHAZAM
 #'    software. If \code{"auxiliary"}, the OLS residuals from the auxiliary
