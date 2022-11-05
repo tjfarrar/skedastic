@@ -190,10 +190,7 @@ When obtained from ALVMs, bootstrap estimates of \eqn{\omega_i} that fall on
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
-myanlvm <- anlvm.fit(mtcars_lm, g = function(x) x ^ 2,
- varselect = "qgcv.linear")
-myalvm <- alvm.fit(mtcars_lm, model = "polynomial", polypen = "L1")
-ci.anlvm <- avm.ci(myanlvm)
+myalvm <- alvm.fit(mtcars_lm, model = "cluster")
 ci.alvm <- avm.ci(myalvm)
 }
 \references{
