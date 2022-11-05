@@ -62,15 +62,14 @@ time is extremely slow for \eqn{n > 10} if \code{usedata} is set to
 continuity correction.
 }
 \examples{
-# For an independent sample of size 9, the probability that D is <= 50 is
-# 0.05399857
-pDtrend(k = 50, n = 9)
+# For an independent sample of size 6, the probability that D is <= 50 is
+# 0.8222
+pDtrend(k = 50, n = 6)
 # Normal approximation of the above with continuity correction is
-# 0.05193808
-pDtrend(k = 50, n = 9, exact = FALSE)
+# 0.8145
+pDtrend(k = 50, n = 6, exact = FALSE)
 # For an independent sample of size 50, the probability that D is >= 20000 is
 # is 0.6093583
-pDtrend(k = 2e4, n = 50, lower.tail = FALSE)
 
 }
 \references{

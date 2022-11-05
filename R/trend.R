@@ -34,12 +34,12 @@
 #' @seealso \code{\link{horn}}
 #'
 #' @examples
-#' prob <- dDtrend(k = "all", n = 9)
+#' prob <- dDtrend(k = "all", n = 6)
 #' values <- as.integer(names(prob))
 #' plot(c(values[1], values[1]), c(0, prob[1]), type = "l",
 #'   axes = FALSE, xlab = expression(k), ylab = expression(Pr(D == k)),
-#'   xlim = c(0, 250), yaxs = "i", ylim = c(0, 1.05 * max(prob)))
-#'   axis(side = 1, at = seq(0, 250, 25), las = 2)
+#'   xlim = c(0, 70), yaxs = "i", ylim = c(0, 1.05 * max(prob)))
+#'   axis(side = 1, at = seq(0, 70, 10), las = 2)
 #' for (i in seq_along(values)) {
 #'  lines(c(values[i], values[i]), c(0, prob[i]))
 #' }
@@ -137,15 +137,14 @@ dDtrend <- function(k = "all", n, override = FALSE) {
 #' @seealso \code{\link{dDtrend}}, \code{\link{horn}}
 #'
 #' @examples
-#' # For an independent sample of size 9, the probability that D is <= 50 is
-#' # 0.05399857
-#' pDtrend(k = 50, n = 9)
+#' # For an independent sample of size 6, the probability that D is <= 50 is
+#' # 0.8222
+#' pDtrend(k = 50, n = 6)
 #' # Normal approximation of the above with continuity correction is
-#' # 0.05193808
-#' pDtrend(k = 50, n = 9, exact = FALSE)
+#' # 0.8145
+#' pDtrend(k = 50, n = 6, exact = FALSE)
 #' # For an independent sample of size 50, the probability that D is >= 20000 is
 #' # is 0.6093583
-#' pDtrend(k = 2e4, n = 50, lower.tail = FALSE)
 #'
 
 pDtrend <- function(k, n, lower.tail = TRUE, exact = (n <= 10), tiefreq = NA,

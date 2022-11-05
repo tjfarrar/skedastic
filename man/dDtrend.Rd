@@ -42,12 +42,12 @@ The function is used within \code{\link{horn}} in computing
   computed in the latter case.
 }
 \examples{
-prob <- dDtrend(k = "all", n = 9)
+prob <- dDtrend(k = "all", n = 6)
 values <- as.integer(names(prob))
 plot(c(values[1], values[1]), c(0, prob[1]), type = "l",
   axes = FALSE, xlab = expression(k), ylab = expression(Pr(D == k)),
-  xlim = c(0, 250), yaxs = "i", ylim = c(0, 1.05 * max(prob)))
-  axis(side = 1, at = seq(0, 250, 25), las = 2)
+  xlim = c(0, 70), yaxs = "i", ylim = c(0, 1.05 * max(prob)))
+  axis(side = 1, at = seq(0, 70, 10), las = 2)
 for (i in seq_along(values)) {
  lines(c(values[i], values[i]), c(0, prob[i]))
 }

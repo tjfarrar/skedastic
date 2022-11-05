@@ -290,7 +290,7 @@ The polynomial and thin-plate spline ALVMs have a penalty hyperparameter
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
-myalvm <- alvm.fit(mtcars_lm, model = "polynomial", polypen = "L1")
+myalvm <- alvm.fit(mtcars_lm, model = "cluster")
 
 }
 \references{

@@ -191,7 +191,8 @@ When obtained from ALVMs, bootstrap estimates of \eqn{\omega_i} that fall on
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 myalvm <- alvm.fit(mtcars_lm, model = "cluster")
-ci.alvm <- avm.ci(myalvm)
+# Brequired would of course not be so small in practice
+ci.alvm <- avm.ci(myalvm, Brequired = 5)
 }
 \references{
 {\insertAllCited{}}

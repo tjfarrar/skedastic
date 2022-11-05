@@ -32,10 +32,6 @@
 #' @examples
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' anscombe(mtcars_lm)
-#' anscombe(mtcars_lm, studentise = FALSE)
-#' # Same as first example
-#' mtcars_list <- list("y" = mtcars$mpg, "X" = cbind(1, mtcars$wt, mtcars$qsec, mtcars$am))
-#' anscombe(mtcars_list)
 #'
 
 anscombe <- function(mainlm, studentise = TRUE, statonly = FALSE) {

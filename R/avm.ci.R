@@ -145,7 +145,8 @@
 #' @examples
 #' mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
 #' myalvm <- alvm.fit(mtcars_lm, model = "cluster")
-#' ci.alvm <- avm.ci(myalvm)
+#' # Brequired would of course not be so small in practice
+#' ci.alvm <- avm.ci(myalvm, Brequired = 5)
 
 avm.ci <- function(object, bootobject = NULL,
                    bootavmobject = NULL, jackobject = NULL,
@@ -239,15 +240,14 @@ avm.ci <- function(object, bootobject = NULL,
     }, simplify = "array")
   }
 
-  if (is.null(jackobject)) {
-    jackobject <- jackavm(object = object,
-                          retune = retune,
-                          returnwhat = "all", ...)
-  }
-
   if (!jackknife_point) {
     newvar.est <- var.est
   } else {
+    if (is.null(jackobject)) {
+      jackobject <- jackavm(object = object,
+                            retune = retune,
+                            returnwhat = "all", ...)
+    }
     newvar.est <- jackpoint(jackobject = jackobject,
                             constol = object$constol, ...)
   }

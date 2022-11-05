@@ -82,7 +82,8 @@ The test assumes that heteroskedasticity, if present, would be
 }
 \examples{
 mtcars_lm <- lm(mpg ~ wt + qsec + am, data = mtcars)
-honda(mtcars_lm, deflator = "qsec")
+# In this example, only the test statistic is returned, to save time
+honda(mtcars_lm, deflator = "qsec", statonly = TRUE)
 
 }
 \references{
