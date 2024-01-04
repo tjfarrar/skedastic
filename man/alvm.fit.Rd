@@ -45,7 +45,7 @@ named \code{"e"}.}
 \code{"cluster"} for the clustering ALVM, \code{"spline"} for the
 thin-plate spline ALVM, \code{"linear"} for the linear ALVM,
 \code{"polynomial"} for the penalised polynomial ALVM, \code{"basic"} for
-the basic or na{\" i}ve ALVM, and \code{"homoskedastic"} for the
+the basic or naive ALVM, and \code{"homoskedastic"} for the
 homoskedastic error variance estimator, \eqn{e'e/(n-p)}.}
 
 \item{varselect}{Either a character indicating how variable selection should

@@ -48,7 +48,7 @@ by calling the non-exported function \code{jackavm}.}
 the approximate bootstrap confidence interval. The default, \code{"pct"},
 corresponds to the percentile interval. \code{"bca"} corresponds to the
 Bias-Corrected and accelerated (BCa) modification of the percentile
-interval. \code{"stdnorm"} corresponds to a na{\" i}ve standard normal
+interval. \code{"stdnorm"} corresponds to a naive standard normal
 interval with bootstrap standard error estimates.}
 
 \item{bootsampmethod}{A character specifying the method to use for
@@ -160,7 +160,7 @@ Uses bootstrap methods to compute approximate confidence intervals for
    (BCa) method as described in \insertCite{Efron93;textual}{skedastic},
    which is intended to improve on the percentile interval (although
    simulations have not found it to yield better coverage probabilities).
-   The third is the na{\" i}ve standard normal interval, which takes
+   The third is the naive standard normal interval, which takes
    \eqn{\hat{\omega}_i \pm z_{1-\alpha/2} \widehat{\mathrm{SE}}}, where
    \eqn{\widehat{\mathrm{SE}}} is the standard deviation of the \eqn{B}
    bootstrap estimates of \eqn{\omega_i}. By default, the expansion

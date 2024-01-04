@@ -1,14 +1,14 @@
 citHeader("To cite package in publications, please use:")
 
-citEntry(entry = "manual",
-    title = "skedastic: Heteroskedasticity Diagnostics for Linear Regression Models",
-    author = "Thomas J. Farrar",
-    institution = "University of the Western  Cape",
-    address = "Bellville, South Africa",
-    year = "2020",
-    note = "R Package Version 1.0.0",
+bibentry(bibtype = "Manual",
+    key = "Farrar2024",
+    title = "skedastic: Handling Heteroskedasticity in the Linear Regression Model",
+    author = c(person(given = c("Thomas", "J."), family = "Farrar", role = c("aut", "cre"), email = "tjfarrar@alumni.uwaterloo.ca"),
+    person(given = "University of the Western Cape", role = "cph")),
+    year = "2024",
+    note = "R Package Version 2.0.2",
     url = "https://github.com/tjfarrar/skedastic",
-    textVersion  = paste0("Farrar, Thomas J. (2020). ",
+    textVersion  = paste0("Farrar, Thomas J. (2024). ",
         "skedastic: Heteroskedasticity Diagnostics for Linear Regression Models. ",
-        "R Package version 1.0.0. ","University of the Western Cape. Bellville, South Africa. ", "https://github.com/tjfarrar/skedastic")
+        "R Package version 2.0.2. ","University of the Western Cape. Bellville, South Africa. ", "https://github.com/tjfarrar/skedastic")
 )

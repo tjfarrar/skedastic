@@ -64,7 +64,7 @@
 #'    \code{"cluster"} for the clustering ALVM, \code{"spline"} for the
 #'    thin-plate spline ALVM, \code{"linear"} for the linear ALVM,
 #'    \code{"polynomial"} for the penalised polynomial ALVM, \code{"basic"} for
-#'    the basic or na{\" i}ve ALVM, and \code{"homoskedastic"} for the
+#'    the basic or naive ALVM, and \code{"homoskedastic"} for the
 #'    homoskedastic error variance estimator, \eqn{e'e/(n-p)}.
 #' @param lambda Either a double of length 1 indicating the value of the
 #'    penalty hyperparameter \eqn{\lambda}, or a character specifying the
