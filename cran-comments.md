@@ -13,3 +13,8 @@ The only change in this version of the package is that the `CITATION` file has b
 * Linux Xenial (r-release, r-devel) checks produced ERRORs, but these were all related to the failture of packages such as `devtools` and `pkgdown` to load, and therefore not the result of problems with the `skedastic` package
 
 * All of the Windows checks returned one NOTE. This referred to `Status: 500`, `Message: Internal Server Error` for one of the URLs in the DESCRIPTION file. However, the URL was checked manually in a web browser and it works.
+
+## CRAN Package Check Page results
+
+* I removed the tex umlaut on the i in naive from the documentation, as it was resulting in some NOTEs
+* I added cmna, lmboot, sandwich packages to Suggests in DESCRIPTION since they are cited in the documentation of some functions (though never called by the package functions)

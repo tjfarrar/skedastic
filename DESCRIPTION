@@ -110,7 +110,10 @@ Suggests:
     gmp,
     Rmpfr,
     cubature,
-    mvtnorm
+    mvtnorm,
+    lmboot,
+    sandwich,
+    cmna
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
