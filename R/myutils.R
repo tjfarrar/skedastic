@@ -515,3 +515,10 @@ is.error <- function(expr) {
 silly <- function(x) {
   CompQuadForm::imhof(q = 2, lambda = 3)
 }
+
+almost.unique <- function(x,
+ tolerance = sqrt(.Machine$double.eps), ...) {
+  y <- round(x / tolerance, 0)
+  d <- duplicated(y, ...)
+  x[!d]
+}

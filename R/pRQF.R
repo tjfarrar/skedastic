@@ -97,7 +97,7 @@ pRQF <- function(r, A, B, Sigma = diag(nrow(A)),
   oner <- function(s) {
     PLambP <- Astar - s * Bstar
 
-    mylambda <- bazar::almost.unique(eigen(PLambP, only.values = TRUE)$values)
+    mylambda <- almost.unique(eigen(PLambP, only.values = TRUE)$values)
     if (any(abs(Im(mylambda)) > sqrt(.Machine$double.eps)))
       stop("Astar - r * Bstar has complex eigenvalue(s)")
     mylambda <- mylambda[(abs(Re(mylambda)) > .Machine$double.eps &

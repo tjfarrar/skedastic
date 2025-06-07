@@ -1,20 +1,16 @@
 ## Minor revision
 
-The only change in this version of the package is that the `CITATION` file has been updated, as I forgot to update it when a substantially modified package version was published in 2022.
+The only change in this version of the package is that the dependency on `bazar` package has been eliminated, since that package was archived on CRAN.
 
 ## Test environments
 
-* ubuntu xenial 16.04 (on travis-ci), r-release and r-devel
 * win-builder (in RStudio), r-oldrelease, r-release and r-devel
+* mac-builder (in RStudio), r-release
 
 ## R CMD check results
 
 * No ERRORs or WARNINGs from Windows (r-release, r-devel, r-oldrelease) checks
-* Linux Xenial (r-release, r-devel) checks produced ERRORs, but these were all related to the failture of packages such as `devtools` and `pkgdown` to load, and therefore not the result of problems with the `skedastic` package
-
-* All of the Windows checks returned one NOTE. This referred to `Status: 500`, `Message: Internal Server Error` for one of the URLs in the DESCRIPTION file. However, the URL was checked manually in a web browser and it works.
+* All of the Windows checks returned one NOTE. This referred to possibly misspelled words that are not misspelled, and to possibly invalid URLs that are in fact valid.
 
 ## CRAN Package Check Page results
 
-* I removed the tex umlaut on the i in naive from the documentation, as it was resulting in some NOTEs
-* I added cmna, lmboot, sandwich packages to Suggests in DESCRIPTION since they are cited in the documentation of some functions (though never called by the package functions)
